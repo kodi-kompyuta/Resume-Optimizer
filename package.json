@@ -1,0 +1,23 @@
+{
+  "name": "resume-optimizer",
+  "version": "1.0.0",
+  "description": "AI-powered resume optimization and cover letter generation tool",
+  "main": "landing.html",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "keywords": [
+    "resume",
+    "optimizer",
+    "ai",
+    "ats",
+    "job-search",
+    "cover-letter"
+  ],
+  "author": "Resume Optimizer Team",
+  "license": "MIT",
+  "dependencies": {
+    "resend": "^3.0.0"
+  }
+}
