@@ -188,10 +188,7 @@ function getWelcomeEmailHTML(email, signupDate) {
       <li><strong>Launch Notification:</strong> Be the first to know when we go live</li>
     </ol>
 
-    <div style="text-align: center; margin: 30px 0;">
-      <a href="https://resume-optimizer.vercel.app" class="cta-button">Visit Our Website</a>
-    </div>
-
+    
     <h2 style="color: #1e293b; margin-top: 30px;">🙋 Quick Question:</h2>
     <p>What's your biggest challenge with your current resume? Just hit reply and let us know! Your feedback helps us build exactly what you need.</p>
 
