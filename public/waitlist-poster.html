@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResumeAI - Join the Waitlist</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.6;
+            color: #1f2937;
+            overflow-x: hidden;
+        }
+
+        .poster-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Header Section */
+        .header {
+            text-align: center;
+            padding: 80px 40px 60px;
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -5%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .main-headline {
+            font-size: 64px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 20px;
+            line-height: 1.2;
+            position: relative;
+            z-index: 1;
+        }
+
+        .subheadline {
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 400;
+            position: relative;
+            z-index: 1;
+        }
+
+        .divider {
+            display: inline-block;
+            margin: 0 12px;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Stats Section */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            padding: 60px 40px;
+            background: white;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .stat-number {
+            font-size: 56px;
+            font-weight: 800;
+            color: #2563eb;
+            margin-bottom: 8px;
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 18px;
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 80px 40px;
+            background: linear-gradient(180deg, #ffffff 0%, #f3f4f6 100%);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 32px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 40px 32px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            font-size: 32px;
+        }
+
+        .feature-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 16px;
+        }
+
+        .feature-list {
+            list-style: none;
+            color: #6b7280;
+            font-size: 16px;
+        }
+
+        .feature-list li {
+            padding: 8px 0;
+            padding-left: 24px;
+            position: relative;
+        }
+
+        .feature-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: 700;
+        }
+
+        /* Promo Banner */
+        .promo-banner {
+            background: #10b981;
+            padding: 24px 40px;
+            text-align: center;
+        }
+
+        .promo-text {
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            letter-spacing: 0.5px;
+        }
+
+        .promo-emoji {
+            font-size: 32px;
+            margin-right: 12px;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: #1e40af;
+            padding: 80px 40px;
+            text-align: center;
+        }
+
+        .cta-title {
+            font-size: 40px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 16px;
+        }
+
+        .cta-subtitle {
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 40px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: white;
+            color: #1e40af;
+            font-size: 20px;
+            font-weight: 700;
+            padding: 20px 60px;
+            border-radius: 12px;
+            text-decoration: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .cta-note {
+            margin-top: 24px;
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Footer */
+        .footer {
+            background: #1e40af;
+            padding: 32px 40px;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-text {
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .footer-link {
+            color: #60a5fa;
+            text-decoration: none;
+            margin-left: 8px;
+        }
+
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 968px) {
+            .main-headline {
+                font-size: 48px;
+            }
+
+            .subheadline {
+                font-size: 20px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-number {
+                font-size: 48px;
+            }
+
+            .divider {
+                display: none;
+            }
+
+            .subheadline br {
+                display: none;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .header {
+                padding: 60px 24px 40px;
+            }
+
+            .main-headline {
+                font-size: 36px;
+            }
+
+            .subheadline {
+                font-size: 18px;
+            }
+
+            .stats {
+                padding: 40px 24px;
+            }
+
+            .features {
+                padding: 60px 24px;
+            }
+
+            .cta-section {
+                padding: 60px 24px;
+            }
+
+            .cta-section > div {
+                grid-template-columns: 1fr !important;
+                gap: 40px !important;
+            }
+
+            .cta-section > div > div {
+                text-align: center !important;
+            }
+
+            .cta-title {
+                font-size: 32px;
+                text-align: center !important;
+            }
+
+            .cta-subtitle {
+                text-align: center !important;
+            }
+
+            .cta-note {
+                text-align: center !important;
+            }
+
+            .cta-button {
+                font-size: 18px;
+                padding: 16px 40px;
+            }
+
+            .promo-text {
+                font-size: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="poster-container">
+        <!-- Header Section -->
+        <div class="header">
+            <div class="badge">🎉 50% OFF EARLY ACCESS • LIMITED SPOTS</div>
+            <h1 class="main-headline">
+                Land Your Dream Job<br>
+                with AI-Optimized Resumes
+            </h1>
+            <p class="subheadline">
+                Beat ATS Systems <span class="divider">•</span>
+                Stand Out to Recruiters <span class="divider">•</span>
+                Get More Interviews
+            </p>
+        </div>
+
+        <!-- Stats Section -->
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number">10,000+</div>
+                <div class="stat-label">Job Seekers<br>Helped</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">94%</div>
+                <div class="stat-label">ATS Pass<br>Rate</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">3x</div>
+                <div class="stat-label">More<br>Interviews</div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="features">
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3 class="feature-title">AI-Powered Analysis</h3>
+                    <ul class="feature-list">
+                        <li>Real-time ATS scoring</li>
+                        <li>Instant improvement suggestions</li>
+                        <li>Industry-specific optimization</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">✍️</div>
+                    <h3 class="feature-title">Smart Rewrites</h3>
+                    <ul class="feature-list">
+                        <li>Transform weak bullets into achievements</li>
+                        <li>AI-generated cover letters</li>
+                        <li>LinkedIn profile sync</li>
+                    </ul>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">Job Matching</h3>
+                    <ul class="feature-list">
+                        <li>Match resume to job descriptions</li>
+                        <li>Identify missing keywords</li>
+                        <li>Tailored recommendations</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Promo Banner -->
+        <div class="promo-banner">
+            <p class="promo-text">
+                <span class="promo-emoji">🎉</span>
+                EARLY ACCESS: 50% OFF • LIMITED SPOTS AVAILABLE
+            </p>
+        </div>
+
+        <!-- CTA Section -->
+        <div class="cta-section">
+            <div style="display: grid; grid-template-columns: 1fr auto; gap: 60px; max-width: 900px; margin: 0 auto; align-items: center;">
+                <div style="text-align: left;">
+                    <h2 class="cta-title" style="text-align: left;">Join the Waitlist Today</h2>
+                    <p class="cta-subtitle" style="text-align: left;">Get exclusive job search tips & updates</p>
+                    <a href="https://resume-optimizer-theta.vercel.app/" class="cta-button">
+                        JOIN THE WAITLIST →
+                    </a>
+                    <p class="cta-note" style="text-align: left;">✨ First 100 signups get lifetime 50% discount</p>
+                </div>
+                <div style="text-align: center;">
+                    <div style="background: white; padding: 20px; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);">
+                        <p style="color: #1f2937; font-weight: 700; font-size: 16px; margin-bottom: 12px;">Scan to Join</p>
+                        <img
+                            src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://resume-optimizer-theta.vercel.app/"
+                            alt="QR Code"
+                            style="width: 200px; height: 200px; display: block;"
+                        />
+                        <p style="color: #6b7280; font-size: 12px; margin-top: 12px;">Instant access from<br>your mobile device</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p class="footer-text">
+                ResumeAI
+                <a href="https://resume-optimizer-theta.vercel.app/" class="footer-link">
+                    resume-optimizer-theta.vercel.app
+                </a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

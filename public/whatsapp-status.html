@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResumeAI - WhatsApp Status</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 0;
+        }
+
+        /* WhatsApp Status Container - 1080x1920px (9:16) */
+        .status-container {
+            width: 1080px;
+            height: 1920px;
+            background: linear-gradient(135deg, #1e40af 0%, #2563eb 50%, #7c3aed 100%);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Animated Background Elements */
+        .bg-gradient-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(124, 58, 237, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(37, 99, 235, 0.3) 0%, transparent 50%);
+            animation: gradientShift 8s ease-in-out infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Decorative circles */
+        .circle-1 {
+            position: absolute;
+            top: -200px;
+            right: -200px;
+            width: 800px;
+            height: 800px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        }
+
+        .circle-2 {
+            position: absolute;
+            bottom: -150px;
+            left: -150px;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+        }
+
+        /* Content Container */
+        .content {
+            position: relative;
+            z-index: 2;
+            padding: 80px 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+        }
+
+        /* Top Badge */
+        .top-badge {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            padding: 16px 32px;
+            border-radius: 60px;
+            font-size: 28px;
+            font-weight: 800;
+            text-align: center;
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+            animation: pulse 2s ease-in-out infinite;
+            margin-bottom: 40px;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 12px 32px rgba(16, 185, 129, 0.6);
+            }
+        }
+
+        /* Main Section */
+        .main-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .emoji {
+            font-size: 120px;
+            text-align: center;
+            margin-bottom: 40px;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
+        }
+
+        .main-headline {
+            font-size: 72px;
+            font-weight: 900;
+            color: white;
+            text-align: center;
+            line-height: 1.1;
+            margin-bottom: 32px;
+            text-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: block;
+        }
+
+        .subheadline {
+            font-size: 36px;
+            color: rgba(255, 255, 255, 0.95);
+            text-align: center;
+            margin-bottom: 60px;
+            line-height: 1.4;
+            font-weight: 600;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 60px;
+        }
+
+        .stat-box {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            padding: 32px 20px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 64px;
+            font-weight: 900;
+            color: white;
+            line-height: 1;
+            margin-bottom: 12px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .stat-label {
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        /* QR Code Section */
+        .qr-section {
+            background: white;
+            border-radius: 32px;
+            padding: 48px 40px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-top: 60px;
+        }
+
+        .qr-title {
+            font-size: 40px;
+            font-weight: 800;
+            color: #1e40af;
+            margin-bottom: 24px;
+        }
+
+        .qr-code-wrapper {
+            background: white;
+            padding: 24px;
+            border-radius: 24px;
+            display: inline-block;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+
+        .qr-code {
+            width: 320px;
+            height: 320px;
+            display: block;
+        }
+
+        .qr-instruction {
+            font-size: 28px;
+            color: #1f2937;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .qr-arrow {
+            font-size: 48px;
+            margin: 16px 0;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* CTA Box */
+        .cta-box {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            border-radius: 24px;
+            padding: 32px;
+            margin-top: 24px;
+            box-shadow: 0 8px 24px rgba(251, 191, 36, 0.3);
+        }
+
+        .cta-text {
+            font-size: 32px;
+            font-weight: 800;
+            color: #1f2937;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .footer-text {
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 600;
+        }
+
+        .footer-url {
+            font-size: 28px;
+            color: white;
+            font-weight: 700;
+            margin-top: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Download Instructions */
+        .instructions {
+            max-width: 1080px;
+            margin: 40px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .instructions h2 {
+            font-size: 32px;
+            color: #1f2937;
+            margin-bottom: 24px;
+        }
+
+        .instructions p {
+            font-size: 18px;
+            color: #6b7280;
+            margin-bottom: 16px;
+            line-height: 1.6;
+        }
+
+        .instructions ol {
+            margin-left: 24px;
+            color: #6b7280;
+            font-size: 18px;
+            line-height: 1.8;
+        }
+
+        .instructions code {
+            background: #f3f4f6;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #2563eb;
+            font-size: 16px;
+        }
+
+        .download-btn {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            padding: 16px 40px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 18px;
+            margin-top: 24px;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .download-btn:hover {
+            background: #1e40af;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(37, 99, 235, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div style="background: #000;">
+        <!-- WhatsApp Status -->
+        <div class="status-container" id="whatsappStatus">
+            <div class="bg-gradient-overlay"></div>
+            <div class="circle-1"></div>
+            <div class="circle-2"></div>
+
+            <div class="content">
+                <!-- Top Badge -->
+                <div style="text-align: center;">
+                    <div class="top-badge">
+                        🎉 50% OFF EARLY ACCESS
+                    </div>
+                </div>
+
+                <!-- Main Section -->
+                <div class="main-section">
+                    <div class="emoji">🚀</div>
+
+                    <h1 class="main-headline">
+                        Stop Getting<br>
+                        <span class="gradient-text">REJECTED</span>
+                    </h1>
+
+                    <p class="subheadline">
+                        Your resume isn't bad.<br>
+                        ATS just can't read it.
+                    </p>
+
+                    <!-- Stats -->
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <div class="stat-number">94%</div>
+                            <div class="stat-label">ATS<br>Pass Rate</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-number">3x</div>
+                            <div class="stat-label">More<br>Interviews</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-number">10K+</div>
+                            <div class="stat-label">Users<br>Hired</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QR Section -->
+                <div class="qr-section">
+                    <h2 class="qr-title">Join the Waitlist</h2>
+
+                    <div class="qr-arrow">👇</div>
+
+                    <div class="qr-code-wrapper">
+                        <img
+                            src="https://api.qrserver.com/v1/create-qr-code/?size=320x320&data=https://resume-optimizer-theta.vercel.app/"
+                            alt="QR Code"
+                            class="qr-code"
+                        />
+                    </div>
+
+                    <p class="qr-instruction">
+                        Scan to Get Started
+                    </p>
+
+                    <div class="cta-box">
+                        <div class="cta-text">
+                            First 100 Get<br>
+                            Lifetime 50% Discount! 🎁
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="footer">
+                    <div class="footer-text">Powered by AI</div>
+                    <div class="footer-url">ResumeAI.app</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="instructions">
+            <h2>📱 How to Download for WhatsApp Status</h2>
+
+            <p><strong>Method 1: Screenshot Tool (Recommended)</strong></p>
+            <ol>
+                <li>Right-click on the design above → "Inspect" (or press <code>F12</code>)</li>
+                <li>Click the device toolbar icon (📱) to enter mobile view</li>
+                <li>Set dimensions to <code>1080 x 1920</code> pixels</li>
+                <li>Take a screenshot using your OS screenshot tool:
+                    <ul style="margin-top: 8px;">
+                        <li><strong>Windows:</strong> Win + Shift + S (Snipping Tool)</li>
+                        <li><strong>Mac:</strong> Cmd + Shift + 4</li>
+                    </ul>
+                </li>
+                <li>Save the image and upload to WhatsApp Status</li>
+            </ol>
+
+            <p style="margin-top: 24px;"><strong>Method 2: Browser Extension</strong></p>
+            <ol>
+                <li>Install "Full Page Screen Capture" or "GoFullPage" extension</li>
+                <li>Set viewport to 1080 x 1920</li>
+                <li>Click extension icon to capture</li>
+                <li>Download and upload to WhatsApp</li>
+            </ol>
+
+            <p style="margin-top: 24px;"><strong>Method 3: Online Tool</strong></p>
+            <ol>
+                <li>Deploy this file to a web server</li>
+                <li>Use <a href="https://www.screenshotmachine.com/" target="_blank">Screenshot Machine</a> or similar</li>
+                <li>Enter URL and set size to 1080x1920</li>
+                <li>Download generated image</li>
+            </ol>
+
+            <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 16px; margin-top: 24px; border-radius: 8px;">
+                <p style="color: #92400e; margin: 0;"><strong>💡 Pro Tip:</strong> For best results, use a screenshot at exactly 1080x1920 pixels. WhatsApp will automatically optimize it for status viewing.</p>
+            </div>
+
+            <div style="margin-top: 32px; padding-top: 32px; border-top: 2px solid #e5e7eb;">
+                <h3 style="font-size: 24px; color: #1f2937; margin-bottom: 16px;">WhatsApp Status Specs</h3>
+                <ul style="color: #6b7280; font-size: 18px; line-height: 1.8;">
+                    <li><strong>Dimensions:</strong> 1080 x 1920 pixels (9:16 aspect ratio)</li>
+                    <li><strong>Format:</strong> JPG or PNG (max 16MB)</li>
+                    <li><strong>Duration:</strong> Image status lasts 24 hours</li>
+                    <li><strong>Best practice:</strong> Include QR code for easy scanning</li>
+                </ul>
+            </div>
+
+            <button onclick="copyToClipboard()" class="download-btn">
+                📋 Copy Landing Page URL
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function copyToClipboard() {
+            const url = 'https://resume-optimizer-theta.vercel.app/';
+            navigator.clipboard.writeText(url).then(() => {
+                alert('✅ URL copied to clipboard!\n\n' + url);
+            }).catch(err => {
+                alert('URL: ' + url + '\n\nPlease copy manually.');
+            });
+        }
+    </script>
+</body>
+</html>

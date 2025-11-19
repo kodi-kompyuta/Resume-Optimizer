@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResumeAI - Facebook Ad</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Facebook Ad Container - Optimized 1200x628px */
+        .fb-ad-container {
+            width: 1200px;
+            height: 628px;
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Decorative Background Elements */
+        .bg-circle-1 {
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .bg-circle-2 {
+            position: absolute;
+            bottom: -80px;
+            left: -80px;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        /* Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            height: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Left Content */
+        .left-content {
+            padding: 60px 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            width: fit-content;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .headline {
+            font-size: 52px;
+            font-weight: 800;
+            color: white;
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+
+        .subheadline {
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 32px;
+            line-height: 1.5;
+        }
+
+        /* Stats */
+        .stats-compact {
+            display: flex;
+            gap: 40px;
+            margin-bottom: 32px;
+        }
+
+        .stat-item {
+            text-align: left;
+        }
+
+        .stat-number {
+            font-size: 40px;
+            font-weight: 800;
+            color: white;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 600;
+        }
+
+        /* Features List */
+        .features-compact {
+            list-style: none;
+            margin-bottom: 32px;
+        }
+
+        .features-compact li {
+            color: white;
+            font-size: 16px;
+            padding: 8px 0;
+            padding-left: 28px;
+            position: relative;
+            font-weight: 500;
+        }
+
+        .features-compact li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        /* CTA Button */
+        .cta-button {
+            display: inline-block;
+            background: white;
+            color: #1e40af;
+            font-size: 18px;
+            font-weight: 700;
+            padding: 16px 40px;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            width: fit-content;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Right Panel - QR Code Section */
+        .qr-panel {
+            background: white;
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-left: 3px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .qr-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .qr-code-container {
+            background: white;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 16px;
+        }
+
+        .qr-code {
+            width: 180px;
+            height: 180px;
+            display: block;
+        }
+
+        .qr-instruction {
+            font-size: 14px;
+            color: #6b7280;
+            text-align: center;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .qr-url {
+            font-size: 12px;
+            color: #2563eb;
+            font-weight: 600;
+            word-break: break-all;
+            text-align: center;
+        }
+
+        .discount-badge {
+            background: #fef3c7;
+            color: #92400e;
+            font-size: 14px;
+            font-weight: 700;
+            padding: 8px 16px;
+            border-radius: 6px;
+            margin-top: 12px;
+            text-align: center;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 1200px) {
+            .fb-ad-container {
+                width: 100%;
+                height: auto;
+                min-height: 400px;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .qr-panel {
+                border-left: none;
+                border-top: 3px solid rgba(255, 255, 255, 0.2);
+            }
+
+            .headline {
+                font-size: 36px;
+            }
+
+            .stats-compact {
+                flex-wrap: wrap;
+                gap: 20px;
+            }
+        }
+
+        /* Download Instructions */
+        .download-instructions {
+            max-width: 1200px;
+            margin: 40px auto 0;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .download-instructions h2 {
+            font-size: 24px;
+            color: #1f2937;
+            margin-bottom: 16px;
+        }
+
+        .download-instructions p {
+            color: #6b7280;
+            margin-bottom: 12px;
+            line-height: 1.6;
+        }
+
+        .download-instructions code {
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #2563eb;
+        }
+
+        .download-button {
+            display: inline-block;
+            background: #2563eb;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 16px;
+            transition: background 0.3s ease;
+        }
+
+        .download-button:hover {
+            background: #1e40af;
+        }
+    </style>
+</head>
+<body>
+    <div style="max-width: 1240px; margin: 0 auto;">
+        <!-- Facebook Ad -->
+        <div class="fb-ad-container" id="fbAd">
+            <div class="bg-circle-1"></div>
+            <div class="bg-circle-2"></div>
+
+            <div class="content-grid">
+                <!-- Left Content -->
+                <div class="left-content">
+                    <div class="badge">🎉 50% OFF EARLY ACCESS</div>
+
+                    <h1 class="headline">
+                        Stop Getting Rejected.<br>
+                        Start Getting Hired.
+                    </h1>
+
+                    <p class="subheadline">
+                        AI-powered resume optimization that beats ATS systems and lands you more interviews.
+                    </p>
+
+                    <!-- Compact Stats -->
+                    <div class="stats-compact">
+                        <div class="stat-item">
+                            <div class="stat-number">94%</div>
+                            <div class="stat-label">ATS Pass Rate</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">3x</div>
+                            <div class="stat-label">More Interviews</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number">10K+</div>
+                            <div class="stat-label">Users Hired</div>
+                        </div>
+                    </div>
+
+                    <!-- Key Features -->
+                    <ul class="features-compact">
+                        <li>Real-time ATS scoring & optimization</li>
+                        <li>AI-powered resume rewrites</li>
+                        <li>Job-specific keyword matching</li>
+                    </ul>
+
+                    <a href="https://resume-optimizer-theta.vercel.app/" class="cta-button">
+                        Join Waitlist - 50% Off →
+                    </a>
+                </div>
+
+                <!-- Right Panel - QR Code -->
+                <div class="qr-panel">
+                    <h3 class="qr-title">Scan to Join</h3>
+                    <div class="qr-code-container">
+                        <img
+                            src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://resume-optimizer-theta.vercel.app/"
+                            alt="QR Code to Resume Optimizer"
+                            class="qr-code"
+                        />
+                    </div>
+                    <p class="qr-instruction">
+                        Scan with your phone<br>to get early access
+                    </p>
+                    <div class="qr-url">resume-optimizer-theta.vercel.app</div>
+                    <div class="discount-badge">
+                        First 100: Lifetime 50% Off
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Download Instructions -->
+        <div class="download-instructions">
+            <h2>📥 How to Download This Facebook Ad</h2>
+            <p><strong>Method 1: Screenshot (Recommended for Facebook)</strong></p>
+            <ul style="margin-left: 20px; color: #6b7280;">
+                <li>Right-click on the ad above → "Inspect" (or press F12)</li>
+                <li>Click the device toolbar icon (mobile view)</li>
+                <li>Set dimensions to <code>1200 x 628</code></li>
+                <li>Take screenshot or use browser's capture tool</li>
+            </ul>
+
+            <p style="margin-top: 20px;"><strong>Method 2: Print to PDF</strong></p>
+            <ul style="margin-left: 20px; color: #6b7280;">
+                <li>Press <code>Ctrl+P</code> (Windows) or <code>Cmd+P</code> (Mac)</li>
+                <li>Select "Save as PDF"</li>
+                <li>Set paper size to "Custom" → 1200px x 628px</li>
+                <li>Remove headers and footers</li>
+            </ul>
+
+            <p style="margin-top: 20px;"><strong>Facebook Ad Specs:</strong></p>
+            <ul style="margin-left: 20px; color: #6b7280;">
+                <li>Recommended size: 1200 x 628 pixels</li>
+                <li>Aspect ratio: 1.91:1</li>
+                <li>File type: JPG or PNG</li>
+                <li>Text should be less than 20% of image</li>
+            </ul>
+
+            <button onclick="downloadAsImage()" class="download-button">
+                Download as PNG (1200x628)
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Function to download as image
+        async function downloadAsImage() {
+            // This is a placeholder - you'll need html2canvas library for actual implementation
+            alert('To download:\n1. Right-click the ad\n2. Select "Save image as..."\n\nOr use a screenshot tool to capture at 1200x628px');
+        }
+    </script>
+</body>
+</html>
