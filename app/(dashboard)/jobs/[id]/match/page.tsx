@@ -34,11 +34,10 @@ export default async function JobMatchPage({ params }: { params: Promise<{ id: s
     )
   }
 
-  // Fetch user's resumes
+  // Fetch ALL user's resumes (job matching doesn't require analysis to be complete)
   const { data: resumes } = await supabase
     .from('resumes')
     .select('id, original_filename, created_at, ats_score, status, version_name')
-    .eq('status', 'completed')
     .order('created_at', { ascending: false })
 
   // Fetch existing matches for this job

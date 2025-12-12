@@ -72,13 +72,16 @@ export async function POST(request: NextRequest) {
     }
 
     // Perform AI matching analysis
+    console.log(`[Match API] Starting AI match analysis for resume ${resume_id} and job ${job_description_id}...`)
     const matchResult = await matchResumeToJob({
       resumeText: resume.resume_text,
       jobDescription: job.job_description,
       jobTitle: job.job_title
     })
+    console.log(`[Match API] Match analysis completed, match_score: ${matchResult.match_analysis.match_score}`)
 
     // Create match record
+    console.log(`[Match API] Saving match results to database...`)
     const { data: match, error: matchError } = await supabase
       .from('resume_job_matches')
       .insert({
@@ -96,12 +99,14 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (matchError) {
-      console.error('Match creation error:', matchError)
+      console.error('[Match API] Match creation error:', matchError)
       return NextResponse.json(
         { error: 'Failed to save match results' },
         { status: 500 }
       )
     }
+
+    console.log(`[Match API] Match saved successfully with score: ${match.match_score}`)
 
     // Track usage
     await supabase

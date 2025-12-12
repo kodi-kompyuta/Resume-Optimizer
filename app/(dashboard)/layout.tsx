@@ -1,12 +1,10 @@
-import { redirect } from 'next/navigation'
-
 import { createClient } from '@/lib/supabase/server'
 
 import { logout } from '@/lib/actions/auth'
 
 import Link from 'next/link'
 
- 
+
 
 export default async function DashboardLayout({
 
@@ -21,14 +19,6 @@ export default async function DashboardLayout({
   const supabase = await createClient()
 
   const { data: { user } } = await supabase.auth.getUser()
-
- 
-
-  if (!user) {
-
-    redirect('/login')
-
-  }
 
  
 
@@ -106,27 +96,49 @@ export default async function DashboardLayout({
 
             <div className="flex items-center gap-2 sm:gap-4">
 
-              <div className="text-xs sm:text-sm text-gray-700 hidden sm:block">
+              {user ? (
 
-                {user.email}
+                <>
 
-              </div>
+                  <div className="text-xs sm:text-sm text-gray-700 hidden sm:block">
 
-              <form action={logout}>
+                    {user.email}
 
-                <button
+                  </div>
 
-                  type="submit"
+                  <form action={logout}>
 
-                  className="text-xs sm:text-sm text-gray-600 hover:text-gray-900 font-medium"
+                    <button
+
+                      type="submit"
+
+                      className="text-xs sm:text-sm text-gray-600 hover:text-gray-900 font-medium"
+
+                    >
+
+                      Logout
+
+                    </button>
+
+                  </form>
+
+                </>
+
+              ) : (
+
+                <Link
+
+                  href="/login"
+
+                  className="text-xs sm:text-sm px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition"
 
                 >
 
-                  Logout
+                  Sign In
 
-                </button>
+                </Link>
 
-              </form>
+              )}
 
             </div>
 

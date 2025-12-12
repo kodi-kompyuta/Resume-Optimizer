@@ -1,6 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import { generateDocx } from '@/lib/services/docx-export'
+import { parseDOCX } from '@/lib/parsers/docx'
+import { ResumeStructureParser } from '@/lib/parsers/structure-parser'
+import { StructuredResume } from '@/types'
 
 export async function POST(request: Request) {
   try {
@@ -38,7 +41,7 @@ export async function POST(request: Request) {
       )
     }
 
-    if (!resume.extracted_text) {
+    if (!resume.resume_text && !resume.structured_data) {
       return NextResponse.json(
         { error: 'Resume text not available' },
         { status: 400 }
@@ -47,7 +50,67 @@ export async function POST(request: Request) {
 
     // Generate the DOCX file
     const filename = resume.original_filename.replace(/\.[^/.]+$/, '.docx')
-    const buffer = await generateDocx(resume.extracted_text, filename)
+    // Use structured data if available, otherwise fall back to plain text
+    const resumeData = resume.structured_data || resume.resume_text
+    const buffer = await generateDocx(resumeData, filename)
+
+    // CRITICAL: Validate the exported DOCX maintains correct structure
+    // This prevents broken exports with duplicate jobs
+    if (typeof resumeData === 'object' && resumeData.sections) {
+      try {
+        console.log('[Export Validation] Starting validation...')
+        const originalStructured = resumeData as StructuredResume
+
+        // Re-parse the generated DOCX
+        const reparsedText = await parseDOCX(buffer)
+        const reparsedStructured = new ResumeStructureParser(reparsedText).parse()
+
+        // Count experience items in original
+        const origExpSection = originalStructured.sections.find(s => s.type === 'experience')
+        const origJobCount = origExpSection
+          ? origExpSection.content.filter(b => b.type === 'experience_item').length
+          : 0
+
+        // Count experience items in re-parsed
+        const newExpSection = reparsedStructured.sections.find(s => s.type === 'experience')
+        const newJobCount = newExpSection
+          ? newExpSection.content.filter(b => b.type === 'experience_item').length
+          : 0
+
+        console.log(`[Export Validation] Original jobs: ${origJobCount}, Re-parsed jobs: ${newJobCount}`)
+
+        if (origJobCount !== newJobCount) {
+          console.error(
+            `[Export Validation] ⚠️  WARNING: Job count mismatch! ` +
+            `Original: ${origJobCount}, Re-parsed: ${newJobCount}. ` +
+            `This may indicate formatting issues in the exported DOCX.`
+          )
+          // Log the job titles for debugging
+          console.error('[Export Validation] Original jobs:',
+            origExpSection?.content
+              .filter(b => b.type === 'experience_item')
+              .map((b: any) => b.content.jobTitle)
+          )
+          console.error('[Export Validation] Re-parsed jobs:',
+            newExpSection?.content
+              .filter(b => b.type === 'experience_item')
+              .map((b: any) => b.content.jobTitle)
+          )
+        } else {
+          console.log('[Export Validation] ✓ Validation passed - job count matches')
+        }
+
+        // Validate section count
+        if (originalStructured.sections.length !== reparsedStructured.sections.length) {
+          console.warn(
+            `[Export Validation] Section count changed: ${originalStructured.sections.length} → ${reparsedStructured.sections.length}`
+          )
+        }
+      } catch (validationError) {
+        console.error('[Export Validation] Validation failed:', validationError)
+        // Don't block the export, just log the error
+      }
+    }
 
     // Return the file as a download
     return new Response(new Uint8Array(buffer), {

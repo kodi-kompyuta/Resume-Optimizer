@@ -9,6 +9,7 @@ import { parseDOCX } from '@/lib/parsers/docx'
 import { parseText } from '@/lib/parsers/text'
 
 import { analyzeResume } from '@/lib/openai/analyzer'
+import { parseResumeStructure } from '@/lib/parsers/structure-parser'
 
  
 
@@ -16,27 +17,13 @@ export async function POST(request: NextRequest) {
 
   try {
 
-    // Get authenticated user
+    // Get user if authenticated (optional)
 
     const supabase = await createClient()
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const { data: { user } } = await supabase.auth.getUser()
 
- 
 
-    if (authError || !user) {
-
-      return NextResponse.json(
-
-        { error: 'Unauthorized' },
-
-        { status: 401 }
-
-      )
-
-    }
-
- 
 
     // Get the uploaded file
 
@@ -180,69 +167,125 @@ export async function POST(request: NextRequest) {
 
     const wordCount = resumeText.trim().split(/\s+/).length
 
- 
 
-    // Create resume record in database
 
-    const { data: resume, error: dbError } = await supabase
+    // If user is authenticated, save to database
 
-      .from('resumes')
+    if (user) {
 
-      .insert({
+      // Create resume record in database
 
-        user_id: user.id,
+      const { data: resume, error: dbError } = await supabase
 
-        original_filename: file.name,
+        .from('resumes')
 
-        resume_text: resumeText,
+        .insert({
 
-        word_count: wordCount,
+          user_id: user.id,
 
-        status: 'processing'
+          original_filename: file.name,
+
+          resume_text: resumeText,
+
+          word_count: wordCount,
+
+          status: 'processing'
+
+        })
+
+        .select()
+
+        .single()
+
+
+
+      if (dbError) {
+
+        console.error('Database error:', dbError)
+
+        return NextResponse.json(
+
+          { error: 'Failed to save resume' },
+
+          { status: 500 }
+
+        )
+
+      }
+
+
+
+      // Start AI analysis in background (don't wait for it)
+
+      analyzeResumeInBackground(resume.id, resumeText, user.id).catch(err => {
+        console.error('Background analysis promise rejection:', err)
+      })
+
+
+
+      // Return resume ID immediately
+
+      return NextResponse.json({
+
+        resumeId: resume.id,
+
+        status: 'processing',
+
+        message: 'Resume uploaded successfully. Analysis in progress...'
 
       })
 
-      .select()
+    } else {
 
-      .single()
+      // For unauthenticated users, perform analysis directly without saving
 
- 
+      try {
 
-    if (dbError) {
+        const structuredData = parseResumeStructure(resumeText)
 
-      console.error('Database error:', dbError)
+        const analysisData = await analyzeResume(resumeText)
 
-      return NextResponse.json(
 
-        { error: 'Failed to save resume' },
 
-        { status: 500 }
+        // Generate a temporary ID for the session
 
-      )
+        const tempId = `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+
+
+
+        return NextResponse.json({
+
+          resumeId: tempId,
+
+          status: 'completed',
+
+          message: 'Resume analyzed successfully',
+
+          analysis: analysisData,
+
+          structured: structuredData,
+
+          resumeText: resumeText,
+
+          isTemporary: true
+
+        })
+
+      } catch (analysisError) {
+
+        console.error('Analysis error:', analysisError)
+
+        return NextResponse.json(
+
+          { error: 'Failed to analyze resume' },
+
+          { status: 500 }
+
+        )
+
+      }
 
     }
-
- 
-
-    // Start AI analysis in background (don't wait for it)
-
-    analyzeResumeInBackground(resume.id, resumeText, user.id).catch(err => {
-      console.error('Background analysis promise rejection:', err)
-    })
-
- 
-
-    // Return resume ID immediately
-
-    return NextResponse.json({
-
-      resumeId: resume.id,
-
-      status: 'processing',
-
-      message: 'Resume uploaded successfully. Analysis in progress...'
-
-    })
 
  
 
@@ -274,15 +317,25 @@ async function analyzeResumeInBackground(resumeId: string, resumeText: string, u
 
  
 
+    // Parse structure
+
+    const structuredData = parseResumeStructure(resumeText)
+
+
+
     // Perform AI analysis
+
+    console.log(`[Upload] Starting AI analysis for resume ${resumeId}...`)
 
     const analysisData = await analyzeResume(resumeText)
 
- 
+    console.log(`[Upload] Analysis completed for resume ${resumeId}, ats_score: ${analysisData.ats_score}`)
 
-    // Update resume with analysis results
 
-    await supabase
+
+    // Update resume with analysis results and structured data
+
+    const { error: updateError } = await supabase
 
       .from('resumes')
 
@@ -292,6 +345,8 @@ async function analyzeResumeInBackground(resumeId: string, resumeText: string, u
 
         analysis_data: analysisData,
 
+        structured_data: structuredData,
+
         status: 'completed',
 
         analyzed_at: new Date().toISOString()
@@ -299,6 +354,20 @@ async function analyzeResumeInBackground(resumeId: string, resumeText: string, u
       })
 
       .eq('id', resumeId)
+
+
+
+    if (updateError) {
+
+      console.error(`[Upload] Failed to update resume ${resumeId}:`, updateError)
+
+      throw updateError
+
+    }
+
+
+
+    console.log(`[Upload] Resume ${resumeId} updated successfully with ats_score: ${analysisData.ats_score}`)
 
  
 

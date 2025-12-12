@@ -262,11 +262,9 @@ export default async function DashboardPage() {
 
               {resumes.map((resume) => (
 
-                <Link
+                <div
 
                   key={resume.id}
-
-                  href={`/analyze/${resume.id}`}
 
                   className="block p-4 border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-md transition-all"
 
@@ -360,15 +358,37 @@ export default async function DashboardPage() {
 
 
 
-                    <svg className="w-5 h-5 text-gray-400 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="ml-4 flex gap-2">
 
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      <Link
 
-                    </svg>
+                        href={`/optimize/${resume.id}`}
+
+                        className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all"
+
+                      >
+
+                        Optimize
+
+                      </Link>
+
+                      <Link
+
+                        href={`/analyze/${resume.id}`}
+
+                        className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-200 transition-colors"
+
+                      >
+
+                        View Analysis
+
+                      </Link>
+
+                    </div>
 
                   </div>
 
-                </Link>
+                </div>
 
               ))}
 

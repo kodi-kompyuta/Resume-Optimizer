@@ -38,7 +38,7 @@ export async function POST(request: Request) {
       )
     }
 
-    if (!resume.extracted_text) {
+    if (!resume.resume_text && !resume.structured_data) {
       return NextResponse.json(
         { error: 'Resume text not available' },
         { status: 400 }
@@ -47,7 +47,11 @@ export async function POST(request: Request) {
 
     // Generate the PDF file
     const filename = resume.original_filename.replace(/\.[^/.]+$/, '.pdf')
-    const buffer = await generatePdf(resume.extracted_text, filename)
+    // Use structured data if available, otherwise fall back to plain text
+    const buffer = await generatePdf(
+      resume.structured_data || resume.resume_text,
+      filename
+    )
 
     // Return the file as a download
     return new Response(new Uint8Array(buffer), {

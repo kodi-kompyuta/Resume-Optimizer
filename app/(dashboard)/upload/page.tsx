@@ -1,14 +1,14 @@
 'use client'
 
- 
+
 
 import { useState } from 'react'
 
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 import Link from 'next/link'
 
- 
+
 
 export default function UploadPage() {
 
@@ -21,6 +21,8 @@ export default function UploadPage() {
   const [dragActive, setDragActive] = useState(false)
 
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const jobId = searchParams.get('jobId')
 
  
 
@@ -172,7 +174,7 @@ export default function UploadPage() {
 
       const data = await response.json()
 
- 
+
 
       if (!response.ok) {
 
@@ -180,11 +182,38 @@ export default function UploadPage() {
 
       }
 
- 
 
-      // Redirect to analysis page
 
-      router.push(`/analyze/${data.resumeId}`)
+      // If temporary (unauthenticated), store data in sessionStorage
+
+      if (data.isTemporary) {
+
+        sessionStorage.setItem(`resume_${data.resumeId}`, JSON.stringify({
+
+          analysis: data.analysis,
+
+          structured: data.structured,
+
+          resumeText: data.resumeText,
+
+          status: data.status,
+
+          isTemporary: true
+
+        }))
+
+      }
+
+
+
+      // Redirect based on context
+      if (jobId) {
+        // If uploading for job match, redirect back to job match page
+        router.push(`/jobs/${jobId}/match`)
+      } else {
+        // Otherwise redirect to analysis page
+        router.push(`/analyze/${data.resumeId}`)
+      }
 
     } catch (err) {
 

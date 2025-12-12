@@ -1,20 +1,53 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
+'use client'
+
+import { useEffect, useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 
-export default async function JobsPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+interface Job {
+  id: string
+  job_title: string
+  company_name?: string
+  location?: string
+  salary_range?: string
+  job_description: string
+  is_active: boolean
+  created_at: string
+}
 
-  if (!user) {
-    redirect('/login')
+export default function JobsPage() {
+  const [jobs, setJobs] = useState<Job[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const loadJobs = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+
+      if (user) {
+        const { data } = await supabase
+          .from('job_descriptions')
+          .select('*')
+          .order('created_at', { ascending: false })
+
+        setJobs(data || [])
+      }
+      setLoading(false)
+    }
+
+    loadJobs()
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="max-w-5xl mx-auto space-y-6">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 rounded w-1/3 mb-2"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+        </div>
+      </div>
+    )
   }
-
-  // Fetch user's job descriptions
-  const { data: jobs } = await supabase
-    .from('job_descriptions')
-    .select('*')
-    .order('created_at', { ascending: false })
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
