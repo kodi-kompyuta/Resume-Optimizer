@@ -99,27 +99,30 @@ function structuredResumeToPlainText(resume: StructuredResume): string {
 
 /**
  * Simple direct optimization using job description
+ * Following Claude API pattern: combine prompt + resume + JD, send, get JSON back
  */
 async function optimizeResumeWithJobDescription(
   resumeText: string,
   jobDescription: string
 ): Promise<any> {
-  const userPrompt = `Resume:
+  // Combine everything into one prompt (following Claude API pattern)
+  const fullPrompt = `${RESUME_OPTIMIZER_SYSTEM_PROMPT}
+
+Resume:
 ${resumeText}
 
 Job Description:
 ${jobDescription}
 
-Optimize this resume for the job description. Return ONLY the JSON structure specified in the system prompt.`
+Return the optimized resume as clean JSON with no extra text.`
 
   const completion = await openai.chat.completions.create({
     model: 'gpt-4o',
     messages: [
-      { role: 'system', content: RESUME_OPTIMIZER_SYSTEM_PROMPT },
-      { role: 'user', content: userPrompt }
+      { role: 'user', content: fullPrompt }
     ],
-    temperature: 0.3,
-    max_tokens: 4000,
+    temperature: 0, // Use 0 for consistency (like Claude example)
+    max_tokens: 4096, // Match Claude's max_tokens
     response_format: { type: 'json_object' },
   })
 
@@ -128,7 +131,15 @@ Optimize this resume for the job description. Return ONLY the JSON structure spe
     throw new Error('No response from AI optimizer')
   }
 
-  return JSON.parse(content)
+  // Parse and return the JSON result
+  const result = JSON.parse(content)
+
+  console.log('[Optimizer] Successfully parsed optimized resume JSON')
+  console.log('[Optimizer] Full name:', result.full_name)
+  console.log('[Optimizer] Work experience entries:', result.work_experience?.length || 0)
+  console.log('[Optimizer] Core skills count:', result.core_skills?.length || 0)
+
+  return result
 }
 
 /**
@@ -294,14 +305,17 @@ export async function optimizeResume(
 ): Promise<OptimizationResult> {
   // If job description is provided, use the new simple optimization method
   if (jobDescription && jobDescription.trim()) {
+    console.log('[Optimizer] ✅ STEP 1: Load resume and job description')
     console.log('[Optimizer] Using direct job-description-based optimization')
 
     try {
       // Convert structured resume to plain text
       const resumeText = structuredResumeToPlainText(structuredResume)
+      console.log('[Optimizer] ✅ STEP 2: Send Resume + JD to AI')
 
       // Get optimized JSON from AI
       const optimizedJson = await optimizeResumeWithJobDescription(resumeText, jobDescription)
+      console.log('[Optimizer] ✅ STEP 3: Received optimized JSON from AI')
 
       // Convert back to StructuredResume format
       const optimizedResume = jsonToStructuredResume(optimizedJson, structuredResume)
