@@ -17,7 +17,6 @@ import {
   ChangeType,
 } from '@/types'
 import { validateStructurePreservation } from '@/lib/validators/structure-validator'
-import { convertToATSTemplate } from '@/lib/converters/ats-template-converter'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
@@ -121,7 +120,6 @@ export async function optimizeResume(
       return {
         originalResume: structuredResume,
         optimizedResume: structuredResume, // Use original instead
-        atsTemplate: convertToATSTemplate(structuredResume), // Convert to ATS format
         changes: [], // No changes applied
         summary: {
           totalChanges: 0,
@@ -155,13 +153,9 @@ export async function optimizeResume(
   // Generate preview
   const preview = generateDiffPreview(optimizedResume, changes)
 
-  // Convert to ATS-optimized flat template format
-  const atsTemplate = convertToATSTemplate(optimizedResume)
-
   return {
     originalResume: structuredResume,
     optimizedResume,
-    atsTemplate,
     changes,
     summary,
     preview,

@@ -340,7 +340,6 @@ export interface OptimizationOptions {
 export interface OptimizationResult {
   originalResume: StructuredResume
   optimizedResume: StructuredResume
-  atsTemplate: ATSResumeTemplate // ATS-optimized flat template format
   changes: ChangeLog[]
   summary: OptimizationSummary
   preview: DiffPreview
