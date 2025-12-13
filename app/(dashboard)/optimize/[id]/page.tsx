@@ -410,16 +410,6 @@ export default function OptimizePage() {
               </button>
 
               <button
-                onClick={() => handleApply(false)}
-                disabled={applying || acceptedCount === 0}
-                className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
-              >
-                {applying
-                  ? 'Applying...'
-                  : `Update Original (${acceptedCount} changes)`}
-              </button>
-
-              <button
                 onClick={() => setResult(null)}
                 disabled={applying}
                 className="px-6 bg-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-400 disabled:cursor-not-allowed"
