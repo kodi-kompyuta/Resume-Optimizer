@@ -51,7 +51,16 @@ Take a resume and job description and return an optimized resume as structured J
   "projects": [...]
 }
 
-Reword resume content to match the job description's language. Do NOT fabricate experience. Match ATS keywords.
+CRITICAL RULES:
+1. PRESERVE ALL CONTENT - Never remove any work experience, skills, education, or certifications
+2. Include EVERY job from the original resume, even if it seems unrelated to the job description
+3. Include ALL skills from the original resume
+4. Include ALL education and certifications from the original resume
+5. ONLY reword and enhance existing content - do not remove or consolidate
+6. Match ATS keywords by enhancing bullet points, not by removing content
+7. Do NOT fabricate any experience
+
+Your job is to make the existing content better, NOT to remove content.
 Only return clean JSON with no extra text.`
 
 /**
