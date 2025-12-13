@@ -50,13 +50,19 @@ export default function OptimizePage() {
           .from('job_descriptions')
           .select('job_title, job_description')
           .eq('id', jobId)
-          .single()
+          .maybeSingle()
 
-        if (error) throw error
+        // If job not found, just proceed without it (no error)
+        if (error && error.code !== 'PGRST116') {
+          throw error
+        }
 
         if (data) {
           setJobDescription(data.job_description)
           setJobTitle(data.job_title)
+        } else {
+          // Job description not found, but that's okay
+          console.warn('Job description not found, proceeding with general optimization')
         }
       } catch (err: any) {
         console.error('Error fetching job description:', err)
