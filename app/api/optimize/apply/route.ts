@@ -61,19 +61,25 @@ export async function POST(request: NextRequest) {
 
     if (createNewVersion) {
       // Create new resume version
+      const insertData: any = {
+        user_id: user.id,
+        original_filename: originalResume.original_filename,
+        resume_text: optimizedText,
+        structured_data: optimizedResume,
+        word_count: wordCount,
+        status: 'completed',
+        parent_resume_id: resumeId,
+        version_name: `Optimized - ${new Date().toLocaleDateString()}`,
+      }
+
+      // Only add optimized_json_data if it exists (for backwards compatibility)
+      if (optimizedJson) {
+        insertData.optimized_json_data = optimizedJson
+      }
+
       const { data: newResume, error: createError } = await supabase
         .from('resumes')
-        .insert({
-          user_id: user.id,
-          original_filename: originalResume.original_filename,
-          resume_text: optimizedText,
-          structured_data: optimizedResume,
-          optimized_json_data: optimizedJson, // Store the clean JSON for template
-          word_count: wordCount,
-          status: 'completed',
-          parent_resume_id: resumeId,
-          version_name: `Optimized - ${new Date().toLocaleDateString()}`,
-        })
+        .insert(insertData)
         .select()
         .single()
 
@@ -88,15 +94,21 @@ export async function POST(request: NextRequest) {
       savedResumeId = newResume.id
     } else {
       // Update existing resume
+      const updateData: any = {
+        resume_text: optimizedText,
+        structured_data: optimizedResume,
+        word_count: wordCount,
+        updated_at: new Date().toISOString(),
+      }
+
+      // Only add optimized_json_data if it exists (for backwards compatibility)
+      if (optimizedJson) {
+        updateData.optimized_json_data = optimizedJson
+      }
+
       const { error: updateError } = await supabase
         .from('resumes')
-        .update({
-          resume_text: optimizedText,
-          structured_data: optimizedResume,
-          optimized_json_data: optimizedJson, // Store the clean JSON for template
-          word_count: wordCount,
-          updated_at: new Date().toISOString(),
-        })
+        .update(updateData)
         .eq('id', resumeId)
 
       if (updateError) {
