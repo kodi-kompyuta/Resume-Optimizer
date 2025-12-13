@@ -33,6 +33,7 @@ interface OptimizedResumeData {
     title: string
     description: string
   }> | string[]
+  references?: string | string[]
 }
 
 /**
@@ -305,21 +306,38 @@ export async function fillResumeTemplate(data: OptimizedResumeData): Promise<Buf
   }
 
   // REFEREES Section
-  children.push(
-    new Paragraph({
-      text: 'REFEREES',
-      heading: HeadingLevel.HEADING_2,
-      spacing: {
-        before: 200,
-        after: 100,
-      },
-    })
-  )
-  children.push(
-    new Paragraph({
-      text: 'Available upon request.',
-    })
-  )
+  if (data.references) {
+    children.push(
+      new Paragraph({
+        text: 'REFEREES',
+        heading: HeadingLevel.HEADING_2,
+        spacing: {
+          before: 200,
+          after: 100,
+        },
+      })
+    )
+
+    if (typeof data.references === 'string') {
+      // Simple text like "Available upon request" or "On request"
+      children.push(
+        new Paragraph({
+          text: data.references,
+          spacing: { after: 200 },
+        })
+      )
+    } else if (Array.isArray(data.references)) {
+      // List of referee names/details
+      data.references.forEach(ref => {
+        children.push(
+          new Paragraph({
+            text: `• ${ref}`,
+            spacing: { after: 50 },
+          })
+        )
+      })
+    }
+  }
 
   // Create the document
   const doc = new Document({

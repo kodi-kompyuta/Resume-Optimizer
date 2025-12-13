@@ -48,17 +48,19 @@ Take a resume and job description and return an optimized resume as structured J
   ],
   "education": [...],
   "certifications": [...],
-  "projects": [...]
+  "projects": [...],
+  "references": "Available upon request" or ["Name 1", "Name 2"]
 }
 
 CRITICAL RULES:
-1. PRESERVE ALL CONTENT - Never remove any work experience, skills, education, or certifications
+1. PRESERVE ALL CONTENT - Never remove any work experience, skills, education, certifications, or references
 2. Include EVERY job from the original resume, even if it seems unrelated to the job description
 3. Include ALL skills from the original resume
 4. Include ALL education and certifications from the original resume
-5. ONLY reword and enhance existing content - do not remove or consolidate
-6. Match ATS keywords by enhancing bullet points, not by removing content
-7. Do NOT fabricate any experience
+5. Include references/referees section if present in the original (e.g., "Available upon request" or "On request")
+6. ONLY reword and enhance existing content - do not remove or consolidate
+7. Match ATS keywords by enhancing bullet points, not by removing content
+8. Do NOT fabricate any experience
 
 Your job is to make the existing content better, NOT to remove content.
 Only return clean JSON with no extra text.`

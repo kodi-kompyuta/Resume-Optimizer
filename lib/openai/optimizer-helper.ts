@@ -104,6 +104,17 @@ export function convertStructuredResumeToCleanJson(structured: StructuredResume)
     })
   }
 
+  // Extract references
+  const refSection = structured.sections.find(s => s.type === 'references' || s.heading.toLowerCase().includes('referee'))
+  let references: string | string[] = 'Available upon request'
+  if (refSection) {
+    const textBlocks = refSection.content.filter(b => b.type === 'text')
+    if (textBlocks.length > 0) {
+      const refText = textBlocks.map(b => b.content as string).join('. ')
+      references = refText || 'Available upon request'
+    }
+  }
+
   return {
     full_name: contact.name || '',
     contact: {
@@ -116,6 +127,7 @@ export function convertStructuredResumeToCleanJson(structured: StructuredResume)
     work_experience,
     education,
     certifications,
-    projects
+    projects,
+    references
   }
 }
