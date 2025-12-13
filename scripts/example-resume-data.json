@@ -1,0 +1,89 @@
+{
+  "full_name": "John Doe",
+  "contact": {
+    "phone": "+1-234-567-8900",
+    "email": "john.doe@email.com",
+    "location": "San Francisco, CA"
+  },
+  "summary": "Experienced Software Engineer with 8+ years of expertise in full-stack development, cloud architecture, and team leadership. Proven track record of delivering scalable solutions and driving technical innovation in fast-paced environments.",
+  "core_skills": [
+    "JavaScript/TypeScript",
+    "React.js & Next.js",
+    "Node.js & Express",
+    "Python & Django",
+    "AWS & Cloud Architecture",
+    "PostgreSQL & MongoDB",
+    "Docker & Kubernetes",
+    "CI/CD & DevOps",
+    "Agile/Scrum Methodologies",
+    "Technical Leadership"
+  ],
+  "work_experience": [
+    {
+      "job_title": "Senior Software Engineer",
+      "company": "Tech Corp",
+      "location": "San Francisco, CA",
+      "date_range": "Jan 2020 - Present",
+      "responsibilities": [
+        "Led development of microservices architecture serving 2M+ daily active users, improving system reliability by 40%",
+        "Architected and implemented CI/CD pipeline reducing deployment time from 2 hours to 15 minutes",
+        "Mentored team of 5 junior engineers, conducting code reviews and establishing best practices",
+        "Spearheaded migration to AWS cloud infrastructure, reducing operational costs by 30%",
+        "Collaborated with product team to deliver 15+ major features on schedule"
+      ]
+    },
+    {
+      "job_title": "Software Engineer",
+      "company": "StartupXYZ",
+      "location": "San Francisco, CA",
+      "date_range": "Jun 2017 - Dec 2019",
+      "responsibilities": [
+        "Developed full-stack features using React, Node.js, and PostgreSQL for B2B SaaS platform",
+        "Implemented real-time notification system handling 100K+ events per day",
+        "Optimized database queries reducing page load times by 60%",
+        "Built automated testing suite achieving 85% code coverage",
+        "Participated in on-call rotation, maintaining 99.9% uptime SLA"
+      ]
+    },
+    {
+      "job_title": "Junior Developer",
+      "company": "Web Agency Inc",
+      "location": "Austin, TX",
+      "date_range": "Jan 2016 - May 2017",
+      "responsibilities": [
+        "Built responsive web applications for 20+ clients using HTML, CSS, JavaScript, and PHP",
+        "Collaborated with designers to implement pixel-perfect UI/UX designs",
+        "Integrated third-party APIs including payment gateways and social media platforms",
+        "Provided technical support and maintenance for client websites"
+      ]
+    }
+  ],
+  "education": [
+    {
+      "degree": "Bachelor of Science in Computer Science",
+      "institution": "University of Texas at Austin",
+      "date_range": "2012 - 2016",
+      "location": "Austin, TX"
+    }
+  ],
+  "certifications": [
+    "AWS Certified Solutions Architect - Associate",
+    "Google Cloud Professional Cloud Architect",
+    "Certified Kubernetes Administrator (CKA)",
+    "Scrum Master Certified (SMC)"
+  ],
+  "projects": [
+    {
+      "title": "Open Source Contribution - React Query",
+      "description": "Active contributor to React Query library with 5+ merged PRs improving TypeScript type safety and documentation"
+    },
+    {
+      "title": "Personal Finance Tracker",
+      "description": "Built full-stack web app with React, Node.js, and MongoDB for tracking expenses and budgeting, deployed on AWS with 500+ active users"
+    },
+    {
+      "title": "DevOps Automation Tools",
+      "description": "Created suite of CLI tools in Python for automating infrastructure provisioning and deployment workflows, reducing manual effort by 70%"
+    }
+  ]
+}
