@@ -72,11 +72,10 @@ export async function POST(request: NextRequest) {
         version_name: `Optimized - ${new Date().toLocaleDateString()}`,
       }
 
-      // NOTE: optimized_json_data field is commented out until you add the column to Supabase
-      // Follow instructions in ADD_COLUMN_TO_SUPABASE.md to enable professional templates
-      // if (optimizedJson) {
-      //   insertData.optimized_json_data = optimizedJson
-      // }
+      // Add optimized_json_data for professional template
+      if (optimizedJson) {
+        insertData.optimized_json_data = optimizedJson
+      }
 
       const { data: newResume, error: createError } = await supabase
         .from('resumes')
@@ -102,11 +101,10 @@ export async function POST(request: NextRequest) {
         updated_at: new Date().toISOString(),
       }
 
-      // NOTE: optimized_json_data field is commented out until you add the column to Supabase
-      // Follow instructions in ADD_COLUMN_TO_SUPABASE.md to enable professional templates
-      // if (optimizedJson) {
-      //   updateData.optimized_json_data = optimizedJson
-      // }
+      // Add optimized_json_data for professional template
+      if (optimizedJson) {
+        updateData.optimized_json_data = optimizedJson
+      }
 
       const { error: updateError } = await supabase
         .from('resumes')
