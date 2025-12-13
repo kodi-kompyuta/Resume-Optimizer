@@ -17,6 +17,7 @@ import {
   ChangeType,
 } from '@/types'
 import { validateStructurePreservation } from '@/lib/validators/structure-validator'
+import { convertStructuredResumeToCleanJson } from './optimizer-helper'
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
@@ -457,9 +458,12 @@ export async function optimizeResume(
       )
 
       // Return original with no changes rather than corrupted structure
+      const fallbackJson = convertStructuredResumeToCleanJson(structuredResume)
+
       return {
         originalResume: structuredResume,
         optimizedResume: structuredResume, // Use original instead
+        optimizedJson: fallbackJson, // Still generate JSON for template
         changes: [], // No changes applied
         summary: {
           totalChanges: 0,
@@ -493,9 +497,15 @@ export async function optimizeResume(
   // Generate preview
   const preview = generateDiffPreview(optimizedResume, changes)
 
+  // IMPORTANT: Always convert to clean JSON format for professional template
+  // Even when not using job description optimization
+  console.log('[Optimizer] Converting to clean JSON format for professional template')
+  const optimizedJson = convertStructuredResumeToCleanJson(optimizedResume)
+
   return {
     originalResume: structuredResume,
     optimizedResume,
+    optimizedJson, // Always include for professional template rendering
     changes,
     summary,
     preview,
