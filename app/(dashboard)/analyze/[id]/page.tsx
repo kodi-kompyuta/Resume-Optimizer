@@ -385,12 +385,14 @@ export default function AnalyzePage() {
 
       {/* Bottom Actions */}
       <div className="flex gap-4 justify-center pb-8">
-        <Link
-          href={`/optimize/${id}`}
-          className="px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg"
-        >
-          Optimize This Resume
-        </Link>
+        {(!resume.ats_score || resume.ats_score < 94) && (
+          <Link
+            href={`/optimize/${id}`}
+            className="px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg"
+          >
+            Optimize This Resume
+          </Link>
+        )}
         <Link
           href="/upload"
           className="px-8 py-3 bg-white border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors"

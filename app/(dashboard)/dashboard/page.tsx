@@ -360,17 +360,19 @@ export default async function DashboardPage() {
 
                     <div className="ml-4 flex gap-2">
 
-                      <Link
+                      {(!resume.ats_score || resume.ats_score < 94) && (
+                        <Link
 
-                        href={`/optimize/${resume.id}`}
+                          href={`/optimize/${resume.id}`}
 
-                        className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all"
+                          className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all"
 
-                      >
+                        >
 
-                        Optimize
+                          Optimize
 
-                      </Link>
+                        </Link>
+                      )}
 
                       <Link
 

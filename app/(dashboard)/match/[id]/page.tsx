@@ -481,7 +481,7 @@ export default async function MatchResultsPage({ params }: { params: Promise<{ i
       )}
 
       {/* Optimize CTA */}
-      {match.match_score < 80 && (
+      {match.match_score < 94 && (
         <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl shadow-lg p-8 text-white">
           <div className="flex items-start justify-between gap-6">
             <div className="flex-1">
