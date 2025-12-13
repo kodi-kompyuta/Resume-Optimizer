@@ -20,11 +20,13 @@ export async function POST(request: NextRequest) {
     const {
       resumeId,
       optimizedResume,
+      optimizedJson,
       acceptedChanges,
       createNewVersion
     } = body as {
       resumeId: string
       optimizedResume: StructuredResume
+      optimizedJson?: any
       acceptedChanges: ChangeLog[]
       createNewVersion: boolean
     }
@@ -66,6 +68,7 @@ export async function POST(request: NextRequest) {
           original_filename: originalResume.original_filename,
           resume_text: optimizedText,
           structured_data: optimizedResume,
+          optimized_json_data: optimizedJson, // Store the clean JSON for template
           word_count: wordCount,
           status: 'completed',
           parent_resume_id: resumeId,
@@ -90,6 +93,7 @@ export async function POST(request: NextRequest) {
         .update({
           resume_text: optimizedText,
           structured_data: optimizedResume,
+          optimized_json_data: optimizedJson, // Store the clean JSON for template
           word_count: wordCount,
           updated_at: new Date().toISOString(),
         })

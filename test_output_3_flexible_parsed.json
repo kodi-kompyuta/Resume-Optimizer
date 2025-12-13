@@ -1,0 +1,74 @@
+[
+  {
+    "id": "57e3222d-88a8-43ff-a4b5-d22396b8e157",
+    "jobTitle": "Head of Client Service & Projects",
+    "company": "Echotel International",
+    "startDate": "Jan 2024",
+    "endDate": "Present",
+    "description": "Responsible for the running and management of the Client Service and Projects Departments, comprising three Project Managers and 17 Technical Support and Enterprise Engineers, providing project implementation and support to clients and partners across Sub-Saharan Africa.",
+    "achievements": []
+  },
+  {
+    "id": "d9e09af3-5f29-45d6-bb58-e57562d2b8ad",
+    "jobTitle": "2 to Hylas 4 satellite platforms across Sub-Saharan Africa. As IT Support Supervisor",
+    "company": "Church World Service",
+    "startDate": "CWS Africa",
+    "endDate": "",
+    "description": "oversee IT support for cloud and on-premises resources in Nairobi and 42 field processing sites across Sub-Saharan Africa, ensuring project execution and adherence to SLAs.",
+    "achievements": []
+  },
+  {
+    "id": "a640ea04-8a14-4e62-be51-f1973da4fd75",
+    "jobTitle": "the IT Point of Contact",
+    "company": "the NIST audit for CWS/RSC Uganda and earned commendation from the Country Director for my contributions. Delivered in-person IT support for field processing operations in Namibia",
+    "startDate": "",
+    "endDate": "",
+    "description": "Chad, Niger, Ethiopia, Burundi, and Uganda. Enhanced IT support project tracking by deploying Monday.com tracking boards and training a team of 15 IT Support Specialists. As IT Infrastructure & Support Manager at African Banking Corporation (Aug 2013 – Nov 2020), provided strategic direction for enterprise-level infrastructure and end-user support, assessed IT industry trends to align with evolving infrastructure needs, and collaborated with business unit heads to advance service efficiency and effectiveness.",
+    "achievements": []
+  },
+  {
+    "id": "f882110c-2057-4f45-8cee-5a370b1641bc",
+    "jobTitle": "Technical Support Team Leader",
+    "company": "Safran Morpho",
+    "startDate": "seconded to IEBC",
+    "endDate": "",
+    "description": "Nairobi (Nov 2012 – Jul 2013), managed the Biometric Voter Registration (BVR) IT infrastructure at the Interim Electoral and Boundaries Commission, ensuring continuous availability of servers, computers, and networking systems while supervising a team of two L1 engineers.",
+    "achievements": []
+  },
+  {
+    "id": "17e1ff77-021b-4f38-a335-0c74cc1443a4",
+    "jobTitle": "IT Trainer and Cisco Partner Relationship Administrator",
+    "company": "Access Kenya",
+    "startDate": "",
+    "endDate": "",
+    "description": "Nairobi.",
+    "achievements": [
+      {
+        "id": "7c3d289b-da14-4c2a-b915-0c49761ef5fd",
+        "text": "MAY 2008 — MAY 2011 Led the organization's technology training initiatives in partnership with HR, successfully delivering comprehensive blended learning programs on various Cisco solutions."
+      }
+    ]
+  },
+  {
+    "id": "a304228f-2e68-4455-b89d-d0438e0cd129",
+    "jobTitle": "a Technical Support Engineer / IT Trainer",
+    "company": "Computer Learning Centre & Mart Networks",
+    "startDate": "",
+    "endDate": "",
+    "description": "Nairobi.",
+    "achievements": [
+      {
+        "id": "0ad02787-068b-47c2-a4b8-5ec12de93da2",
+        "text": "JANUARY 2005 — MAY 2008 Delivered comprehensive on-site and remote technical support to end-users, while also serving as an IT trainer."
+      },
+      {
+        "id": "3e910ef1-053a-42c4-b5ca-b032296959e3",
+        "text": "Conducted instructor-led courses on ICDL, CompTIA A+, Network+, Cisco CCNA, and CCNP for both internal staff and external clients."
+      },
+      {
+        "id": "1309a42c-73c7-4e27-a2ce-55254244dda1",
+        "text": "Conducted training sessions for over 2,000 participants over three years, earning the accolade of 'Best Cisco Trainer' in both 2007 and 2008."
+      }
+    ]
+  }
+]

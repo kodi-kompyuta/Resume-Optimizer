@@ -1,0 +1,22 @@
+=== TESTING SECTION HEADER SPLITTING ===
+
+Original problematic text:
+"IT Leadership, CX, Service Delivery, Internet Service Provider Experience, SD WAN, IT infrastructure & Ops, Technical Support, IP Networks, Storage, Virtualization (VMware & HyperV), Cloud Computing (AWS, Azure), IT Security, End User Training, Vendor Management, IT Procurement, Budgeting, Project Management, IT Policy Formulation, Big Data, Python programming., WORK EXPERIENCEHead of Client Service & Projects"
+
+Expected after fix:
+"IT Leadership, CX, Service Delivery, Internet Service Provider Experience, SD WAN, IT infrastructure & Ops, Technical Support, IP Networks, Storage, Virtualization (VMware & HyperV), Cloud Computing (AWS, Azure), IT Security, End User Training, Vendor Management, IT Procurement, Budgeting, Project Management, IT Policy Formulation, Big Data, Python programming.
+
+WORK EXPERIENCE
+Head of Client Service & Projects"
+
+The new parser will:
+1. Detect "WORK EXPERIENCE" embedded in the paragraph
+2. Split it out onto its own line with proper spacing
+3. Ensure the job title that follows is also on a new line
+
+This fix handles THREE patterns:
+a) "...text, SECTION HEADERMore text" (with punctuation)
+b) "SECTION HEADERCapitalizedText" (header immediately followed by content)
+c) "lowercase SECTION HEADERUppercase" (mid-paragraph headers)
+
+All section headers are now properly extracted and placed on their own lines!

@@ -1,18 +1,22 @@
 {
   "permissions": {
     "allow": [
-      "Bash(dir node_modulespdfjs-distlegacybuild)",
-      "Bash(test:*)",
-      "Bash(ls:*)",
-      "Bash(npm install:*)",
-      "WebFetch(domain:resume-optimizer-theta.vercel.app)",
-      "Bash(npm run build:*)",
-      "Bash(npm run dev:*)",
-      "Bash(timeout 5 bash:*)",
-      "Bash(tasklist:*)",
+      "Bash(powershell -ExecutionPolicy Bypass -Command \"Stop-Process -Id 14400 -Force\")",
+      "Bash(Remove-Item middleware.ts)",
+      "Bash(powershell -ExecutionPolicy Bypass -Command \"Remove-Item middleware.ts\")",
+      "Bash(powershell -ExecutionPolicy Bypass -Command \"Stop-Process -Id 23872 -Force\")",
+      "Bash(powershell -ExecutionPolicy Bypass -Command \"Remove-Item -Recurse -Force .next\")",
+      "Bash(powershell -ExecutionPolicy Bypass -Command \"Stop-Process -Id 26500 -Force\")",
+      "Bash(dir /s /b \"D:\\Projects\\resume-optimizer-app\\app\\api\")",
       "Bash(findstr:*)",
-      "Bash(taskkill:*)",
-      "Bash(git add:*)"
+      "Bash(powershell -ExecutionPolicy Bypass -Command \"Get-ChildItem -Path ''D:\\Projects\\resume-optimizer-app\\app\\api'' -Recurse -Filter ''route.ts'' | Select-Object FullName\")",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nAdd optimization feature and update job match to candidate perspective\n\nMajor features and improvements:\n- Add resume optimization feature with structure preservation\n- Add resume download functionality (DOCX/PDF export)\n- Add auto-refresh for resume analysis status\n- Change job match scoring from recruiter to candidate perspective\n- Add comprehensive job match scoring system with detailed criteria\n- Add ATS template converter for structure-preserving exports\n- Add resume structure parser and validators\n- Add optimization API endpoints with apply/preview functionality\n- Update UI language to address users directly (you/your instead of candidate)\n- Update interview recommendations to be candidate-focused\n- Add experience level matching in job analysis\n- Improve type definitions with optimization and structured resume types\n\nTechnical improvements:\n- Add JSON schema validation for resume structure\n- Add change tracking for optimization preview\n- Improve error handling and logging in job matcher\n- Add support for legacy field names for backwards compatibility\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push:*)",
+      "Bash(git commit:*)",
+      "Bash(npx tsx:*)",
+      "Bash(del test-output.docx)",
+      "Bash(powershell -ExecutionPolicy Bypass -Command:*)"
     ],
     "deny": [],
     "ask": []

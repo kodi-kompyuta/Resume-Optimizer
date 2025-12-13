@@ -135,6 +135,7 @@ export default function OptimizePage() {
         body: JSON.stringify({
           resumeId,
           optimizedResume: result.optimizedResume,
+          optimizedJson: result.optimizedJson, // Include JSON for professional template
           acceptedChanges: acceptedChangesList,
           createNewVersion,
         }),

@@ -1,0 +1,496 @@
+{
+  "metadata": {
+    "parsedAt": "2025-11-21T09:18:34.230Z",
+    "wordCount": 1137
+  },
+  "sections": [
+    {
+      "id": "7dc61c7f-e340-41ca-aa19-7d01bd64fce2",
+      "type": "contact",
+      "heading": "Contact Information",
+      "order": 0,
+      "content": [
+        {
+          "id": "72f9a9a1-69c8-45bc-9701-ebf5d2bcce43",
+          "type": "contact_info",
+          "content": {
+            "name": "CONTACT INFORMATION",
+            "email": "dkamale@gmail.com",
+            "phone": "254-723-7277"
+          }
+        }
+      ]
+    },
+    {
+      "id": "6d16f100-6186-4c08-b08b-f7a6a7132e79",
+      "type": "summary",
+      "heading": "PERSONAL PROFILE",
+      "order": 1,
+      "content": [
+        {
+          "id": "b36b00a0-f1ae-4491-abcc-3f8571de7ebf",
+          "type": "text",
+          "content": "Dynamic Information Technology expert with 16 years of comprehensive experience in infrastructure management, including both on-premises and cloud-based systems, application support, and cybersecurity services. Committed to elevating customer satisfaction by delivering precise and innovative technical solutions. Demonstrated leadership in orchestrating operations, maintenance, and support of intricate systems."
+        }
+      ],
+      "metadata": {
+        "originalHeading": "PERSONAL PROFILE",
+        "formatting": {
+          "capitalization": "uppercase"
+        }
+      }
+    },
+    {
+      "id": "67a392cb-61e0-4fde-8b02-3abde3e42e28",
+      "type": "skills",
+      "heading": "KEY SKILLS:",
+      "order": 2,
+      "content": [
+        {
+          "id": "00820c97-80ec-4d91-a88f-5f188b89300c",
+          "type": "skill_group",
+          "content": {
+            "skills": [
+              "IT Leadership",
+              "CX",
+              "Service Delivery",
+              "Internet Service Provider Experience",
+              "SD WAN",
+              "IT infrastructure & Ops",
+              "Technical Support",
+              "IP Networks",
+              "Storage",
+              "Virtualization (VMware & HyperV)",
+              "Cloud Computing (AWS",
+              "Azure)",
+              "IT Security",
+              "End User Training",
+              "Vendor Management",
+              "IT Procurement",
+              "Budgeting",
+              "Project Management",
+              "IT Policy Formulation",
+              "Big Data",
+              "Python programming."
+            ]
+          }
+        }
+      ],
+      "metadata": {
+        "originalHeading": "KEY SKILLS:",
+        "formatting": {
+          "capitalization": "uppercase"
+        }
+      }
+    },
+    {
+      "id": "8eab9c2e-c85b-4071-8428-7e0390a54502",
+      "type": "experience",
+      "heading": "WORK EXPERIENCE",
+      "order": 3,
+      "content": [
+        {
+          "id": "76680ef1-dc9c-439f-ad99-2d2cf4ecd5bd",
+          "type": "experience_item",
+          "content": {
+            "id": "4f1ae8bd-ad45-483e-b5cc-ea439b1e6b6f",
+            "jobTitle": "Head of Client Service & Projects",
+            "company": "Echotel International",
+            "location": "",
+            "startDate": "Jan 2024",
+            "endDate": "Present",
+            "description": "Responsible for the running and management of the Client Service and Projects Departments, comprising three Project Managers and 17 Technical Support and Enterprise Engineers, providing project implementation and support to clients and partners across Sub-Saharan Africa.",
+            "achievements": [
+              {
+                "id": "5eb46776-6242-4a41-adb5-ab6069335afe",
+                "text": "Successfully deployed and commissioned an Omnichannel customer service platform across Sub-Saharan Africa, significantly boosting customer engagement with notable improvements in Net Promoter and Customer Satisfaction scores."
+              },
+              {
+                "id": "8764b7d4-cfa6-464d-9436-787e205a3c60",
+                "text": "Standardized Customer Experience (CX) strategy, enhancing governance across eight African country offices."
+              },
+              {
+                "id": "beab96bc-b2dc-4751-aa1d-338c2e4209f7",
+                "text": "Developed and implemented a robust vendor management framework for Multi-National Business operations in Sub-Saharan Africa."
+              },
+              {
+                "id": "3bc9f570-b081-4c81-9102-a65e193d02e8",
+                "text": "Established a Global Service Desk, streamlining support for the region."
+              },
+              {
+                "id": "a1c139cb-2f22-4acf-a558-567683011a51",
+                "text": "Designed an automated customer experience portal to optimize the customer journey and increase operational efficiency."
+              },
+              {
+                "id": "61706e03-66df-4a7e-b778-f7d020ee5a91",
+                "text": "Automated monitoring systems to proactively issue outage notifications to vendors, customers, and support agents, thereby reducing manual interventions by 30%."
+              },
+              {
+                "id": "a4e81d30-016d-4013-be19-8ae1414b574f",
+                "text": "Deployed Starlink ground stations for satellite monitoring and implemented SD-WAN solutions (using FortiGate and Meraki) for 76 KFC outlets in Kenya and Uganda."
+              },
+              {
+                "id": "e4c33907-0748-487a-a2fa-be80c7947955",
+                "text": "Currently spearheading client migrations from Avanti Hylas 2 to Hylas 4 satellite platforms across Sub-Saharan Africa."
+              }
+            ]
+          }
+        },
+        {
+          "id": "13156c03-d108-4dce-b537-7c74e809bc09",
+          "type": "experience_item",
+          "content": {
+            "id": "e5817275-d7f9-4da1-b0ec-7bdaf385ae86",
+            "jobTitle": "IT Support Supervisor",
+            "company": "Church World Service",
+            "startDate": "CWS Africa",
+            "endDate": "",
+            "description": "oversee IT support for cloud and on-premises resources in Nairobi and 42 field processing sites across Sub-Saharan Africa, ensuring project execution and adherence to SLAs.",
+            "achievements": [
+              {
+                "id": "1457143a-e92d-4135-8960-ba23092c8bb6",
+                "text": "Led the successful construction and launch of the CWS Uganda Data Center, managing components such as computing, storage, HVAC, power, access control, and inter-connectivity, all within the stipulated schedule and budget."
+              },
+              {
+                "id": "b844b19b-16dd-455a-95fa-106dda05c2e4",
+                "text": "As a Solutions Architect, facilitated secure access for CWS/RSCs to the US Government Refugee database on AWS via Okta."
+              },
+              {
+                "id": "5b979869-cfc9-42a4-be30-7be46c19c96d",
+                "text": "Implemented a Paper Lite processing system, resulting in $16,000 in annual savings, which included overseeing the RFQ process for E-signature pads and conducting installation, configuration, and user training."
+              },
+              {
+                "id": "4b68bf8a-9283-4106-be95-bb249ba6e3f4",
+                "text": "Established internet connectivity for six field processing sites in Ethiopia and built the IT function for CWS Uganda by recruiting two IT specialists."
+              },
+              {
+                "id": "d26afadf-2f4c-42ae-9f8d-1a110cdd9463",
+                "text": "Acted as the IT Point of Contact for the NIST audit for CWS/RSC Uganda and earned commendation from the Country Director for my contributions."
+              },
+              {
+                "id": "6d79045f-618c-4dab-884f-cf584782ca60",
+                "text": "Delivered in-person IT support for field processing operations in Namibia, Chad, Niger, Ethiopia, Burundi, and Uganda."
+              },
+              {
+                "id": "96539f80-fc69-4128-86c8-c7c83e00f9a1",
+                "text": "Enhanced IT support project tracking by deploying Monday.com tracking boards and training a team of 15 IT Support Specialists."
+              }
+            ]
+          }
+        },
+        {
+          "id": "32ae0052-8789-4577-b0e0-cf0cc158afac",
+          "type": "experience_item",
+          "content": {
+            "id": "8b19b03c-895c-4ed3-811c-edad2d8fe6d2",
+            "jobTitle": "IT Infrastructure & Support Manager",
+            "company": "African Banking Corporation",
+            "startDate": "Aug 2013",
+            "endDate": "Nov 2020",
+            "description": "provided strategic direction for enterprise-level infrastructure and end-user support, assessed IT industry trends to align with evolving infrastructure needs, and collaborated with business unit heads to advance service efficiency and effectiveness.",
+            "achievements": [
+              {
+                "id": "d1d6aecd-0031-4674-8743-5b5d3901ac1f",
+                "text": "Led a comprehensive hardware refresh project for the bank's data center, optimizing switching, routing, firewall, and storage infrastructure to enhance operational efficiency."
+              },
+              {
+                "id": "b6e1e6fc-4e9a-48c1-8a87-b169a86e825f",
+                "text": "Spearheaded a network cabling and switching fabric upgrade across the bank's headquarters and 12 branches, resulting in improved infrastructure performance and response times."
+              },
+              {
+                "id": "208eb70e-58a8-47bc-b796-4194ac167ee2",
+                "text": "Played an integral role in establishing the bank's disaster recovery site, saving $8,000 in implementation costs."
+              },
+              {
+                "id": "a76c2703-e206-4c5a-ad14-705a0d7d4011",
+                "text": "Successfully migrated the email system from Microsoft Exchange to Google Workspace for 450 users, achieving 99.99% email availability."
+              },
+              {
+                "id": "55ea7eb9-7b9b-4951-b165-677ed4786d2b",
+                "text": "Attained a 96% CSAT by streamlining customer support through a centralized Helpdesk system."
+              },
+              {
+                "id": "f9d8e71a-eee5-40f6-9d0f-b0387dd44368",
+                "text": "Reduced security events by implementing infrastructure hardening with McAfee EPO, Web Application Firewall, SIEM, and Next Generation Firewall technologies."
+              },
+              {
+                "id": "15882ec5-2558-4e8a-9bd9-f59b1477f107",
+                "text": "Deployed network and server monitoring systems, enhancing Estimated Time to Repair (ETR) by 20%."
+              },
+              {
+                "id": "f5d76f3e-fc14-4717-ac94-60898a9715bb",
+                "text": "Improved WAN and internet connectivity uptime from 93% to 99% through managed WAN services, reducing annual connectivity costs by $20,000 via outsourcing."
+              },
+              {
+                "id": "199e64e9-963e-49aa-b92c-4c6b02366a15",
+                "text": "Conducted a skill-gap analysis for the IT team, providing a detailed report on training needs, potential learning providers, and associated costs."
+              }
+            ]
+          }
+        },
+        {
+          "id": "83146c7a-673d-4804-b909-370adbb4fe3e",
+          "type": "experience_item",
+          "content": {
+            "id": "c66deea0-089d-425a-aed3-1f78d189c58e",
+            "jobTitle": "Technical Support Team Leader",
+            "company": "Safran Morpho",
+            "startDate": "seconded to IEBC",
+            "endDate": "",
+            "description": "Nairobi (Nov 2012 – Jul 2013), managed the Biometric Voter Registration (BVR) IT infrastructure at the Interim Electoral and Boundaries Commission, ensuring continuous availability of servers, computers, and networking systems while supervising a team of two L1 engineers.",
+            "achievements": [
+              {
+                "id": "f2620847-c8ba-478d-934b-e65df9b97321",
+                "text": "Ensured 99% uptime for infrastructure during the critical 2013 pre-election and election period, enhancing operational reliability."
+              }
+            ]
+          }
+        },
+        {
+          "id": "6ab9ba6d-2e45-44e9-be47-d199b77b8c39",
+          "type": "experience_item",
+          "content": {
+            "id": "abf5403b-cdeb-45b8-ba0f-fe1c4bca6912",
+            "jobTitle": "IT Trainer and Cisco Partner Relationship Administrator",
+            "company": "Access Kenya",
+            "location": "Nairobi.",
+            "startDate": "MAY 2008",
+            "endDate": "MAY 2011",
+            "achievements": [
+              {
+                "id": "3b236a0d-535b-4703-a88c-65fcbcacfa3d",
+                "text": "Led the organization's technology training initiatives in partnership with HR, successfully delivering comprehensive blended learning programs on various Cisco solutions."
+              },
+              {
+                "id": "b4d49344-8fa2-4989-9aa9-1f2239e6d367",
+                "text": "Played a pivotal role in establishing and equipping the Access Kenya training function and center in partnership with HR."
+              },
+              {
+                "id": "ae650f59-163c-464f-91ad-2467e3c274a0",
+                "text": "Instrumental in elevating AccessKenya's Cisco Partner Status to Premier Partner, enabling significant cost savings of up to 40% on Cisco technology products and services."
+              },
+              {
+                "id": "525bab55-9d6e-4d08-b37c-3de1803f8c38",
+                "text": "Successfully trained 100 colleagues across Sales, Marketing, and Technical teams on Cisco solutions."
+              }
+            ]
+          }
+        },
+        {
+          "id": "7d08d4bc-001b-41fa-87bb-29451dbbcb4c",
+          "type": "experience_item",
+          "content": {
+            "id": "0ffe0593-1000-432b-a149-59d5f37345d2",
+            "jobTitle": "a Technical Support Engineer / IT Trainer",
+            "company": "Computer Learning Centre & Mart Networks",
+            "location": "Nairobi.",
+            "startDate": "JANUARY 2005",
+            "endDate": "MAY 2008",
+            "achievements": [
+              {
+                "id": "c5cdbfa5-9bba-455c-83e5-61e33569464e",
+                "text": "Delivered comprehensive on-site and remote technical support to end-users, while also serving as an IT trainer."
+              },
+              {
+                "id": "12978254-6dda-4341-bd63-f4a0c30113d2",
+                "text": "Conducted instructor-led courses on ICDL, CompTIA A+, Network+, Cisco CCNA, and CCNP for both internal staff and external clients."
+              },
+              {
+                "id": "2683f082-4045-42b6-9a74-3a72bec9a730",
+                "text": "Conducted training sessions for over 2,000 participants over three years, earning the accolade of 'Best Cisco Trainer' in both 2007 and 2008."
+              }
+            ]
+          }
+        },
+        {
+          "id": "645f49a3-e6a4-4bf6-84c8-f06921f144a8",
+          "type": "experience_item",
+          "content": {
+            "id": "0ffe0593-1000-432b-a149-59d5f37345d2",
+            "jobTitle": "a Technical Support Engineer / IT Trainer",
+            "company": "Computer Learning Centre & Mart Networks",
+            "location": "Nairobi.",
+            "startDate": "JANUARY 2005",
+            "endDate": "MAY 2008",
+            "achievements": [
+              {
+                "id": "c5cdbfa5-9bba-455c-83e5-61e33569464e",
+                "text": "Delivered comprehensive on-site and remote technical support to end-users, while also serving as an IT trainer."
+              },
+              {
+                "id": "12978254-6dda-4341-bd63-f4a0c30113d2",
+                "text": "Conducted instructor-led courses on ICDL, CompTIA A+, Network+, Cisco CCNA, and CCNP for both internal staff and external clients."
+              },
+              {
+                "id": "2683f082-4045-42b6-9a74-3a72bec9a730",
+                "text": "Conducted training sessions for over 2,000 participants over three years, earning the accolade of 'Best Cisco Trainer' in both 2007 and 2008."
+              }
+            ]
+          }
+        }
+      ],
+      "metadata": {
+        "originalHeading": "WORK EXPERIENCE",
+        "formatting": {
+          "capitalization": "uppercase"
+        }
+      }
+    },
+    {
+      "id": "4c4f289c-2662-4bc0-a566-6975e8e2050e",
+      "type": "education",
+      "heading": "EDUCATION",
+      "order": 4,
+      "content": [
+        {
+          "id": "552b1e66-a5d9-4bed-81b9-5bf9e7547ef8",
+          "type": "education_item",
+          "content": {
+            "id": "7031ee7c-f2f5-494f-9a22-b5d9eacf1545",
+            "degree": "2022 - 2025",
+            "institution": "Master of Science Degree in Big Data Technologies – University of East London",
+            "location": "",
+            "graduationDate": "2005",
+            "gpa": ""
+          }
+        },
+        {
+          "id": "afca34ce-b851-4afb-a138-4a23b0fcc840",
+          "type": "education_item",
+          "content": {
+            "id": "13101cc4-3001-43db-ac46-73b2e076c2c8",
+            "degree": "British Technical",
+            "institution": "",
+            "location": "",
+            "graduationDate": "",
+            "gpa": ""
+          }
+        }
+      ],
+      "metadata": {
+        "originalHeading": "EDUCATION",
+        "formatting": {
+          "capitalization": "uppercase"
+        }
+      }
+    },
+    {
+      "id": "3daab57d-024c-421c-b31e-781a1cee201f",
+      "type": "education",
+      "heading": "Education",
+      "order": 5,
+      "content": [
+        {
+          "id": "2f052947-bb50-43a5-86a4-a2f9a1577baf",
+          "type": "education_item",
+          "content": {
+            "id": "56ad5cd5-f26b-4252-9e19-fc9c6c36b540",
+            "degree": "al Council (BTEC) EDEXCEL, Higher National Diploma in Computing – Computer Learning Centre.",
+            "institution": "",
+            "location": "",
+            "graduationDate": "",
+            "gpa": ""
+          }
+        }
+      ],
+      "metadata": {
+        "originalHeading": "Education",
+        "formatting": {
+          "capitalization": "title"
+        }
+      }
+    },
+    {
+      "id": "fbefd11e-933b-4c2a-9d87-98f440bb4f2b",
+      "type": "certifications",
+      "heading": "PROFESSIONAL CERTIFICATIONS",
+      "order": 6,
+      "content": [],
+      "metadata": {
+        "originalHeading": "PROFESSIONAL CERTIFICATIONS",
+        "formatting": {
+          "capitalization": "uppercase"
+        }
+      }
+    },
+    {
+      "id": "b76ce0f4-f6fc-4d56-bbef-d92c7c7355c0",
+      "type": "custom",
+      "heading": "AND TRAINING",
+      "order": 7,
+      "content": [],
+      "metadata": {
+        "originalHeading": "AND TRAINING",
+        "formatting": {
+          "capitalization": "uppercase"
+        }
+      }
+    },
+    {
+      "id": "c1880a4b-497d-488c-95c0-aaa95441da33",
+      "type": "custom",
+      "heading": "ADDITIONAL INFORMATION",
+      "order": 8,
+      "content": [
+        {
+          "id": "e54b5f6a-4b9b-4fc6-82be-653fe3c701ab",
+          "type": "text",
+          "content": "Passionate about leveraging technology to enhance travel"
+        }
+      ],
+      "metadata": {
+        "originalHeading": "ADDITIONAL INFORMATION",
+        "formatting": {
+          "capitalization": "uppercase"
+        }
+      }
+    },
+    {
+      "id": "a2a9f8a6-3704-4156-a377-d5e3ac7b9421",
+      "type": "experience",
+      "heading": "experience",
+      "order": 9,
+      "content": [
+        {
+          "id": "113fdcf5-1743-40c9-81ff-0456c5b9a32f",
+          "type": "experience_item",
+          "content": {
+            "id": "36b94633-dd7d-41e6-8ebd-fd9ac50a9fb5",
+            "jobTitle": "s, skilled in crafting compelling narratives through writing, and adept",
+            "company": "engaging audiences through public speaking.",
+            "location": "",
+            "startDate": "",
+            "endDate": "",
+            "achievements": []
+          }
+        }
+      ],
+      "metadata": {
+        "originalHeading": "experience",
+        "formatting": {
+          "capitalization": "lowercase"
+        }
+      }
+    },
+    {
+      "id": "af17db11-d723-4f5f-9339-09d441ce4746",
+      "type": "custom",
+      "heading": "REFEREES",
+      "order": 10,
+      "content": [
+        {
+          "id": "775ce529-8821-4814-a198-cc43b557ce3e",
+          "type": "text",
+          "content": "Available upon request"
+        }
+      ],
+      "metadata": {
+        "originalHeading": "REFEREES",
+        "formatting": {
+          "capitalization": "uppercase"
+        }
+      }
+    }
+  ],
+  "rawText": "CONTACT INFORMATION\nDavid Kaniaru Kamau | Curriculum Vitae\ndkamale@gmail.com\n254-723-7277\n\nPERSONAL PROFILE\nDynamic Information Technology expert with 16 years of comprehensive experience in infrastructure management, including both on-premises and cloud-based systems, application support, and cybersecurity services. Committed to elevating customer satisfaction by delivering precise and innovative technical solutions. Demonstrated leadership in orchestrating operations, maintenance, and support of intricate systems.\nKEY SKILLS:\nIT Leadership, CX, Service Delivery, Internet Service Provider Experience, SD WAN, IT infrastructure & Ops, Technical Support, IP Networks, Storage, Virtualization (VMware & HyperV), Cloud Computing (AWS, Azure), IT Security, End User Training, Vendor Management, IT Procurement, Budgeting, Project Management, IT Policy Formulation, Big Data, Python programming.,\n\nWORK EXPERIENCE\nHead of Client Service & Projects\nEchotel International\nJan 2024 - Present\nResponsible for the running and management of the Client Service and Projects Departments, comprising three Project Managers and 17 Technical Support and Enterprise Engineers, providing project implementation and support to clients and partners across Sub-Saharan Africa.\n\n\nACHIEVEMENTS\n- Successfully deployed and commissioned an Omnichannel customer service platform across Sub-Saharan Africa, significantly boosting customer engagement with notable improvements in Net Promoter and Customer Satisfaction scores.\n- Standardized Customer Experience (CX) strategy, enhancing governance across eight African country offices.\n- Developed and implemented a robust vendor management framework for Multi-National Business operations in Sub-Saharan Africa.\n- Established a Global Service Desk, streamlining support for the region.\n- Designed an automated customer experience portal to optimize the customer journey and increase operational efficiency.\n- Automated monitoring systems to proactively issue outage notifications to vendors, customers, and support agents, thereby reducing manual interventions by 30%.\n- Deployed Starlink ground stations for satellite monitoring and implemented SD-WAN solutions (using FortiGate and Meraki) for 76 KFC outlets in Kenya and Uganda.\n- Currently spearheading client migrations from Avanti Hylas 2 to Hylas 4 satellite platforms across Sub-Saharan Africa.\n- As IT Support Supervisor for Church World Service (CWS Africa), oversee IT support for cloud and on-premises resources in Nairobi and 42 field processing sites across Sub-Saharan Africa, ensuring project execution and adherence to SLAs.\n\nACHIEVEMENTS\n- Led the successful construction and launch of the CWS Uganda Data Center, managing components such as computing, storage, HVAC, power, access control, and inter-connectivity, all within the stipulated schedule and budget.\n- As a Solutions Architect, facilitated secure access for CWS/RSCs to the US Government Refugee database on AWS via Okta.\n- Implemented a Paper Lite processing system, resulting in $16,000 in annual savings, which included overseeing the RFQ process for E-signature pads and conducting installation, configuration, and user training.\n- Established internet connectivity for six field processing sites in Ethiopia and built the IT function for CWS Uganda by recruiting two IT specialists.\n- Acted as the IT Point of Contact for the NIST audit for CWS/RSC Uganda and earned commendation from the Country Director for my contributions.\n- Delivered in-person IT support for field processing operations in Namibia, Chad, Niger, Ethiopia, Burundi, and Uganda.\n- Enhanced IT support project tracking by deploying Monday.com tracking boards and training a team of 15 IT Support Specialists.\n- As IT Infrastructure & Support Manager at African Banking Corporation (Aug 2013 – Nov 2020), provided strategic direction for enterprise-level infrastructure and end-user support, assessed IT industry trends to align with evolving infrastructure needs, and collaborated with business unit heads to advance service efficiency and effectiveness.\n\nACHIEVEMENTS\n- Led a comprehensive hardware refresh project for the bank's data center, optimizing switching, routing, firewall, and storage infrastructure to enhance operational efficiency.\n- Spearheaded a network cabling and switching fabric upgrade across the bank's headquarters and 12 branches, resulting in improved infrastructure performance and response times.\n- Played an integral role in establishing the bank's disaster recovery site, saving $8,000 in implementation costs.\n- Successfully migrated the email system from Microsoft Exchange to Google Workspace for 450 users, achieving 99.99% email availability.\n- Attained a 96% CSAT by streamlining customer support through a centralized Helpdesk system.\n- Reduced security events by implementing infrastructure hardening with McAfee EPO, Web Application Firewall, SIEM, and Next Generation Firewall technologies.\n- Deployed network and server monitoring systems, enhancing Estimated Time to Repair (ETR) by 20%.\n- Improved WAN and internet connectivity uptime from 93% to 99% through managed WAN services, reducing annual connectivity costs by $20,000 via outsourcing.\n- Conducted a skill-gap analysis for the IT team, providing a detailed report on training needs, potential learning providers, and associated costs.\n- As Technical Support Team Leader at Safran Morpho (seconded to IEBC), Nairobi (Nov 2012 – Jul 2013), managed the Biometric Voter Registration (BVR) IT infrastructure at the Interim Electoral and Boundaries Commission, ensuring continuous availability of servers, computers, and networking systems while supervising a team of two L1 engineers.\n\nACHIEVEMENTS\n- Ensured 99% uptime for infrastructure during the critical 2013 pre-election and election period, enhancing operational reliability.\n- Served as IT Trainer and Cisco Partner Relationship Administrator at Access Kenya, Nairobi.\nMAY 2008 — MAY 2011\n- Led the organization's technology training initiatives in partnership with HR, successfully delivering comprehensive blended learning programs on various Cisco solutions.\n\nACHIEVEMENTS\n- Played a pivotal role in establishing and equipping the Access Kenya training function and center in partnership with HR.\n- Instrumental in elevating AccessKenya's Cisco Partner Status to Premier Partner, enabling significant cost savings of up to 40% on Cisco technology products and services.\n- Successfully trained 100 colleagues across Sales, Marketing, and Technical teams on Cisco solutions.\n- Served as a Technical Support Engineer / IT Trainer at Computer Learning Centre & Mart Networks, Nairobi.\nJANUARY 2005 — MAY 2008\n- Delivered comprehensive on-site and remote technical support to end-users, while also serving as an IT trainer.\n- Conducted instructor-led courses on ICDL, CompTIA A+, Network+, Cisco CCNA, and CCNP for both internal staff and external clients.\n\nACHIEVEMENTS\n- Conducted training sessions for over 2,000 participants over three years, earning the accolade of 'Best Cisco Trainer' in both 2007 and 2008.\n\nEDUCATION\n2022 - 2025\nMaster of Science Degree in Big Data Technologies – University of East London\n2002 - 2005\nBritish Technical\n\nEducation\nal Council (BTEC) EDEXCEL, Higher National Diploma in Computing – Computer Learning Centre.\n\nPROFESSIONAL CERTIFICATIONS\nAND TRAINING\nPursuing: AWS Certified Solutions Architect – Professional\nCertifications:\n• AWS Certified Cloud Practitioner\n• AWS Certified Solutions Architect – Associate\n• Microsoft Certified: Azure Fundamentals\n• ITIL Foundation\n• Red Hat Certified System Administrator (RHCSA)\n• Cisco Certified Network Professional (CCNP)\n• Cisco Certified Network Associate (CCNA)\n• Cisco Certified Design Associate (CCDA)\n• Microsoft Certified Solutions Associate (MCSA)\n• CompTIA User Support Specialist\n• CompTIA Network Support Specialist\n• Siemon Distributed Listed Installer (DLI)\nSkills: Customer Service, Project Management, Public Speaking\n\nADDITIONAL INFORMATION\nPassionate about leveraging technology to enhance travel\n\nexperience\ns, skilled in crafting compelling narratives through writing, and adept at engaging audiences through public speaking.\n\nREFEREES\nAvailable upon request"
+}

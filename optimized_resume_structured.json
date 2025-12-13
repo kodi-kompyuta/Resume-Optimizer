@@ -1,0 +1,595 @@
+{
+  "metadata": {
+    "parsedAt": "2025-12-09T08:29:40.763Z",
+    "wordCount": 920
+  },
+  "sections": [
+    {
+      "id": "dcd86cfe-e009-43ab-a526-6e0388e52e14",
+      "type": "contact",
+      "heading": "Contact Information",
+      "order": 0,
+      "content": [
+        {
+          "id": "cd096074-1649-4e1d-9f66-9a4342f0b2b1",
+          "type": "contact_info",
+          "content": {
+            "name": "CONTACT INFORMATION",
+            "email": "dkamale@gmail.com",
+            "phone": "254-723-7277"
+          }
+        }
+      ]
+    },
+    {
+      "id": "445a709e-359d-4037-8b24-e44b94a14cce",
+      "type": "summary",
+      "heading": "PROFESSIONAL SUMMARY",
+      "order": 1,
+      "content": [
+        {
+          "id": "99fd94a4-199b-43db-ac7d-3312a69b5d5f",
+          "type": "text",
+          "content": "IT leader with 16+ years in designing and managing secure, scalable infrastructure across finance, telecom, and humanitarian sectors. Expertise in multi-country IT operations, cloud-first strategies (AWS, Azure), cybersecurity, and enterprise network optimization. Skilled in aligning technology with business goals while overseeing large teams and budgets. Currently pursuing AWS Solutions Architect – Professional and planning CISSP (Q1 2026)."
+        }
+      ],
+      "metadata": {
+        "originalHeading": "PROFESSIONAL SUMMARY",
+        "formatting": {
+          "capitalization": "uppercase"
+        }
+      }
+    },
+    {
+      "id": "c62d5c3c-b2ec-427d-826c-91592143143f",
+      "type": "skills",
+      "heading": "CORE COMPETENCIES",
+      "order": 2,
+      "content": [
+        {
+          "id": "44c5a5ed-511a-4218-9b56-2f9a181cc170",
+          "type": "skill_group",
+          "content": {
+            "skills": [
+              "IT Strategy & Governance (ISO 27001",
+              "NIST",
+              "ITIL v4)",
+              "Cloud & Infrastructure (AWS",
+              "Azure",
+              "Hybrid Environments)",
+              "Cybersecurity (SIEM",
+              "NGFW",
+              "Incident Response",
+              "BCP/DR)",
+              "Network Architecture (MPLS",
+              "SD-WAN",
+              "Fortinet",
+              "Meraki",
+              "QoS)",
+              "Call Centre & Voice (Omnichannel CX",
+              "VoIP",
+              "SIP",
+              "IVR",
+              "CRM)",
+              "Project & Service Delivery (Agile",
+              "CI/CD",
+              "SLA/KPI Ownership)",
+              "Vendor & Contract Management (ISPs",
+              "MNOs",
+              "SaaS",
+              "Licensing)",
+              "Budgeting & Cost Optimization (OPEX/CAPEX Planning)",
+              "People Leadership (Team Building",
+              "Career Pathing",
+              "Mentorship)"
+            ]
+          }
+        }
+      ],
+      "metadata": {
+        "originalHeading": "CORE COMPETENCIES",
+        "formatting": {
+          "capitalization": "uppercase"
+        }
+      }
+    },
+    {
+      "id": "bdc46ff2-54f9-40c0-a95f-52b94473c912",
+      "type": "experience",
+      "heading": "PROFESSIONAL EXPERIENCE",
+      "order": 3,
+      "content": [
+        {
+          "id": "7d9135d2-42a0-4471-8c2b-7202c8cf825f",
+          "type": "experience_item",
+          "content": {
+            "id": "ca9c8119-3726-444a-b6a1-a87a878d2c5d",
+            "jobTitle": "Regional Head of Client Services & Projects",
+            "company": "",
+            "location": "Echotel International",
+            "startDate": "Jul 2025",
+            "endDate": "Present",
+            "description": "Head of Client Services & Projects Echotel International | Jul 2025 – Present",
+            "achievements": [
+              {
+                "id": "5ef9f578-4a4b-42ce-92ba-ba382313c850",
+                "text": "Led IT service and project delivery in Kenya, Uganda, Tanzania, Ghana, Namibia, and one additional country."
+              }
+            ]
+          }
+        },
+        {
+          "id": "d03fab97-8bb2-4674-b9f4-46fdcce08295",
+          "type": "experience_item",
+          "content": {
+            "id": "b8823901-f168-455e-badc-e663a3ac6069",
+            "jobTitle": "Zambia), overseeing 3 PMs and 17 technical engineers.",
+            "company": "",
+            "location": "",
+            "startDate": "",
+            "endDate": "",
+            "achievements": [
+              {
+                "id": "07b9ac97-ad7b-4e95-a7df-7ca9f1a385ae",
+                "text": "Implemented an omnichannel customer engagement platform, integrating CRM and WhatsApp, enhancing communication efficiency."
+              }
+            ]
+          }
+        },
+        {
+          "id": "9f148e66-fc73-4d40-9a4b-86d632da03fb",
+          "type": "experience_item",
+          "content": {
+            "id": "ea51b8df-4c03-44d6-88f4-a8d204fe4125",
+            "jobTitle": "IVR, and digital channels—boosted CSAT and NPS scores.",
+            "company": "",
+            "location": "",
+            "startDate": "",
+            "endDate": "",
+            "achievements": [
+              {
+                "id": "446373c1-7d58-419a-b228-876e95e51a22",
+                "text": "Led SD-WAN deployments using FortiGate and Meraki across 76 KFC retail sites in Kenya and Uganda, enhancing network efficiency."
+              }
+            ]
+          }
+        },
+        {
+          "id": "3d41e491-6626-4700-ac88-6eb997cf5048",
+          "type": "experience_item",
+          "content": {
+            "id": "71d2e88d-6934-4b61-bae8-e8c9809561ec",
+            "jobTitle": "improving network uptime to 99.9%.",
+            "company": "",
+            "location": "",
+            "startDate": "",
+            "endDate": "",
+            "achievements": [
+              {
+                "id": "92d4a6c8-d562-4f77-8db2-8785463e2cb6",
+                "text": "- 1 of 4 --"
+              },
+              {
+                "id": "13b94c15-3b8c-43c7-b9e8-626464556255",
+                "text": "Implemented automated monitoring systems for customer experience platforms and Starlink satellite uplinks, decreasing incident response time by 30%"
+              }
+            ]
+          }
+        },
+        {
+          "id": "5f7c948c-377e-4fec-8ba2-9ab36ffea491",
+          "type": "experience_item",
+          "content": {
+            "id": "bb7c05cd-6a1c-4b31-afa6-cdd260b37a63",
+            "jobTitle": "time by 30%.",
+            "company": "",
+            "location": "",
+            "startDate": "",
+            "endDate": "",
+            "achievements": [
+              {
+                "id": "373563bd-ecdb-4c13-9c83-247470075b8e",
+                "text": "Implemented vendor management framework and led SLA negotiations with MNOs, ISPs, and SaaS providers"
+              }
+            ]
+          }
+        },
+        {
+          "id": "c33518e1-e07c-4a7a-ac94-479ae7fd85f5",
+          "type": "experience_item",
+          "content": {
+            "id": "f756a7c4-34a6-4005-9675-8f462f5a28e6",
+            "jobTitle": "providers across Sub-Saharan Africa.",
+            "company": "",
+            "location": "",
+            "startDate": "",
+            "endDate": "",
+            "achievements": [
+              {
+                "id": "a4a47ad5-08d1-4c8a-944a-eee30b4ac553",
+                "text": "Implemented a centralized Global Service Desk improving regional IT support standardization."
+              },
+              {
+                "id": "5363c844-be81-4230-9902-4208a032b905",
+                "text": "Led migration of clients from Avanti Hylas 2 to Hylas 4 satellite platform."
+              }
+            ]
+          }
+        },
+        {
+          "id": "62aefe39-c059-4eb3-8e52-2d9ab951e5de",
+          "type": "experience_item",
+          "content": {
+            "id": "7c053ad7-f6b4-4176-9127-ce7975516f55",
+            "jobTitle": "IT Support Supervisor",
+            "company": "",
+            "location": "Church World Service (CWS Africa)",
+            "startDate": "Jan 2023",
+            "endDate": "Dec 2024",
+            "achievements": [
+              {
+                "id": "1e78de05-5d01-46d3-939d-9d4e32299cd5",
+                "text": "Led IT support for cloud and on-premises systems across 42 regional sites; coordinated a major data center build-out."
+              }
+            ]
+          }
+        },
+        {
+          "id": "f241ed4e-4a72-4bea-b7a5-f22382ee7238",
+          "type": "experience_item",
+          "content": {
+            "id": "fbb47798-a8ff-436d-b8c6-c728088190d1",
+            "jobTitle": "Uganda within time and budget.",
+            "company": "",
+            "location": "",
+            "startDate": "",
+            "endDate": "",
+            "achievements": [
+              {
+                "id": "69b08a0f-9abe-422a-8d8b-b991f6122ed8",
+                "text": "Led AWS Solutions Architecture ensuring secure connectivity via Okta to US refugee databases."
+              },
+              {
+                "id": "8ef336e6-c426-42cb-8a9b-4bd8819beaa5",
+                "text": "Facilitated NIST-compliant audits and Business Continuity Planning as Security Point of Contact, recognized nationally."
+              }
+            ]
+          }
+        },
+        {
+          "id": "be06bd06-a393-460f-af62-42f405076357",
+          "type": "experience_item",
+          "content": {
+            "id": "3f185006-0b6a-4c43-81d4-a2d90f16f222",
+            "jobTitle": "Director for excellence.",
+            "company": "",
+            "location": "",
+            "startDate": "",
+            "endDate": "",
+            "achievements": [
+              {
+                "id": "0e5dd13a-b46d-4921-822b-97184d9b5be6",
+                "text": "Implemented remote monitoring tools and enhanced field connectivity, reducing downtime by 20% and improving system reliability."
+              }
+            ]
+          }
+        },
+        {
+          "id": "823d33ae-b82e-4f79-a324-87d8cf1d3353",
+          "type": "experience_item",
+          "content": {
+            "id": "8eccd319-3fe1-4b5d-ae5d-71ee8d38579b",
+            "jobTitle": "SLAs.",
+            "company": "",
+            "location": "",
+            "startDate": "",
+            "endDate": "",
+            "achievements": [
+              {
+                "id": "689b269e-88ec-4226-847f-e121b72b6c3e",
+                "text": "Implemented project tracking with Monday.com,"
+              }
+            ]
+          }
+        },
+        {
+          "id": "93c97818-107a-4424-90f8-f956c0324758",
+          "type": "experience_item",
+          "content": {
+            "id": "8eccd319-3fe1-4b5d-ae5d-71ee8d38579b",
+            "jobTitle": "SLAs.",
+            "company": "",
+            "location": "",
+            "startDate": "",
+            "endDate": "",
+            "achievements": [
+              {
+                "id": "689b269e-88ec-4226-847f-e121b72b6c3e",
+                "text": "Implemented project tracking with Monday.com,"
+              }
+            ]
+          }
+        }
+      ],
+      "metadata": {
+        "originalHeading": "PROFESSIONAL EXPERIENCE",
+        "formatting": {
+          "capitalization": "uppercase"
+        }
+      }
+    },
+    {
+      "id": "d17db165-414d-452b-a2d0-939ce25c17c4",
+      "type": "custom",
+      "heading": "training",
+      "order": 4,
+      "content": [],
+      "metadata": {
+        "originalHeading": "training",
+        "formatting": {
+          "capitalization": "lowercase"
+        }
+      }
+    },
+    {
+      "id": "233f77f4-86ac-4d0b-947c-d7ed864bfd5b",
+      "type": "education",
+      "heading": "EDUCATION",
+      "order": 5,
+      "content": [
+        {
+          "id": "9cf6f0ef-4a94-4978-859e-bb0501d0cd97",
+          "type": "education_item",
+          "content": {
+            "id": "2875062b-9a28-421c-aae2-e7baae87df8d",
+            "degree": "MSc in Big Data Technologies (Expected 2025)",
+            "institution": "University of East London",
+            "location": "",
+            "graduationDate": "",
+            "gpa": ""
+          }
+        },
+        {
+          "id": "f42b1ad5-48ae-41fb-adda-6b667c8198be",
+          "type": "education_item",
+          "content": {
+            "id": "41ae5e4e-7d4e-4a61-8b9e-6685aedc2ec7",
+            "degree": "Higher National Diploma in Computing",
+            "institution": "BTEC EDEXCEL, UK – Computer Learning Centre",
+            "location": "",
+            "graduationDate": "",
+            "gpa": ""
+          }
+        }
+      ],
+      "metadata": {
+        "originalHeading": "EDUCATION",
+        "formatting": {
+          "capitalization": "uppercase"
+        }
+      }
+    },
+    {
+      "id": "9a47241d-9dae-4278-b33d-342367502043",
+      "type": "certifications",
+      "heading": "CERTIFICATIONS",
+      "order": 6,
+      "content": [
+        {
+          "id": "5ad09bf7-6f46-4975-94d5-5c0edf59edfe",
+          "type": "bullet_list",
+          "content": {
+            "items": [
+              {
+                "id": "a9c60e57-a5ae-4944-91c2-f6eb1021b72c",
+                "text": "AWS Certified Solutions Architect Associate",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "AWS Certified Solutions Architect Associate"
+                }
+              },
+              {
+                "id": "81d377b6-e84d-4794-bf20-2d3073f05171",
+                "text": "Pursuing AWS Certified Solutions Architect Professional",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "Pursuing AWS Certified Solutions Architect Professional"
+                }
+              },
+              {
+                "id": "72991e7e-4b3f-4056-80c5-455a7fce4b2e",
+                "text": "Microsoft Azure Fundamentals Certification",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "Microsoft Azure Fundamentals Certification"
+                }
+              },
+              {
+                "id": "4564d70c-9d39-4cfd-adc6-fade6df9d5c9",
+                "text": "Cisco CCNP, CCNA, CCDA Certifications",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "Cisco CCNP, CCNA, CCDA Certifications"
+                }
+              },
+              {
+                "id": "dc3dc087-fdd8-4119-b9c4-726591ee1a52",
+                "text": "ITIL Foundation Certification",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "ITIL Foundation Certification"
+                }
+              },
+              {
+                "id": "106c456d-b7c5-463b-93c0-473bbe28fa86",
+                "text": "Red Hat Certified System Administrator",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "Red Hat Certified System Administrator"
+                }
+              },
+              {
+                "id": "5456c7f6-2db8-48a6-9eec-500ede9818e5",
+                "text": "Microsoft Certified Solutions Associate (MCSA)",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "Microsoft Certified Solutions Associate (MCSA)"
+                }
+              },
+              {
+                "id": "09fbf763-4a28-4f87-998e-49ce21ca8201",
+                "text": "Project Management and Customer Service Skills",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "Project Management and Customer Service Skills"
+                }
+              },
+              {
+                "id": "01edb5ce-1bb3-435a-ae6d-1958695eeb64",
+                "text": "Plan to Obtain CISSP Certification by Q1 2026",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "Plan to Obtain CISSP Certification by Q1 2026"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "metadata": {
+        "originalHeading": "CERTIFICATIONS",
+        "formatting": {
+          "capitalization": "uppercase"
+        }
+      }
+    },
+    {
+      "id": "7af09c44-2205-446e-8cfa-d6ae7824913e",
+      "type": "awards",
+      "heading": "SELECTED ACHIEVEMENTS",
+      "order": 7,
+      "content": [
+        {
+          "id": "100453ca-6b0e-4a93-92e3-943311bb7f92",
+          "type": "bullet_list",
+          "content": {
+            "items": [
+              {
+                "id": "50c46c8f-99c9-4c55-9db3-564faed541a0",
+                "text": "Implemented infrastructure monitoring systems, reducing IT incident resolution time by 20%.",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "Implemented infrastructure monitoring systems, reducing IT incident resolution time by 20%."
+                }
+              },
+              {
+                "id": "1054568e-729d-472a-9baf-105ddf59bdfe",
+                "text": "Enhanced WAN uptime from 93% to 99% through managed WAN services.",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "Enhanced WAN uptime from 93% to 99% through managed WAN services."
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "metadata": {
+        "originalHeading": "SELECTED ACHIEVEMENTS",
+        "formatting": {
+          "capitalization": "uppercase"
+        }
+      }
+    },
+    {
+      "id": "c4c2e2e2-e90d-4daa-9d70-e0c4d1e931fe",
+      "type": "custom",
+      "heading": "TECHNICAL TOOLS & STACK",
+      "order": 8,
+      "content": [
+        {
+          "id": "24555384-5a42-45fb-8b23-7a8767852e6b",
+          "type": "bullet_list",
+          "content": {
+            "items": [
+              {
+                "id": "f4136322-2318-4e1f-b2b3-01c01cec7a18",
+                "text": "Implemented cloud solutions using AWS, Azure, and Google Workspace.",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "Implemented cloud solutions using AWS, Azure, and Google Workspace."
+                }
+              },
+              {
+                "id": "dd4a6bd3-e179-4074-bc4f-81d12f10cf69",
+                "text": "Managed networking technologies including MPLS, SD-WAN, FortiGate, Meraki, VPN, and BGP.",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "Managed networking technologies including MPLS, SD-WAN, FortiGate, Meraki, VPN, and BGP."
+                }
+              },
+              {
+                "id": "38c9b061-9d82-4392-a64b-8d6a57b96150",
+                "text": "Enhanced security protocols with McAfee ePO, WAF, SIEM, adhering to ISO 27001 and NIST standards, and developed DR/BCP strategies.",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "Enhanced security protocols with McAfee ePO, WAF, SIEM, adhering to ISO 27001 and NIST standards, and developed DR/BCP strategies."
+                }
+              },
+              {
+                "id": "fae37ff9-8ace-4348-a482-794014741e4f",
+                "text": "Utilized Monday.com, Helpdesk Systems, and Remote Access Tools for effective monitoring and support.",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "Utilized Monday.com, Helpdesk Systems, and Remote Access Tools for effective monitoring and support."
+                }
+              },
+              {
+                "id": "95ca205a-09d1-4027-ab2a-b51784a294db",
+                "text": "Gained foundational knowledge in Automation and DevOps with Terraform, CI/CD concepts, and Python scripting.",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "Gained foundational knowledge in Automation and DevOps with Terraform, CI/CD concepts, and Python scripting."
+                }
+              },
+              {
+                "id": "ae7ef1fe-a6b6-46b6-ace6-1ec2da83da3e",
+                "text": "Integrated CX platforms Connex1 and Zoho Desk for omnichannel support, including CRM, WhatsApp, and IVR systems.",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "Integrated CX platforms Connex1 and Zoho Desk for omnichannel support, including CRM, WhatsApp, and IVR systems."
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "metadata": {
+        "originalHeading": "TECHNICAL TOOLS & STACK",
+        "formatting": {
+          "capitalization": "uppercase"
+        }
+      }
+    },
+    {
+      "id": "bffac49c-0a5f-42fc-8449-8ffb95455864",
+      "type": "custom",
+      "heading": "REFEREES",
+      "order": 9,
+      "content": [
+        {
+          "id": "460449b4-abf1-4eb9-a80b-655af9018979",
+          "type": "text",
+          "content": "References available upon request."
+        }
+      ],
+      "metadata": {
+        "originalHeading": "REFEREES",
+        "formatting": {
+          "capitalization": "uppercase"
+        }
+      }
+    }
+  ],
+  "rawText": "CONTACT INFORMATION\nDavid Kaniaru Kamau\ndkamale@gmail.com\n254-723-7277\n\nPROFESSIONAL SUMMARY\nIT leader with 16+ years in designing and managing secure, scalable infrastructure across finance, telecom, and humanitarian sectors. Expertise in multi-country IT operations, cloud-first strategies (AWS, Azure), cybersecurity, and enterprise network optimization. Skilled in aligning technology with business goals while overseeing large teams and budgets. Currently pursuing AWS Solutions Architect – Professional and planning CISSP (Q1 2026).\n\nCORE COMPETENCIES\nIT Strategy & Governance (ISO 27001, NIST, ITIL v4), Cloud & Infrastructure (AWS, Azure, Hybrid Environments), Cybersecurity (SIEM, NGFW, Incident Response, BCP/DR), Network Architecture (MPLS, SD-WAN, Fortinet, Meraki, QoS), Call Centre & Voice (Omnichannel CX, VoIP, SIP, IVR, CRM), Project & Service Delivery (Agile, CI/CD, SLA/KPI Ownership), Vendor & Contract Management (ISPs, MNOs, SaaS, Licensing), Budgeting & Cost Optimization (OPEX/CAPEX Planning), People Leadership (Team Building, Career Pathing, Mentorship)\n\nPROFESSIONAL EXPERIENCE\nRegional Head of Client Services & Projects\nEchotel International | Jul 2025 - Present\nHead of Client Services & Projects Echotel International | Jul 2025 – Present\n• Led IT service and project delivery in Kenya, Uganda, Tanzania, Ghana, Namibia, and one additional country.\nZambia), overseeing 3 PMs and 17 technical engineers.\n• Implemented an omnichannel customer engagement platform, integrating CRM and WhatsApp, enhancing communication efficiency.\nIVR, and digital channels—boosted CSAT and NPS scores.\n• Led SD-WAN deployments using FortiGate and Meraki across 76 KFC retail sites in Kenya and Uganda, enhancing network efficiency.\nimproving network uptime to 99.9%.\n• - 1 of 4 --\n• Implemented automated monitoring systems for customer experience platforms and Starlink satellite uplinks, decreasing incident response time by 30%\ntime by 30%.\n• Implemented vendor management framework and led SLA negotiations with MNOs, ISPs, and SaaS providers\nproviders across Sub-Saharan Africa.\n• Implemented a centralized Global Service Desk improving regional IT support standardization.\n• Led migration of clients from Avanti Hylas 2 to Hylas 4 satellite platform.\nIT Support Supervisor\nChurch World Service (CWS Africa) | Jan 2023 - Dec 2024\n• Led IT support for cloud and on-premises systems across 42 regional sites; coordinated a major data center build-out.\nUganda within time and budget.\n• Led AWS Solutions Architecture ensuring secure connectivity via Okta to US refugee databases.\n• Facilitated NIST-compliant audits and Business Continuity Planning as Security Point of Contact, recognized nationally.\nDirector for excellence.\n• Implemented remote monitoring tools and enhanced field connectivity, reducing downtime by 20% and improving system reliability.\nSLAs.\n• Implemented project tracking with Monday.com,\n\ntraining\nover 15 engineers to enhance visibility and increase team efficiency.\nIT Infrastructure & Support Manager\nAfrican Banking Corporation | Aug 2013 - Nov 2020\n• Managed enterprise infrastructure and user support, achieving 99.99% system uptime across all branches.\n• Migrated 450 users from Microsoft Exchange to Google Workspace, increasing email system availability.\n• Enhanced infrastructure security with McAfee EPO, Web Application Firewalls, and SIEM implementation.\n• Decreased annual WAN expenses by $20,000 by consolidating vendors and renegotiating contracts.\n• Led Disaster Recovery Site deployment, saving $8,000 in capital expenditures.\n• Conducted skills gap analysis and training, aligning team roles with career development paths.\nTechnical Support Team Leader\nSafran Morpho (IEBC) | Nov 2012 - Jul 2013\n• Maintained 99% uptime for the nationwide biometric voter registration system in Kenya during 2013.\nelection cycle.\n• Managed server, storage, and network operations; supervised L1 support team, improving efficiency by 15%.\n• - 2 of 4 --\nIT Trainer & Cisco Partner Relations Access Kenya | May 2008 – May 2011\n• Led Cisco technology training programs to facilitate Access Kenya's upgrade to Premier Partner status\nstatus thereby unlocking upto 40% in vendor discounts\n• Trained over 100 staff across sales, technical, and marketing teams.\nIT Trainer & Support Engineer Computer Learning Centre & Mart Networks | Jan 2005 – May 2008\n• Conducted instructor-led training on CCNA, CCNP, A+, N+, and ICDL to over 2,000 learners across 3 years.\n• Recognized as Best Cisco Trainer in 2007 and 2008.\nstatus thereby unlocking upto 40% in vendor discounts\n• Trained over 100 staff across sales, technical, and marketing teams.\nIT Trainer & Support Engineer Computer Learning Centre & Mart Networks | Jan 2005 – May 2008\n• Conducted instructor-led training on CCNA, CCNP, A+, N+, and ICDL for over 2,000 learners in 3 years.\n• Recognized as Best Cisco Trainer in 2007 and 2008.\n\nEDUCATION\nMSc in Big Data Technologies (Expected 2025)\nUniversity of East London\nHigher National Diploma in Computing\nBTEC EDEXCEL, UK – Computer Learning Centre\n\nCERTIFICATIONS\n• AWS Certified Solutions Architect Associate\n• Pursuing AWS Certified Solutions Architect Professional\n• Microsoft Azure Fundamentals Certification\n• Cisco CCNP, CCNA, CCDA Certifications\n• ITIL Foundation Certification\n• Red Hat Certified System Administrator\n• Microsoft Certified Solutions Associate (MCSA)\n• Project Management and Customer Service Skills\n• Plan to Obtain CISSP Certification by Q1 2026\n\nSELECTED ACHIEVEMENTS\n• Implemented infrastructure monitoring systems, reducing IT incident resolution time by 20%.\n• Enhanced WAN uptime from 93% to 99% through managed WAN services.\nTECHNICAL TOOLS & STACK\n• Implemented cloud solutions using AWS, Azure, and Google Workspace.\n• Managed networking technologies including MPLS, SD-WAN, FortiGate, Meraki, VPN, and BGP.\n• Enhanced security protocols with McAfee ePO, WAF, SIEM, adhering to ISO 27001 and NIST standards, and developed DR/BCP strategies.\n• Utilized Monday.com, Helpdesk Systems, and Remote Access Tools for effective monitoring and support.\n• Gained foundational knowledge in Automation and DevOps with Terraform, CI/CD concepts, and Python scripting.\n• Integrated CX platforms Connex1 and Zoho Desk for omnichannel support, including CRM, WhatsApp, and IVR systems.\n\nREFEREES\nReferences available upon request."
+}

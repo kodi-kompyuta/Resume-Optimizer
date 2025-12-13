@@ -1,0 +1,580 @@
+{
+  "metadata": {
+    "parsedAt": "2025-12-09T08:29:40.444Z",
+    "wordCount": 861
+  },
+  "sections": [
+    {
+      "id": "d5f82621-3266-4ca2-9e56-2b031d218047",
+      "type": "contact",
+      "heading": "Contact Information",
+      "order": 0,
+      "content": [
+        {
+          "id": "493c8f64-4423-4816-a577-23e361ec490f",
+          "type": "contact_info",
+          "content": {
+            "name": "David Kaniaru Kamau",
+            "email": "dkamale@gmail.com",
+            "phone": "254-723-7277"
+          }
+        }
+      ]
+    },
+    {
+      "id": "2767cf63-3c31-4d4d-8e8c-41ffa7077918",
+      "type": "summary",
+      "heading": "PROFESSIONAL SUMMARY",
+      "order": 1,
+      "content": [
+        {
+          "id": "b12dde27-7472-418c-aeb8-b32130c2df26",
+          "type": "text",
+          "content": "Strategic and results-driven IT leader with 16+ years of experience in designing, deploying, and managing secure, scalable, and high-availability infrastructure across finance, telecommunications, and humanitarian sectors. Proven track record of leading multi-country IT operations, implementing cloud-first strategies (AWS & Azure), fortifying cybersecurity posture, and optimizing enterprise networks and customer platforms. Adept at aligning technology vision with business outcomes while managing large teams, complex budgets, and mission-critical vendor relationships. Currently pursuing AWS Solutions Architect – Professional and planning CISSP certification (Q1 2026)."
+        }
+      ],
+      "metadata": {
+        "originalHeading": "PROFESSIONAL SUMMARY",
+        "formatting": {
+          "capitalization": "uppercase"
+        }
+      }
+    },
+    {
+      "id": "4a2bebfa-a052-4839-98cd-8cbebda9b622",
+      "type": "skills",
+      "heading": "CORE COMPETENCIES",
+      "order": 2,
+      "content": [
+        {
+          "id": "9ae16efd-86a7-4b7e-93e4-8ec7ca9802fa",
+          "type": "skill_group",
+          "content": {
+            "skills": [
+              "IT Strategy & Governance (ISO 27001, NIST, ITIL v4)",
+              "Cloud & Infrastructure (AWS, Azure, Hybrid Environments)",
+              "Cybersecurity (SIEM, NGFW, Incident Response, BCP/DR)",
+              "Network Architecture (MPLS, SD-WAN, Fortinet, Meraki, QoS)",
+              "Call Centre & Voice (Omnichannel CX, VoIP, SIP, IVR, CRM)",
+              "Project & Service Delivery (Agile, CI/CD, SLA/KPI Ownership)",
+              "Vendor & Contract Management (ISPs, MNOs, SaaS, Licensing)",
+              "Budgeting & Cost Optimization (OPEX/CAPEX Planning)",
+              "People Leadership (Team Building, Career Pathing, Mentorship)"
+            ]
+          }
+        }
+      ],
+      "metadata": {
+        "originalHeading": "CORE COMPETENCIES",
+        "formatting": {
+          "capitalization": "uppercase"
+        }
+      }
+    },
+    {
+      "id": "991c58c7-2fcc-4e23-8c6c-4a13f705913f",
+      "type": "experience",
+      "heading": "PROFESSIONAL EXPERIENCE",
+      "order": 3,
+      "content": [
+        {
+          "id": "6e29e41b-82a0-4057-979c-a73a1b12d205",
+          "type": "experience_item",
+          "content": {
+            "id": "bef11daa-942d-4dac-a36d-584421f43bc1",
+            "jobTitle": "Regional Head of Client Services & Projects",
+            "company": "",
+            "location": "Echotel International",
+            "startDate": "Jul 2025",
+            "endDate": "Present",
+            "description": "Head of Client Services & Projects Echotel International | Jul 2025 – Present",
+            "achievements": [
+              {
+                "id": "c8bce555-3a38-4077-a9f2-582030b65304",
+                "text": "Led IT services and project delivery across 6 countries (Kenya, Uganda, Tanzania, Ghana, Namibia, Zambia), overseeing 3 PMs and 17 technical engineers."
+              },
+              {
+                "id": "e31c6ad9-9571-4ddd-b05b-662071f04680",
+                "text": "Architected and deployed an omnichannel customer engagement platform, integrating CRM, WhatsApp, IVR, and digital channels—boosted CSAT and NPS scores."
+              },
+              {
+                "id": "393bf203-789c-4322-9048-4b26512ba6de",
+                "text": "Spearheaded SD-WAN rollouts (FortiGate & Meraki) across 76 retail sites (KFC) in Kenya & Uganda, improving network uptime to 99.9%."
+              },
+              {
+                "id": "ea4df62c-283e-4bb6-ace1-ef101c1c5fde",
+                "text": "Deployed automated monitoring for CX platforms and satellite uplinks (Starlink), reducing incident response time by 30%."
+              },
+              {
+                "id": "6570943d-8263-417b-bf56-6df605388837",
+                "text": "Implemented a vendor management framework and led SLA negotiations with MNOs, ISPs, and SaaS providers across Sub-Saharan Africa."
+              },
+              {
+                "id": "47a96d81-06cb-43cd-82eb-d8598b2dbc58",
+                "text": "Established a centralized Global Service Desk to standardize IT support operations regionally."
+              },
+              {
+                "id": "b7188730-5629-4415-acca-bfdb4cb6ab22",
+                "text": "Initiated migration of clients from Avanti Hylas 2 to Hylas 4 satellite platform."
+              }
+            ]
+          }
+        },
+        {
+          "id": "caf14441-1bd3-403c-a441-95249cc55477",
+          "type": "experience_item",
+          "content": {
+            "id": "fe0cff84-0b98-419e-b92d-88edc8a8fd6a",
+            "jobTitle": "IT Support Supervisor",
+            "company": "",
+            "location": "Church World Service (CWS Africa)",
+            "startDate": "Jan 2023",
+            "endDate": "Dec 2024",
+            "achievements": [
+              {
+                "id": "867538e2-dd53-4b57-9427-a64250de10e6",
+                "text": "Led cloud/on-prem IT support across 42 regional sites and coordinated a major data center build-out in Uganda within time and budget."
+              },
+              {
+                "id": "769649c7-bc37-4460-b1eb-671c6e31e18b",
+                "text": "Acted as Solutions Architect for secure AWS connectivity (via Okta) to US refugee databases."
+              },
+              {
+                "id": "fd8f277e-666b-4832-8207-38dee23dc757",
+                "text": "Supported NIST-compliant audit and BCP planning, serving as security POC—recognized by Country Director for excellence."
+              },
+              {
+                "id": "1ca1235d-1416-46c6-ae46-12c57e1340bc",
+                "text": "Enhanced field connectivity and implemented remote monitoring tools, reducing downtime and improving SLAs."
+              },
+              {
+                "id": "ad678861-098a-424d-a8c1-05497dfb723f",
+                "text": "Introduced project tracking via Monday.com; trained 15+ engineers, improving visibility and team efficiency."
+              }
+            ]
+          }
+        },
+        {
+          "id": "fc85b94a-a82b-4993-b49e-7e6c00f29035",
+          "type": "experience_item",
+          "content": {
+            "id": "6ec162a2-ae72-4fe5-a0e7-6be14ea660d6",
+            "jobTitle": "IT Infrastructure & Support Manager",
+            "company": "",
+            "location": "African Banking Corporation",
+            "startDate": "Aug 2013",
+            "endDate": "Nov 2020",
+            "achievements": [
+              {
+                "id": "95c71b76-1870-4522-ab66-463c5061df9c",
+                "text": "Directed enterprise infrastructure and end-user support across branches; improved uptime to 99.99%."
+              },
+              {
+                "id": "89a7616c-e30c-4f08-a2df-0fe39b3dc9de",
+                "text": "Migrated 450 users from Microsoft Exchange to Google Workspace, enhancing email availability."
+              },
+              {
+                "id": "d2967559-fbdd-471f-8833-587885ab1a67",
+                "text": "Implemented infrastructure hardening using McAfee EPO, Web Application Firewalls, and SIEM."
+              },
+              {
+                "id": "2adf14b3-d54a-4cf3-b6a1-6c4089230d1e",
+                "text": "Reduced annual WAN costs by $20,000 through vendor consolidation and contract renegotiation."
+              },
+              {
+                "id": "1aeb52cf-feae-4dd4-91d6-060257379da9",
+                "text": "Led the deployment of Disaster Recovery Site, saving $8,000 in CAPEX."
+              },
+              {
+                "id": "04bb4b82-7712-4a4f-bcd7-98b32f09368f",
+                "text": "Coordinated team-wide skills gap analysis and training plans, aligning roles with career paths."
+              }
+            ]
+          }
+        },
+        {
+          "id": "ca29ae11-f514-4ddc-a00b-8c8a75b7b349",
+          "type": "experience_item",
+          "content": {
+            "id": "bbd0aead-39e8-48c0-943b-20c3d3a01b6c",
+            "jobTitle": "Technical Support Team Leader",
+            "company": "",
+            "location": "Safran Morpho (IEBC)",
+            "startDate": "Nov 2012",
+            "endDate": "Jul 2013",
+            "achievements": [
+              {
+                "id": "2f4a4d73-dc5e-4027-8def-3c783ca1e712",
+                "text": "Ensured 99% uptime of nationwide biometric voter registration infrastructure during the 2013 Kenyan election cycle."
+              },
+              {
+                "id": "1bc9bf85-8e2c-4094-954d-2603d7d893d6",
+                "text": "Oversaw server, storage, and network operations; led a small L1 support team."
+              }
+            ]
+          }
+        },
+        {
+          "id": "3e7b02ae-f1c1-4594-8212-e5563144ad95",
+          "type": "experience_item",
+          "content": {
+            "id": "fc276232-4b82-4069-991d-10129744e106",
+            "jobTitle": "IT Trainer & Cisco Partner Relations",
+            "company": "",
+            "location": "Access Kenya",
+            "startDate": "May 2008",
+            "endDate": "May 2011",
+            "achievements": [
+              {
+                "id": "919ca812-c741-4852-946e-fe7f8d2f2ec2",
+                "text": "Spearheaded Cisco technology training programs, enabling Access Kenya to upgrade to Premier Partner status thereby unlocking upto 40% in vendor discounts"
+              },
+              {
+                "id": "74db5cda-ff57-47b2-b611-6a2a215ddcd9",
+                "text": "Trained over 100 staff across sales, technical, and marketing teams."
+              }
+            ]
+          }
+        },
+        {
+          "id": "cf204f58-2c8f-4dc5-a5a1-130bae9c45eb",
+          "type": "experience_item",
+          "content": {
+            "id": "3b5334f1-e86d-4e39-9612-d3ba17b361d8",
+            "jobTitle": "IT Trainer & Support Engineer",
+            "company": "",
+            "location": "",
+            "startDate": "Jan 2005",
+            "endDate": "May 2008",
+            "achievements": [
+              {
+                "id": "9e9e2986-dfba-4e64-aa81-777abe784a08",
+                "text": "Delivered instructor-led training on CCNA/CCNP, A+, N+, and ICDL to 2,000+ learners over 3 years."
+              },
+              {
+                "id": "85283d4b-c9da-467a-97f3-4116ee7034cd",
+                "text": "Awarded Best Cisco Trainer (2007 & 2008)."
+              }
+            ]
+          }
+        },
+        {
+          "id": "3aee4f2e-7360-4917-bab9-ab2944a99ae5",
+          "type": "experience_item",
+          "content": {
+            "id": "3b5334f1-e86d-4e39-9612-d3ba17b361d8",
+            "jobTitle": "IT Trainer & Support Engineer",
+            "company": "",
+            "location": "",
+            "startDate": "Jan 2005",
+            "endDate": "May 2008",
+            "achievements": [
+              {
+                "id": "9e9e2986-dfba-4e64-aa81-777abe784a08",
+                "text": "Delivered instructor-led training on CCNA/CCNP, A+, N+, and ICDL to 2,000+ learners over 3 years."
+              },
+              {
+                "id": "85283d4b-c9da-467a-97f3-4116ee7034cd",
+                "text": "Awarded Best Cisco Trainer (2007 & 2008)."
+              }
+            ]
+          }
+        }
+      ],
+      "metadata": {
+        "originalHeading": "PROFESSIONAL EXPERIENCE",
+        "formatting": {
+          "capitalization": "uppercase"
+        }
+      }
+    },
+    {
+      "id": "91e2a5c1-4ce4-402e-9d98-1c2121e42261",
+      "type": "education",
+      "heading": "EDUCATION",
+      "order": 4,
+      "content": [
+        {
+          "id": "75e1478e-9966-4e07-8cde-aab03bf620d9",
+          "type": "education_item",
+          "content": {
+            "id": "57506747-0d39-4ee7-a4aa-3cd066672464",
+            "degree": "MSc in Big Data Technologies (Expected 2025)University of East London",
+            "institution": "Higher National Diploma in ComputingBTEC EDEXCEL, UK – Computer Learning Centre",
+            "location": "",
+            "graduationDate": "",
+            "gpa": ""
+          }
+        }
+      ],
+      "metadata": {
+        "originalHeading": "EDUCATION",
+        "formatting": {
+          "capitalization": "uppercase"
+        }
+      }
+    },
+    {
+      "id": "f3622410-9639-44ee-b3ac-88706bec5ad7",
+      "type": "certifications",
+      "heading": "CERTIFICATIONS",
+      "order": 5,
+      "content": [
+        {
+          "id": "0bbbca26-3bcb-4747-b17f-33ecf2f47a0e",
+          "type": "bullet_list",
+          "content": {
+            "items": [
+              {
+                "id": "6700245f-24a1-4582-b3d1-89794217ef08",
+                "text": "AWS Certified Solutions Architect – Associate",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "AWS Certified Solutions Architect – Associate"
+                }
+              },
+              {
+                "id": "d360cba0-f2a7-4018-a4dd-a3aebe630a40",
+                "text": "(Pursuing AWS Solutions Architect – Professional)",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "(Pursuing AWS Solutions Architect – Professional)"
+                }
+              },
+              {
+                "id": "819be28d-1d2f-4bce-bae9-7adf2477c8bb",
+                "text": "Azure Fundamentals",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "Azure Fundamentals"
+                }
+              },
+              {
+                "id": "526c6c07-7a36-4429-adc1-f524aa5aaadd",
+                "text": "CCNP, CCNA, CCDA",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "CCNP, CCNA, CCDA"
+                }
+              },
+              {
+                "id": "bf5fbe14-aebe-41c7-a185-725c06b36f06",
+                "text": "ITIL Foundation",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "ITIL Foundation"
+                }
+              },
+              {
+                "id": "1e27afc2-adfd-4a5e-9d96-6f409e91385a",
+                "text": "Red Hat Systems Administration",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "Red Hat Systems Administration"
+                }
+              },
+              {
+                "id": "90ce53be-66d6-4c9f-ba19-cee3d2d73393",
+                "text": "MCSA",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "MCSA"
+                }
+              },
+              {
+                "id": "3235c2f7-0b5a-4601-84ac-50aa941d5155",
+                "text": "Project Management & Customer Service",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "Project Management & Customer Service"
+                }
+              },
+              {
+                "id": "83eb74e0-5239-43b3-8c76-969b5186b0c9",
+                "text": "(CISSP – Planned Q1 2026)",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "(CISSP – Planned Q1 2026)"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "metadata": {
+        "originalHeading": "CERTIFICATIONS",
+        "formatting": {
+          "capitalization": "uppercase"
+        }
+      }
+    },
+    {
+      "id": "28c57675-7c80-496b-97b2-e3b36b7b7dd4",
+      "type": "awards",
+      "heading": "SELECTED ACHIEVEMENTS",
+      "order": 6,
+      "content": [
+        {
+          "id": "31393e03-4d53-4b70-9dc3-3cf3c109b766",
+          "type": "bullet_list",
+          "content": {
+            "items": [
+              {
+                "id": "23dd8f34-35de-416d-b6ff-4edcfaee3569",
+                "text": "Reduced IT incident resolution time by 20% via infrastructure monitoring systems.",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "Reduced IT incident resolution time by 20% via infrastructure monitoring systems."
+                }
+              },
+              {
+                "id": "c8b8e912-90cb-4096-8af1-e4e5171dc512",
+                "text": "Improved WAN uptime from 93% → 99% using managed WAN services.",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "Improved WAN uptime from 93% → 99% using managed WAN services."
+                }
+              },
+              {
+                "id": "3309b2b8-ee62-4931-844f-0740ee00ff3e",
+                "text": "Consistently delivered >90% of IT projects on time and within budget.",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "Consistently delivered >90% of IT projects on time and within budget."
+                }
+              },
+              {
+                "id": "ac4a1076-ee4f-4b4c-8ae5-040489f2a2a9",
+                "text": "Supported security audits and ensured zero critical findings in key reviews.",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "Supported security audits and ensured zero critical findings in key reviews."
+                }
+              },
+              {
+                "id": "f563b258-8d6d-4e13-a0e5-4fb2ed1f94df",
+                "text": "Delivered $20,000 annual cost savings via strategic vendor outsourcing.",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "Delivered $20,000 annual cost savings via strategic vendor outsourcing."
+                }
+              },
+              {
+                "id": "f01e9f26-e1a0-4742-86d9-fe16eb1909f8",
+                "text": "Deployed automated monitoring and improved processes thereby bringing down MTTR to below 2 hours.",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "Deployed automated monitoring and improved processes thereby bringing down MTTR to below 2 hours."
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "metadata": {
+        "originalHeading": "SELECTED ACHIEVEMENTS",
+        "formatting": {
+          "capitalization": "uppercase"
+        }
+      }
+    },
+    {
+      "id": "b739d2da-611b-43af-a3d1-f7237cbdb6f5",
+      "type": "custom",
+      "heading": "TECHNICAL TOOLS & STACK",
+      "order": 7,
+      "content": [
+        {
+          "id": "049b8fd1-4c2a-4414-be7f-42186f00cbdd",
+          "type": "bullet_list",
+          "content": {
+            "items": [
+              {
+                "id": "3a3217d0-67ac-4a56-8b06-317798b075e2",
+                "text": "Cloud: AWS, Azure, Google Workspace",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "Cloud: AWS, Azure, Google Workspace"
+                }
+              },
+              {
+                "id": "b59334be-d1c7-4c6e-9a20-9a26791d0e44",
+                "text": "Networking: MPLS, SD-WAN, FortiGate, Meraki, VPN,  BGP",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "Networking: MPLS, SD-WAN, FortiGate, Meraki, VPN,  BGP"
+                }
+              },
+              {
+                "id": "a4ae7d9a-eeca-4f46-87df-d32fa3f3116e",
+                "text": "Security: McAfee ePO, WAF, SIEM, ISO 27001, NIST, DR/BCP",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "Security: McAfee ePO, WAF, SIEM, ISO 27001, NIST, DR/BCP"
+                }
+              },
+              {
+                "id": "960f1934-c4ea-42a0-8c3d-ce7584a65ee0",
+                "text": "Monitoring: Monday.com, Helpdesk Systems, Remote Access Tools",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "Monitoring: Monday.com, Helpdesk Systems, Remote Access Tools"
+                }
+              },
+              {
+                "id": "ac1d7d6d-8521-46bf-b207-5d15c2bd7aa4",
+                "text": "Automation & DevOps (basic exposure): Terraform (intro), CI/CD concepts, Python scripting",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "Automation & DevOps (basic exposure): Terraform (intro), CI/CD concepts, Python scripting"
+                }
+              },
+              {
+                "id": "4909c5a0-036b-4187-add6-005f575778c3",
+                "text": "CX Platforms: Connex1 & Zoho Desk Omnichannel integration, CRM, WhatsApp, IVR (Platforms comparable to Ameyo)",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "CX Platforms: Connex1 & Zoho Desk Omnichannel integration, CRM, WhatsApp, IVR (Platforms comparable to Ameyo)"
+                }
+              },
+              {
+                "id": "b009a63c-3e07-4a73-bc47-b52f86a9c33c",
+                "text": "Project Tools: Jira, Confluence, SharePoint",
+                "metadata": {
+                  "indentLevel": 0,
+                  "originalText": "Project Tools: Jira, Confluence, SharePoint"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "metadata": {
+        "originalHeading": "TECHNICAL TOOLS & STACK",
+        "formatting": {
+          "capitalization": "uppercase"
+        }
+      }
+    },
+    {
+      "id": "f67da49e-f5a8-4726-ae17-0a7362cec416",
+      "type": "custom",
+      "heading": "REFEREES",
+      "order": 8,
+      "content": [
+        {
+          "id": "3adce2cb-02d1-4b73-8b12-6d840509d41b",
+          "type": "text",
+          "content": "Available upon request."
+        }
+      ],
+      "metadata": {
+        "originalHeading": "REFEREES",
+        "formatting": {
+          "capitalization": "uppercase"
+        }
+      }
+    }
+  ],
+  "rawText": "David Kaniaru Kamau\n📱 +254-723-727791 | ✉️ dkamale@gmail.com | 🌍 Nairobi, Kenya\nPROFESSIONAL SUMMARY\nStrategic and results-driven IT leader with 16+ years of experience in designing, deploying, and managing secure, scalable, and high-availability infrastructure across finance, telecommunications, and humanitarian sectors. Proven track record of leading multi-country IT operations, implementing cloud-first strategies (AWS & Azure), fortifying cybersecurity posture, and optimizing enterprise networks and customer platforms. Adept at aligning technology vision with business outcomes while managing large teams, complex budgets, and mission-critical vendor relationships. Currently pursuing AWS Solutions Architect – Professional and planning CISSP certification (Q1 2026).\nCORE COMPETENCIES\n• IT Strategy & Governance (ISO 27001, NIST, ITIL v4)\n• Cloud & Infrastructure (AWS, Azure, Hybrid Environments)\n• Cybersecurity (SIEM, NGFW, Incident Response, BCP/DR)\n• Network Architecture (MPLS, SD-WAN, Fortinet, Meraki, QoS)\n• Call Centre & Voice (Omnichannel CX, VoIP, SIP, IVR, CRM)\n• Project & Service Delivery (Agile, CI/CD, SLA/KPI Ownership)\n• Vendor & Contract Management (ISPs, MNOs, SaaS, Licensing)\n• Budgeting & Cost Optimization (OPEX/CAPEX Planning)\n• People Leadership (Team Building, Career Pathing, Mentorship)\nPROFESSIONAL EXPERIENCE\nRegional Head of Client Services & Projects\nEchotel International | Jul 2025 – Present\nHead of Client Services & Projects\nEchotel International | Jul 2025 – Present\n• Led IT services and project delivery across 6 countries (Kenya, Uganda, Tanzania, Ghana, Namibia, Zambia), overseeing 3 PMs and 17 technical engineers.\n• Architected and deployed an omnichannel customer engagement platform, integrating CRM, WhatsApp, IVR, and digital channels—boosted CSAT and NPS scores.\n• Spearheaded SD-WAN rollouts (FortiGate & Meraki) across 76 retail sites (KFC) in Kenya & Uganda, improving network uptime to 99.9%.\n• Deployed automated monitoring for CX platforms and satellite uplinks (Starlink), reducing incident response time by 30%.\n• Implemented a vendor management framework and led SLA negotiations with MNOs, ISPs, and SaaS providers across Sub-Saharan Africa.\n• Established a centralized Global Service Desk to standardize IT support operations regionally.\n• Initiated migration of clients from Avanti Hylas 2 to Hylas 4 satellite platform.\nIT Support Supervisor\nChurch World Service (CWS Africa) | Jan 2023 – Dec 2024\n• Led cloud/on-prem IT support across 42 regional sites and coordinated a major data center build-out in Uganda within time and budget.\n• Acted as Solutions Architect for secure AWS connectivity (via Okta) to US refugee databases.\n• Supported NIST-compliant audit and BCP planning, serving as security POC—recognized by Country Director for excellence.\n• Enhanced field connectivity and implemented remote monitoring tools, reducing downtime and improving SLAs.\n• Introduced project tracking via Monday.com; trained 15+ engineers, improving visibility and team efficiency.\nIT Infrastructure & Support Manager\nAfrican Banking Corporation | Aug 2013 – Nov 2020\n• Directed enterprise infrastructure and end-user support across branches; improved uptime to 99.99%.\n• Migrated 450 users from Microsoft Exchange to Google Workspace, enhancing email availability.\n• Implemented infrastructure hardening using McAfee EPO, Web Application Firewalls, and SIEM.\n• Reduced annual WAN costs by $20,000 through vendor consolidation and contract renegotiation.\n• Led the deployment of Disaster Recovery Site, saving $8,000 in CAPEX.\n• Coordinated team-wide skills gap analysis and training plans, aligning roles with career paths.\nTechnical Support Team Leader\nSafran Morpho (IEBC) | Nov 2012 – Jul 2013\n• Ensured 99% uptime of nationwide biometric voter registration infrastructure during the 2013 Kenyan election cycle.\n• Oversaw server, storage, and network operations; led a small L1 support team.\nIT Trainer & Cisco Partner Relations\nAccess Kenya | May 2008 – May 2011\n• Spearheaded Cisco technology training programs, enabling Access Kenya to upgrade to Premier Partner status thereby unlocking upto 40% in vendor discounts\n• Trained over 100 staff across sales, technical, and marketing teams.\nIT Trainer & Support Engineer\nComputer Learning Centre & Mart Networks | Jan 2005 – May 2008\n• Delivered instructor-led training on CCNA/CCNP, A+, N+, and ICDL to 2,000+ learners over 3 years.\n• Awarded Best Cisco Trainer (2007 & 2008).\nEDUCATION\nMSc in Big Data Technologies (Expected 2025)University of East London\nHigher National Diploma in ComputingBTEC EDEXCEL, UK – Computer Learning Centre\nCERTIFICATIONS\n• AWS Certified Solutions Architect – Associate\n• (Pursuing AWS Solutions Architect – Professional)\n• Azure Fundamentals\n• CCNP, CCNA, CCDA\n• ITIL Foundation\n• Red Hat Systems Administration\n• MCSA\n• Project Management & Customer Service\n• (CISSP – Planned Q1 2026)\nSELECTED ACHIEVEMENTS\n• Reduced IT incident resolution time by 20% via infrastructure monitoring systems.\n• Improved WAN uptime from 93% → 99% using managed WAN services.\n• Consistently delivered >90% of IT projects on time and within budget.\n• Supported security audits and ensured zero critical findings in key reviews.\n• Delivered $20,000 annual cost savings via strategic vendor outsourcing.\n• Deployed automated monitoring and improved processes thereby bringing down MTTR to below 2 hours.\nTECHNICAL TOOLS & STACK\n• Cloud: AWS, Azure, Google Workspace\n• Networking: MPLS, SD-WAN, FortiGate, Meraki, VPN,  BGP\n• Security: McAfee ePO, WAF, SIEM, ISO 27001, NIST, DR/BCP\n• Monitoring: Monday.com, Helpdesk Systems, Remote Access Tools\n• Automation & DevOps (basic exposure): Terraform (intro), CI/CD concepts, Python scripting\n• CX Platforms: Connex1 & Zoho Desk Omnichannel integration, CRM, WhatsApp, IVR (Platforms comparable to Ameyo)\n• Project Tools: Jira, Confluence, SharePoint\nREFEREES\nAvailable upon request."
+}

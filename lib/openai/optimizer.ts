@@ -357,6 +357,7 @@ export async function optimizeResume(
       return {
         originalResume: structuredResume,
         optimizedResume,
+        optimizedJson: optimizedJson, // Include the JSON for template rendering
         changes,
         summary,
         preview,

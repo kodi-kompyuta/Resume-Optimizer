@@ -340,6 +340,7 @@ export interface OptimizationOptions {
 export interface OptimizationResult {
   originalResume: StructuredResume
   optimizedResume: StructuredResume
+  optimizedJson?: any // Optional: the clean JSON format for template rendering
   changes: ChangeLog[]
   summary: OptimizationSummary
   preview: DiffPreview

@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
 import { generateDocx } from '@/lib/services/docx-export'
+import { fillResumeTemplate } from '@/lib/templates/fill-template'
 import { parseDOCX } from '@/lib/parsers/docx'
 import { ResumeStructureParser } from '@/lib/parsers/structure-parser'
 import { StructuredResume } from '@/types'
@@ -50,9 +51,20 @@ export async function POST(request: Request) {
 
     // Generate the DOCX file
     const filename = resume.original_filename.replace(/\.[^/.]+$/, '.docx')
-    // Use structured data if available, otherwise fall back to plain text
+
+    let buffer: Buffer
     const resumeData = resume.structured_data || resume.resume_text
-    const buffer = await generateDocx(resumeData, filename)
+
+    // Check if resume has optimized_json_data (new template format)
+    if (resume.optimized_json_data) {
+      console.log('[DOCX Export] Using new professional template with optimized JSON data')
+      buffer = await fillResumeTemplate(resume.optimized_json_data)
+    }
+    // Otherwise use structured data or plain text with old generator
+    else {
+      console.log('[DOCX Export] Using legacy generator')
+      buffer = await generateDocx(resumeData, filename)
+    }
 
     // CRITICAL: Validate the exported DOCX maintains correct structure
     // This prevents broken exports with duplicate jobs

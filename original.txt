@@ -1,0 +1,4 @@
+  File "<string>", line 1
+    import docx; doc = docx.Document('C:\Users\DavidKamau\Downloads\David Kaniaru Kamau 2412.docx'); print('\n'.join([p.text for p in doc.paragraphs]))
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+SyntaxError: (unicode error) 'unicodeescape' codec can't decode bytes in position 2-3: truncated \UXXXXXXXX escape

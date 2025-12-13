@@ -1,0 +1,98 @@
+CONTACT INFORMATION
+David Kaniaru Kamau
+dkamale@gmail.com
+254-723-7277
+
+PROFESSIONAL SUMMARY
+IT leader with 16+ years experience in designing and managing secure, scalable infrastructure in finance, telecom, and humanitarian sectors. Expertise in multi-country IT operations, cloud strategies (AWS, Azure), cybersecurity, and network optimization. Skilled in aligning technology with business
+
+objective
+s, managing large teams and budgets. Currently pursuing AWS Solutions Architect – Professional; planning CISSP in Q1 2026.
+
+CORE COMPETENCIES
+IT Strategy & Governance (ISO 27001, NIST, ITIL v4), Cloud & Infrastructure (AWS, Azure, Hybrid Environments), Cybersecurity (SIEM, NGFW, Incident Response, BCP/DR), Network Architecture (MPLS, SD-WAN, Fortinet, Meraki, QoS), Call Centre & Voice (Omnichannel CX, VoIP, SIP, IVR, CRM), Project & Service Delivery (Agile, CI/CD, SLA/KPI Ownership), Vendor & Contract Management (ISPs, MNOs, SaaS, Licensing), Budgeting & Cost Optimization (OPEX/CAPEX Planning), People Leadership (Team Building, Career Pathing, Mentorship)
+
+PROFESSIONAL EXPERIENCE
+Regional Head of Client Services & Projects
+Echotel International | Jul 2025 - Present
+Head of Client Services & Projects Echotel International | Jul 2025 – Present
+• Led IT service and project delivery across six countries, including Kenya, Uganda, Tanzania, Ghana, and Namibia, enhancing regional efficiency.
+Zambia), overseeing 3 PMs and 17 technical engineers.
+• Implemented a customer engagement platform integrating CRM and WhatsApp, improving communication efficiency by 30%.
+IVR, and digital channels—boosted CSAT and NPS scores.
+• Implemented SD-WAN solutions with FortiGate and Meraki for 76 KFC retail sites in Kenya and Uganda, improving network efficiency.
+improving network uptime to 99.9%.
+• - 1 of 4 --
+• Implemented automated monitoring systems for customer experience platforms and satellite uplinks, reducing incident response time by 30%
+time by 30%.
+• Implemented vendor management framework and led SLA negotiations with MNOs, ISPs, and SaaS providers, enhancing service efficiency by 20%
+providers across Sub-Saharan Africa.
+• Implemented a centralized Global Service Desk to enhance IT support standardization across regions.
+• Led client migration from Avanti Hylas 2 to Hylas 4 satellite platform, ensuring seamless transition.
+IT Support Supervisor
+Church World Service (CWS Africa) | Jan 2023 - Dec 2024
+• Led IT support for cloud and on-premises systems across 42 regional sites and coordinated a major data center expansion.
+Uganda within time and budget.
+• Led AWS Solutions Architecture to ensure secure Okta connectivity with US refugee databases.
+• Facilitated NIST-compliant audits and Business Continuity Planning as Security Point of Contact, earning national recognition.
+Director for excellence.
+• Implemented remote monitoring tools and improved field connectivity, reducing downtime by 20% and increasing system reliability.
+SLAs.
+• Implemented project tracking using Monday.com,
+
+training
+15+ engineers to improve visibility and boost team efficiency.
+IT Infrastructure & Support Manager
+African Banking Corporation | Aug 2013 - Nov 2020
+• Managed enterprise infrastructure and user support, maintaining 99.99% system uptime across all locations.
+• Migrated 450 users from Microsoft Exchange to Google Workspace, enhancing email system availability.
+• Enhanced security by implementing McAfee EPO, Web Application Firewalls, and SIEM.
+• Reduced annual WAN costs by $20,000 through vendor consolidation and contract negotiation.
+• Led Disaster Recovery Site deployment, reducing capital expenditures by $8,000.
+• Performed skills gap analysis and training, aligning team roles with career paths.
+Technical Support Team Leader
+Safran Morpho (IEBC) | Nov 2012 - Jul 2013
+• Achieved 99% uptime for Kenya's biometric voter registration system nationwide in 2013.
+election cycle.
+• Led server, storage, and network operations while supervising Level 1 support team, enhancing efficiency by 15%.
+• - 2 of 4 -- IT Trainer & Cisco Partner Relations Access Kenya | May 2008 – May 2011
+• Led Cisco technology training programs, enabling Access Kenya to achieve Premier Partner status
+status thereby unlocking upto 40% in vendor discounts
+• Trained over 100 staff across sales, technical, and marketing teams. IT Trainer & Support Engineer Computer Learning Centre & Mart Networks | Jan 2005 – May 2008
+• Led instructor training on CCNA, CCNP, A+, N+, and ICDL for over 2,000 learners in 3 years.
+• Awarded Best Cisco Trainer for exceptional performance in 2007 and 2008.
+status thereby unlocking upto 40% in vendor discounts
+• Trained over 100 staff across sales, technical, and marketing teams. IT Trainer & Support Engineer Computer Learning Centre & Mart Networks | Jan 2005 – May 2008
+• Led instructor-led training sessions on CCNA, CCNP, A+, N+, and ICDL, educating over 2,000 learners in 3 years.
+• Awarded Best Cisco Trainer in 2007 and 2008 for exceptional training delivery and learner success.
+
+EDUCATION
+MSc in Big Data Technologies (Expected 2025)
+University of East London
+Higher National Diploma in Computing
+BTEC EDEXCEL, UK – Computer Learning Centre
+
+CERTIFICATIONS
+• Obtained AWS Certified Solutions Architect Associate
+• Currently pursuing AWS Certified Solutions Architect Professional
+• Completed Microsoft Azure Fundamentals Certification
+• Earned Cisco CCNP, CCNA, and CCDA Certifications
+• Achieved ITIL Foundation Certification
+• Certified as Red Hat Certified System Administrator
+• Secured Microsoft Certified Solutions Associate (MCSA)
+• Developed Project Management and Customer Service Skills
+• Planning to obtain CISSP Certification by Q1 2026
+
+SELECTED ACHIEVEMENTS
+• Implemented infrastructure monitoring systems to reduce IT incident resolution time by 20%.
+• Improved WAN uptime from 93% to 99% using managed WAN services.
+TECHNICAL TOOLS & STACK
+• Implemented cloud solutions leveraging AWS, Azure, and Google Workspace for improved scalability.
+• Managed networking technologies such as MPLS, SD-WAN, FortiGate, Meraki, VPN, and BGP to enhance connectivity.
+• Enhanced security protocols with McAfee ePO, WAF, and SIEM; adhered to ISO 27001 and NIST standards; developed DR/BCP strategies.
+• Utilized Monday.com, Helpdesk Systems, and Remote Access Tools to streamline monitoring and support.
+• Acquired foundational knowledge in Automation and DevOps using Terraform, CI/CD methodologies, and Python scripting.
+• Integrated CX platforms Connex1 and Zoho Desk for omnichannel support, enhancing CRM, WhatsApp, and IVR systems.
+
+REFEREES
+References provided upon request.

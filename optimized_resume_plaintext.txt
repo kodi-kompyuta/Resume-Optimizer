@@ -1,0 +1,98 @@
+CONTACT INFORMATION
+David Kaniaru Kamau
+dkamale@gmail.com
+254-723-7277
+
+PROFESSIONAL SUMMARY
+IT leader with 16+ years in designing and managing secure, scalable infrastructure across finance, telecom, and humanitarian sectors. Expertise in multi-country IT operations, cloud-first strategies (AWS, Azure), cybersecurity, and enterprise network optimization. Skilled in aligning technology with business goals while overseeing large teams and budgets. Currently pursuing AWS Solutions Architect – Professional and planning CISSP (Q1 2026).
+
+CORE COMPETENCIES
+IT Strategy & Governance (ISO 27001, NIST, ITIL v4), Cloud & Infrastructure (AWS, Azure, Hybrid Environments), Cybersecurity (SIEM, NGFW, Incident Response, BCP/DR), Network Architecture (MPLS, SD-WAN, Fortinet, Meraki, QoS), Call Centre & Voice (Omnichannel CX, VoIP, SIP, IVR, CRM), Project & Service Delivery (Agile, CI/CD, SLA/KPI Ownership), Vendor & Contract Management (ISPs, MNOs, SaaS, Licensing), Budgeting & Cost Optimization (OPEX/CAPEX Planning), People Leadership (Team Building, Career Pathing, Mentorship)
+
+PROFESSIONAL EXPERIENCE
+Regional Head of Client Services & Projects
+Echotel International | Jul 2025 - Present
+Head of Client Services & Projects Echotel International | Jul 2025 – Present
+• Led IT service and project delivery in Kenya, Uganda, Tanzania, Ghana, Namibia, and one additional country.
+Zambia), overseeing 3 PMs and 17 technical engineers.
+• Implemented an omnichannel customer engagement platform, integrating CRM and WhatsApp, enhancing communication efficiency.
+IVR, and digital channels—boosted CSAT and NPS scores.
+• Led SD-WAN deployments using FortiGate and Meraki across 76 KFC retail sites in Kenya and Uganda, enhancing network efficiency.
+improving network uptime to 99.9%.
+• - 1 of 4 --
+• Implemented automated monitoring systems for customer experience platforms and Starlink satellite uplinks, decreasing incident response time by 30%
+time by 30%.
+• Implemented vendor management framework and led SLA negotiations with MNOs, ISPs, and SaaS providers
+providers across Sub-Saharan Africa.
+• Implemented a centralized Global Service Desk improving regional IT support standardization.
+• Led migration of clients from Avanti Hylas 2 to Hylas 4 satellite platform.
+IT Support Supervisor
+Church World Service (CWS Africa) | Jan 2023 - Dec 2024
+• Led IT support for cloud and on-premises systems across 42 regional sites; coordinated a major data center build-out.
+Uganda within time and budget.
+• Led AWS Solutions Architecture ensuring secure connectivity via Okta to US refugee databases.
+• Facilitated NIST-compliant audits and Business Continuity Planning as Security Point of Contact, recognized nationally.
+Director for excellence.
+• Implemented remote monitoring tools and enhanced field connectivity, reducing downtime by 20% and improving system reliability.
+SLAs.
+• Implemented project tracking with Monday.com,
+
+training
+over 15 engineers to enhance visibility and increase team efficiency.
+IT Infrastructure & Support Manager
+African Banking Corporation | Aug 2013 - Nov 2020
+• Managed enterprise infrastructure and user support, achieving 99.99% system uptime across all branches.
+• Migrated 450 users from Microsoft Exchange to Google Workspace, increasing email system availability.
+• Enhanced infrastructure security with McAfee EPO, Web Application Firewalls, and SIEM implementation.
+• Decreased annual WAN expenses by $20,000 by consolidating vendors and renegotiating contracts.
+• Led Disaster Recovery Site deployment, saving $8,000 in capital expenditures.
+• Conducted skills gap analysis and training, aligning team roles with career development paths.
+Technical Support Team Leader
+Safran Morpho (IEBC) | Nov 2012 - Jul 2013
+• Maintained 99% uptime for the nationwide biometric voter registration system in Kenya during 2013.
+election cycle.
+• Managed server, storage, and network operations; supervised L1 support team, improving efficiency by 15%.
+• - 2 of 4 --
+IT Trainer & Cisco Partner Relations Access Kenya | May 2008 – May 2011
+• Led Cisco technology training programs to facilitate Access Kenya's upgrade to Premier Partner status
+status thereby unlocking upto 40% in vendor discounts
+• Trained over 100 staff across sales, technical, and marketing teams.
+IT Trainer & Support Engineer Computer Learning Centre & Mart Networks | Jan 2005 – May 2008
+• Conducted instructor-led training on CCNA, CCNP, A+, N+, and ICDL to over 2,000 learners across 3 years.
+• Recognized as Best Cisco Trainer in 2007 and 2008.
+status thereby unlocking upto 40% in vendor discounts
+• Trained over 100 staff across sales, technical, and marketing teams.
+IT Trainer & Support Engineer Computer Learning Centre & Mart Networks | Jan 2005 – May 2008
+• Conducted instructor-led training on CCNA, CCNP, A+, N+, and ICDL for over 2,000 learners in 3 years.
+• Recognized as Best Cisco Trainer in 2007 and 2008.
+
+EDUCATION
+MSc in Big Data Technologies (Expected 2025)
+University of East London
+Higher National Diploma in Computing
+BTEC EDEXCEL, UK – Computer Learning Centre
+
+CERTIFICATIONS
+• AWS Certified Solutions Architect Associate
+• Pursuing AWS Certified Solutions Architect Professional
+• Microsoft Azure Fundamentals Certification
+• Cisco CCNP, CCNA, CCDA Certifications
+• ITIL Foundation Certification
+• Red Hat Certified System Administrator
+• Microsoft Certified Solutions Associate (MCSA)
+• Project Management and Customer Service Skills
+• Plan to Obtain CISSP Certification by Q1 2026
+
+SELECTED ACHIEVEMENTS
+• Implemented infrastructure monitoring systems, reducing IT incident resolution time by 20%.
+• Enhanced WAN uptime from 93% to 99% through managed WAN services.
+TECHNICAL TOOLS & STACK
+• Implemented cloud solutions using AWS, Azure, and Google Workspace.
+• Managed networking technologies including MPLS, SD-WAN, FortiGate, Meraki, VPN, and BGP.
+• Enhanced security protocols with McAfee ePO, WAF, SIEM, adhering to ISO 27001 and NIST standards, and developed DR/BCP strategies.
+• Utilized Monday.com, Helpdesk Systems, and Remote Access Tools for effective monitoring and support.
+• Gained foundational knowledge in Automation and DevOps with Terraform, CI/CD concepts, and Python scripting.
+• Integrated CX platforms Connex1 and Zoho Desk for omnichannel support, including CRM, WhatsApp, and IVR systems.
+
+REFEREES
+References available upon request.
