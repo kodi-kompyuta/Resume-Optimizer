@@ -181,6 +181,56 @@ Output: `john-doe-resume.docx`
 - Ensure your JSON has all required fields: `full_name`, `contact`, `summary`, etc.
 - See `example-resume-data.json` for reference
 
+## 📄 PDF Conversion
+
+### Convert DOCX to PDF
+
+```bash
+# Convert a resume to PDF
+npx tsx scripts/convert-to-pdf.ts optimized_resume_output.docx
+
+# Specify output path
+npx tsx scripts/convert-to-pdf.ts resume.docx my-resume.pdf
+```
+
+**Requirements:**
+- Install LibreOffice (cross-platform)
+  - Windows: https://www.libreoffice.org/download/download/
+  - macOS: `brew install --cask libreoffice`
+  - Linux: `sudo apt-get install libreoffice`
+
+**Python equivalent:**
+```python
+# Option A: docx2pdf (Windows/macOS only)
+from docx2pdf import convert
+convert("optimized_resume_output.docx")
+
+# Option B: LibreOffice (cross-platform)
+libreoffice --headless --convert-to pdf optimized_resume_output.docx
+```
+
+**TypeScript implementation:**
+```typescript
+import { convert } from './convert-to-pdf'
+await convert('resume.docx', 'resume.pdf')
+```
+
+### Complete Pipeline: JSON → DOCX → PDF
+
+Generate both DOCX and PDF in one command:
+
+```bash
+# Use example data
+npx tsx scripts/generate-and-convert.ts
+
+# Use your own data
+npx tsx scripts/generate-and-convert.ts my-resume.json my-output
+
+# Outputs:
+#   my-output.docx
+#   my-output.pdf
+```
+
 ## 🔗 Related
 
 - Template system: `lib/templates/`
