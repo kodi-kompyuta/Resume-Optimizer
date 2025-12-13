@@ -52,17 +52,26 @@ Take a resume and job description and return an optimized resume as structured J
   "references": "Available upon request" or ["Name 1", "Name 2"]
 }
 
-CRITICAL RULES:
-1. PRESERVE ALL CONTENT - Never remove any work experience, skills, education, certifications, or references
-2. Include EVERY job from the original resume, even if it seems unrelated to the job description
-3. Include ALL skills from the original resume
-4. Include ALL education and certifications from the original resume
-5. Include references/referees section if present in the original (e.g., "Available upon request" or "On request")
-6. ONLY reword and enhance existing content - do not remove or consolidate
-7. Match ATS keywords by enhancing bullet points, not by removing content
-8. Do NOT fabricate any experience
+⚠️ ABSOLUTE REQUIREMENTS - FAILURE TO FOLLOW WILL RESULT IN REJECTION:
 
-Your job is to make the existing content better, NOT to remove content.
+1. COUNT THE JOBS: If the original resume has N work experience entries, your output MUST have EXACTLY N work experience entries
+2. COUNT THE SKILLS: If the original has M skills, your output must have AT LEAST M skills
+3. COUNT EDUCATION: If original has K education entries, output must have EXACTLY K entries
+4. NEVER DELETE: You are FORBIDDEN from removing ANY work experience, no matter how irrelevant it seems
+5. ENHANCE ONLY: Your job is to reword bullet points to include job description keywords - NOT to remove jobs
+6. CURRENT JOB IS SACRED: The most recent job (with "Current" or latest date) MUST be included
+7. ALL SKILLS REQUIRED: Every skill from the original must appear in your output
+8. DO NOT CONSOLIDATE: Never merge multiple jobs into one
+9. DO NOT SUMMARIZE: Never replace detailed experience with a summary
+10. PRESERVE CHRONOLOGY: Keep all jobs in the same order
+
+VALIDATION CHECK BEFORE RETURNING:
+- Count work_experience array length - does it match the original? If NO, you FAILED
+- Check if the most recent/current job is present - if NO, you FAILED
+- Verify all skills are included - if any missing, you FAILED
+
+Your ONLY job is to enhance the wording of bullet points to match keywords. You are NOT allowed to remove content.
+
 Only return clean JSON with no extra text.`
 
 /**
@@ -115,8 +124,20 @@ function structuredResumeToPlainText(resume: StructuredResume): string {
  */
 async function optimizeResumeWithJobDescription(
   resumeText: string,
-  jobDescription: string
+  jobDescription: string,
+  originalStructured: StructuredResume
 ): Promise<any> {
+  // Count original content for validation
+  const originalExpCount = originalStructured.sections
+    .find(s => s.type === 'experience')?.content
+    .filter(b => b.type === 'experience_item').length || 0
+
+  const originalEduCount = originalStructured.sections
+    .find(s => s.type === 'education')?.content
+    .filter(b => b.type === 'education_item').length || 0
+
+  console.log(`[Optimizer] Original has ${originalExpCount} jobs, ${originalEduCount} education entries`)
+
   // Combine everything into one prompt (following Claude API pattern)
   const fullPrompt = `${RESUME_OPTIMIZER_SYSTEM_PROMPT}
 
@@ -125,6 +146,8 @@ ${resumeText}
 
 Job Description:
 ${jobDescription}
+
+IMPORTANT: The resume above has ${originalExpCount} work experience entries. Your output MUST have exactly ${originalExpCount} work experience entries.
 
 Return the optimized resume as clean JSON with no extra text.`
 
@@ -150,6 +173,23 @@ Return the optimized resume as clean JSON with no extra text.`
   console.log('[Optimizer] Full name:', result.full_name)
   console.log('[Optimizer] Work experience entries:', result.work_experience?.length || 0)
   console.log('[Optimizer] Core skills count:', result.core_skills?.length || 0)
+
+  // CRITICAL VALIDATION: Ensure no content was removed
+  const optimizedExpCount = result.work_experience?.length || 0
+  const optimizedEduCount = result.education?.length || 0
+
+  if (optimizedExpCount < originalExpCount) {
+    console.error(`[Optimizer] ❌ VALIDATION FAILED: AI removed ${originalExpCount - optimizedExpCount} work experience entries!`)
+    console.error(`[Optimizer] Original: ${originalExpCount} jobs, Optimized: ${optimizedExpCount} jobs`)
+    throw new Error(`AI removed work experience! Expected ${originalExpCount} jobs but got ${optimizedExpCount}. Rejecting optimization.`)
+  }
+
+  if (optimizedEduCount < originalEduCount) {
+    console.error(`[Optimizer] ❌ VALIDATION FAILED: AI removed education entries!`)
+    throw new Error(`AI removed education! Expected ${originalEduCount} entries but got ${optimizedEduCount}. Rejecting optimization.`)
+  }
+
+  console.log('[Optimizer] ✅ Validation passed: All content preserved')
 
   return result
 }
@@ -326,7 +366,7 @@ export async function optimizeResume(
       console.log('[Optimizer] ✅ STEP 2: Send Resume + JD to AI')
 
       // Get optimized JSON from AI
-      const optimizedJson = await optimizeResumeWithJobDescription(resumeText, jobDescription)
+      const optimizedJson = await optimizeResumeWithJobDescription(resumeText, jobDescription, structuredResume)
       console.log('[Optimizer] ✅ STEP 3: Received optimized JSON from AI')
 
       // Convert back to StructuredResume format
