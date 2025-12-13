@@ -161,9 +161,17 @@ export default function AnalyzePage() {
           )}
         </div>
         <div className="flex space-x-3">
+          {(!resume.ats_score || resume.ats_score < 90) && !isTemporary && (
+            <Link
+              href={`/optimize/${id}`}
+              className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg"
+            >
+              Optimize Resume
+            </Link>
+          )}
           <Link
             href="/upload"
-            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg"
+            className="px-6 py-3 bg-white border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
           >
             Upload New Resume
           </Link>
@@ -379,9 +387,17 @@ export default function AnalyzePage() {
 
       {/* Bottom Actions */}
       <div className="flex gap-4 justify-center pb-8">
+        {(!resume.ats_score || resume.ats_score < 90) && !isTemporary && (
+          <Link
+            href={`/optimize/${id}`}
+            className="px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg"
+          >
+            Optimize This Resume
+          </Link>
+        )}
         <Link
           href="/upload"
-          className="px-8 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-blue-700 transition-all shadow-lg"
+          className="px-8 py-3 bg-white border-2 border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
         >
           Analyze Another Resume
         </Link>
