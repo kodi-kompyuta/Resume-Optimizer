@@ -22,6 +22,268 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
 })
 
+// Simple, direct optimization system prompt
+const RESUME_OPTIMIZER_SYSTEM_PROMPT = `You are a resume optimizer working with an ATS system.
+
+Take a resume and job description and return an optimized resume as structured JSON, using this exact format:
+
+{
+  "full_name": "...",
+  "contact": {
+    "phone": "...",
+    "email": "...",
+    "location": "..."
+  },
+  "summary": "...",
+  "core_skills": ["...", "..."],
+  "work_experience": [
+    {
+      "job_title": "...",
+      "company": "...",
+      "location": "...",
+      "date_range": "...",
+      "responsibilities": ["...", "..."]
+    }
+  ],
+  "education": [...],
+  "certifications": [...],
+  "projects": [...]
+}
+
+Reword resume content to match the job description's language. Do NOT fabricate experience. Match ATS keywords.
+Only return clean JSON with no extra text.`
+
+/**
+ * Convert structured resume to plain text for AI optimization
+ */
+function structuredResumeToPlainText(resume: StructuredResume): string {
+  const lines: string[] = []
+
+  for (const section of resume.sections) {
+    lines.push(section.heading.toUpperCase())
+    lines.push('')
+
+    for (const block of section.content) {
+      if (block.type === 'contact_info') {
+        const contact = block.content as any
+        if (contact.name) lines.push(contact.name)
+        if (contact.email) lines.push(contact.email)
+        if (contact.phone) lines.push(contact.phone)
+        if (contact.location) lines.push(contact.location)
+      } else if (block.type === 'text') {
+        lines.push(block.content as string)
+      } else if (block.type === 'experience_item') {
+        const exp = block.content as any
+        lines.push(`${exp.jobTitle} | ${exp.company} | ${exp.location}`)
+        lines.push(`${exp.startDate} - ${exp.endDate}`)
+        if (exp.description) lines.push(exp.description)
+        exp.achievements?.forEach((ach: any) => lines.push(`• ${ach.text}`))
+      } else if (block.type === 'education_item') {
+        const edu = block.content as any
+        lines.push(`${edu.degree} | ${edu.institution}`)
+        if (edu.graduationDate) lines.push(edu.graduationDate)
+      } else if (block.type === 'bullet_list') {
+        const bullets = block.content as any
+        bullets.items?.forEach((item: any) => lines.push(`• ${item.text}`))
+      } else if (block.type === 'skill_group') {
+        const skills = block.content as any
+        if (skills.category) lines.push(`${skills.category}:`)
+        lines.push(skills.skills.join(', '))
+      }
+    }
+    lines.push('')
+  }
+
+  return lines.join('\n')
+}
+
+/**
+ * Simple direct optimization using job description
+ */
+async function optimizeResumeWithJobDescription(
+  resumeText: string,
+  jobDescription: string
+): Promise<any> {
+  const userPrompt = `Resume:
+${resumeText}
+
+Job Description:
+${jobDescription}
+
+Optimize this resume for the job description. Return ONLY the JSON structure specified in the system prompt.`
+
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-4o',
+    messages: [
+      { role: 'system', content: RESUME_OPTIMIZER_SYSTEM_PROMPT },
+      { role: 'user', content: userPrompt }
+    ],
+    temperature: 0.3,
+    max_tokens: 4000,
+    response_format: { type: 'json_object' },
+  })
+
+  const content = completion.choices[0].message.content
+  if (!content) {
+    throw new Error('No response from AI optimizer')
+  }
+
+  return JSON.parse(content)
+}
+
+/**
+ * Convert optimized JSON back to StructuredResume format
+ */
+function jsonToStructuredResume(json: any, originalResume: StructuredResume): StructuredResume {
+  const sections: ResumeSection[] = []
+  let order = 0
+
+  // Contact section
+  sections.push({
+    id: uuidv4(),
+    type: 'contact',
+    heading: 'Contact',
+    order: order++,
+    content: [{
+      id: uuidv4(),
+      type: 'contact_info',
+      content: {
+        name: json.full_name,
+        email: json.contact.email,
+        phone: json.contact.phone,
+        location: json.contact.location,
+      }
+    }]
+  })
+
+  // Summary section
+  if (json.summary) {
+    sections.push({
+      id: uuidv4(),
+      type: 'summary',
+      heading: 'Professional Summary',
+      order: order++,
+      content: [{
+        id: uuidv4(),
+        type: 'text',
+        content: json.summary
+      }]
+    })
+  }
+
+  // Skills section
+  if (json.core_skills && json.core_skills.length > 0) {
+    sections.push({
+      id: uuidv4(),
+      type: 'skills',
+      heading: 'Skills',
+      order: order++,
+      content: [{
+        id: uuidv4(),
+        type: 'skill_group',
+        content: {
+          skills: json.core_skills,
+          displayStyle: 'inline' as const
+        }
+      }]
+    })
+  }
+
+  // Work experience section
+  if (json.work_experience && json.work_experience.length > 0) {
+    sections.push({
+      id: uuidv4(),
+      type: 'experience',
+      heading: 'Professional Experience',
+      order: order++,
+      content: json.work_experience.map((exp: any) => ({
+        id: uuidv4(),
+        type: 'experience_item',
+        content: {
+          id: uuidv4(),
+          jobTitle: exp.job_title,
+          company: exp.company,
+          location: exp.location,
+          startDate: exp.date_range.split(' - ')[0] || exp.date_range,
+          endDate: exp.date_range.split(' - ')[1] || 'Present',
+          achievements: exp.responsibilities.map((resp: string) => ({
+            id: uuidv4(),
+            text: resp,
+            metadata: { indentLevel: 0 }
+          }))
+        }
+      }))
+    })
+  }
+
+  // Education section
+  if (json.education && json.education.length > 0) {
+    sections.push({
+      id: uuidv4(),
+      type: 'education',
+      heading: 'Education',
+      order: order++,
+      content: json.education.map((edu: any) => ({
+        id: uuidv4(),
+        type: 'education_item',
+        content: {
+          id: uuidv4(),
+          degree: edu.degree,
+          institution: edu.institution,
+          location: edu.location,
+          graduationDate: edu.date_range
+        }
+      }))
+    })
+  }
+
+  // Certifications section
+  if (json.certifications && json.certifications.length > 0) {
+    sections.push({
+      id: uuidv4(),
+      type: 'certifications',
+      heading: 'Certifications',
+      order: order++,
+      content: [{
+        id: uuidv4(),
+        type: 'bullet_list',
+        content: {
+          items: json.certifications.map((cert: string) => ({
+            id: uuidv4(),
+            text: cert,
+            metadata: { indentLevel: 0 }
+          }))
+        }
+      }]
+    })
+  }
+
+  // Projects section
+  if (json.projects && json.projects.length > 0) {
+    sections.push({
+      id: uuidv4(),
+      type: 'projects',
+      heading: 'Projects',
+      order: order++,
+      content: json.projects.map((proj: any) => ({
+        id: uuidv4(),
+        type: 'text',
+        content: typeof proj === 'string' ? proj : `${proj.title}: ${proj.description}`
+      }))
+    })
+  }
+
+  return {
+    id: originalResume.id,
+    metadata: {
+      ...originalResume.metadata,
+      parsedAt: new Date().toISOString()
+    },
+    sections,
+    rawText: originalResume.rawText
+  }
+}
+
 /**
  * Optimize resume while preserving structure
  */
@@ -30,6 +292,69 @@ export async function optimizeResume(
   options: OptimizationOptions,
   jobDescription?: string
 ): Promise<OptimizationResult> {
+  // If job description is provided, use the new simple optimization method
+  if (jobDescription && jobDescription.trim()) {
+    console.log('[Optimizer] Using direct job-description-based optimization')
+
+    try {
+      // Convert structured resume to plain text
+      const resumeText = structuredResumeToPlainText(structuredResume)
+
+      // Get optimized JSON from AI
+      const optimizedJson = await optimizeResumeWithJobDescription(resumeText, jobDescription)
+
+      // Convert back to StructuredResume format
+      const optimizedResume = jsonToStructuredResume(optimizedJson, structuredResume)
+
+      // Generate simple change summary
+      const changes: ChangeLog[] = [{
+        id: uuidv4(),
+        sectionId: 'all',
+        sectionName: 'All Sections',
+        contentBlockId: 'all',
+        changeType: 'enhance',
+        originalValue: 'Original resume',
+        newValue: 'Optimized resume tailored to job description',
+        reason: 'Optimized entire resume to match job description keywords and language',
+        confidence: 0.95,
+        impact: 'high',
+        category: 'keyword',
+      }]
+
+      const summary: OptimizationSummary = {
+        totalChanges: 1,
+        changesByCategory: {
+          keyword: 1,
+          bullet_point: 0,
+          grammar: 0,
+          clarity: 0,
+          section_content: 0,
+          formatting: 0,
+        },
+        keywordsAdded: optimizedJson.core_skills || [],
+        estimatedImpact: 'Resume optimized to match job description language and ATS keywords',
+      }
+
+      const preview: DiffPreview = {
+        sections: [],
+        highlightedChanges: [],
+      }
+
+      return {
+        originalResume: structuredResume,
+        optimizedResume,
+        changes,
+        summary,
+        preview,
+      }
+    } catch (error) {
+      console.error('[Optimizer] Error in direct optimization, falling back to section-by-section:', error)
+      // Fall through to original method on error
+    }
+  }
+
+  // Original section-by-section optimization (fallback or when no job description)
+  console.log('[Optimizer] Using section-by-section optimization')
   const changes: ChangeLog[] = []
   const optimizedResume: StructuredResume = JSON.parse(JSON.stringify(structuredResume))
 
