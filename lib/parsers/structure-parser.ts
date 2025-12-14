@@ -335,10 +335,16 @@ export class ResumeStructureParser {
     while (this.currentIndex < this.lines.length) {
       const line = this.lines[this.currentIndex].trim()
 
-      // Stop at next major section heading (not ACHIEVEMENTS)
-      if (this.isHeading(this.lines[this.currentIndex]) && line.toUpperCase() !== 'ACHIEVEMENTS') {
+      // Check if this is a date-only heading (job entry with just dates)
+      // Example: "MAY 2008 — MAY 2011" or "JANUARY 2005 — MAY 2008"
+      const isDateOnlyLine = this.isDateRangeLine(line)
+
+      // Stop at next major section heading (not ACHIEVEMENTS and not date-only lines)
+      if (this.isHeading(this.lines[this.currentIndex]) &&
+          line.toUpperCase() !== 'ACHIEVEMENTS' &&
+          !isDateOnlyLine) {
         // Save any pending experience
-        if (currentExperience && achievementBuffer.length > 0) {
+        if (currentExperience) {
           currentExperience.achievements = achievementBuffer
           blocks.push({
             id: uuidv4(),
@@ -347,6 +353,35 @@ export class ResumeStructureParser {
           })
         }
         break
+      }
+
+      // Handle date-only job entries (e.g., "MAY 2008 — MAY 2011")
+      if (isDateOnlyLine) {
+        // Save previous experience if exists
+        if (currentExperience) {
+          currentExperience.achievements = achievementBuffer
+          blocks.push({
+            id: uuidv4(),
+            type: 'experience_item',
+            content: currentExperience,
+          })
+        }
+
+        // Parse the date range
+        const dateInfo = this.parseDateRange(line)
+
+        // Create new experience with dates, will fill in title/company from following content
+        currentExperience = {
+          id: uuidv4(),
+          jobTitle: '', // Will be inferred from bullets
+          company: '',
+          startDate: dateInfo.startDate,
+          endDate: dateInfo.endDate,
+          achievements: [],
+        }
+        achievementBuffer = []
+        this.currentIndex++
+        continue
       }
 
       // Skip ACHIEVEMENTS header
@@ -446,6 +481,67 @@ export class ResumeStructureParser {
         content: currentExperience,
       })
     }
+
+    // Infer job titles and companies for date-only entries from their bullets
+    blocks.forEach(block => {
+      if (block.type !== 'experience_item') return
+
+      const exp = block.content as ExperienceItem
+
+      // If job title is empty, try to infer from first bullet
+      if (!exp.jobTitle && exp.achievements && exp.achievements.length > 0) {
+        const firstBullet = exp.achievements[0].text
+
+        // Look for verbs that typically start job descriptions: "Led", "Managed", "Delivered", etc.
+        // Extract the main action as the job title
+        const actionMatch = firstBullet.match(/^(Led|Managed|Delivered|Provided|Coordinated|Oversaw|Supported|Developed|Implemented|Facilitated|Trained|Conducted)\s+(.+?)(?:in partnership|for|at|to|across|\.|\,)/i)
+
+        if (actionMatch) {
+          const action = actionMatch[1]
+          const object = actionMatch[2].trim()
+          // Create concise title: "Led technology training" instead of full sentence
+          exp.jobTitle = `${action} ${object}`.substring(0, 80)
+        } else if (firstBullet.length > 10) {
+          // Fallback: Take first clause or up to 80 chars
+          const titleCandidate = firstBullet.split(/[.;,]/).shift()?.trim() || firstBullet
+          exp.jobTitle = titleCandidate.substring(0, 80)
+        }
+      }
+
+      // Try to extract company from achievements if company is empty
+      if (!exp.company && exp.achievements) {
+        let bestCompany = ''
+
+        for (const achievement of exp.achievements) {
+          // PRIORITY 1: Look for possessive company names (Company's, AccessKenya's)
+          const possessiveMatch = achievement.text.match(/\b([A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+)*)'s\b/)
+          if (possessiveMatch) {
+            const candidate = possessiveMatch[1].trim()
+            // Ignore generic terms
+            if (!['HR', 'IT', 'The'].includes(candidate) && candidate.length > 2) {
+              bestCompany = candidate
+              break // Possessive form is highly reliable
+            }
+          }
+
+          // PRIORITY 2: Look for "at/for/with Company Name" patterns
+          if (!bestCompany) {
+            const companyMatch = achievement.text.match(/\b(?:at|for|with)\s+([A-Z][A-Za-z]+(?:\s+[A-Z][A-Za-z]+)*)\b/)
+            if (companyMatch) {
+              const candidate = companyMatch[1].trim()
+              // Ignore generic single-letter or common abbreviations
+              if (!['HR', 'IT', 'US'].includes(candidate) && candidate.length > 2) {
+                bestCompany = candidate
+              }
+            }
+          }
+        }
+
+        if (bestCompany) {
+          exp.company = bestCompany
+        }
+      }
+    })
 
     // CRITICAL: Deduplicate experience items
     // This prevents duplicate job entries in the resume
@@ -549,6 +645,28 @@ export class ResumeStructureParser {
               achievements: [],
             }
           }
+        }
+      }
+    }
+
+    // Pattern 4: "Job Title at Company, Location Dates" or "Job Title at Company (Details), Location Dates"
+    // Examples:
+    // "Technical Support Team Leader at Safran Morpho (seconded to IEBC), Nairobi Nov 2012 – Jul 2013"
+    if (text.includes(' at ')) {
+      const atPattern = /^(.+?)\s+at\s+(.+?)(?:,\s*(.+?))?\s+((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4})\s*[–-]\s*((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}|Present|Current)/i
+      const match = text.match(atPattern)
+
+      if (match) {
+        const [, jobTitle, companyWithDetails, location, startDate, endDate] = match
+
+        return {
+          id: uuidv4(),
+          jobTitle: jobTitle.trim(),
+          company: companyWithDetails.trim(),
+          location: location?.trim() || '',
+          startDate: startDate.trim(),
+          endDate: endDate.trim(),
+          achievements: [],
         }
       }
     }
@@ -1102,6 +1220,19 @@ export class ResumeStructureParser {
     const trimmed = text.trim()
     const match = trimmed.match(/^(\+\d{1,4}[\s.-]?)?(\(?\d{1,4}\)?[\s.-]?){2,5}\d{1,4}$/)
     return match !== null && trimmed.replace(/\D/g, '').length >= 7
+  }
+
+  /**
+   * Helper: Check if line is a date range only (job entry with just dates)
+   * Examples: "MAY 2008 — MAY 2011", "JANUARY 2005 — MAY 2008"
+   */
+  private isDateRangeLine(text: string): boolean {
+    const trimmed = text.trim()
+
+    // Check for month year — month year pattern
+    const dateRangePattern = /^(JAN(?:UARY)?|FEB(?:RUARY)?|MAR(?:CH)?|APR(?:IL)?|MAY|JUN(?:E)?|JUL(?:Y)?|AUG(?:UST)?|SEP(?:TEMBER)?|OCT(?:OBER)?|NOV(?:EMBER)?|DEC(?:EMBER)?)[A-Z]*\.?\s+\d{4}\s*[–—-]\s*(JAN(?:UARY)?|FEB(?:RUARY)?|MAR(?:CH)?|APR(?:IL)?|MAY|JUN(?:E)?|JUL(?:Y)?|AUG(?:UST)?|SEP(?:TEMBER)?|OCT(?:OBER)?|NOV(?:EMBER)?|DEC(?:EMBER)?)[A-Z]*\.?\s+\d{4}\s*$/i
+
+    return dateRangePattern.test(trimmed)
   }
 
   /**
