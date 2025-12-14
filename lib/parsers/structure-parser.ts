@@ -13,6 +13,21 @@ import {
 } from '@/types'
 
 /**
+ * Resume format types detected by the parser
+ */
+enum ResumeFormat {
+  TRADITIONAL = 'traditional',           // Title, Company, Location/Dates on separate lines
+  INLINE_PIPE = 'inline_pipe',          // Title | Company | Dates on one line
+  DATE_FIRST = 'date_first',            // Dates appear before job title
+  COMPACT = 'compact',                   // All info on single line
+  FUNCTIONAL = 'functional',             // Skill-based, no clear job entries
+  BULLET_JOBS = 'bullet_jobs',          // Jobs formatted as bullets
+  COMPANY_HEADERS = 'company_headers',   // Company name as section, jobs underneath
+  HYBRID = 'hybrid',                     // Mix of formats
+  UNKNOWN = 'unknown',                   // Cannot determine format
+}
+
+/**
  * Parses plain text resume into structured format
  * Preserves all sections, bullets, and formatting metadata
  */
@@ -225,6 +240,7 @@ export class ResumeStructureParser {
       'experience',
       'work experience',
       'employment history',
+      'work history',
       'professional experience',
       'education',
       'academic background',
@@ -325,9 +341,186 @@ export class ResumeStructureParser {
   }
 
   /**
+   * Detect the format of the experience section
+   * Analyzes patterns in the experience section to determine parsing strategy
+   */
+  private detectExperienceFormat(startIndex: number): ResumeFormat {
+    const analysisLines: string[] = []
+    let idx = startIndex
+
+    // Collect up to 50 lines from experience section for analysis
+    while (idx < this.lines.length && analysisLines.length < 50) {
+      const line = this.lines[idx].trim()
+
+      // Stop at next major section
+      if (this.isHeading(this.lines[idx]) &&
+          !this.isDateRangeLine(line) &&
+          line.toUpperCase() !== 'ACHIEVEMENTS') {
+        break
+      }
+
+      if (line) analysisLines.push(line)
+      idx++
+    }
+
+    if (analysisLines.length === 0) return ResumeFormat.UNKNOWN
+
+    // Count different patterns
+    let pipeCount = 0
+    let dateFirstCount = 0
+    let bulletJobCount = 0
+    let dateOnlyCount = 0
+    let traditionalCount = 0
+    let companyHeaderCount = 0
+
+    for (let i = 0; i < analysisLines.length - 1; i++) {
+      const line = analysisLines[i]
+      const nextLine = analysisLines[i + 1]
+
+      // Pattern: "Title | Company | Dates"
+      if (line.includes('|') && this.containsDate(line)) {
+        pipeCount++
+      }
+
+      // Pattern: Date range line followed by title/company
+      if (this.isDateRangeLine(line) && nextLine && !this.isBullet(nextLine)) {
+        dateFirstCount++
+      }
+
+      // Pattern: Date range as standalone (like "MAY 2008 — MAY 2011")
+      if (this.isDateRangeLine(line)) {
+        dateOnlyCount++
+      }
+
+      // Pattern: Bullet with job info
+      if (this.isBullet(line) && (line.includes(' at ') || line.includes(' - ')) && this.containsDate(line)) {
+        bulletJobCount++
+      }
+
+      // Pattern: ALL CAPS line (potential company) followed by job title
+      if (line === line.toUpperCase() &&
+          line.length > 5 &&
+          line.length < 50 &&
+          !this.isDateRangeLine(line) &&
+          nextLine &&
+          !this.isBullet(nextLine) &&
+          !this.isDateLine(nextLine)) {
+        companyHeaderCount++
+      }
+
+      // Pattern: Traditional multi-line (title, then company/location, then dates or bullets)
+      if (!this.isBullet(line) &&
+          !this.isDateLine(line) &&
+          !line.includes('|') &&
+          line.length > 10 &&
+          line.length < 80 &&
+          (nextLine && (this.isDateLine(nextLine) || !this.isBullet(nextLine)))) {
+        traditionalCount++
+      }
+    }
+
+    // Decision tree based on pattern counts
+    console.log('[Format Detection]', {
+      pipeCount,
+      dateFirstCount,
+      bulletJobCount,
+      dateOnlyCount,
+      traditionalCount,
+      companyHeaderCount
+    })
+
+    // Check for functional resume (mostly bullets, no clear job structure)
+    const bulletRatio = analysisLines.filter(l => this.isBullet(l)).length / analysisLines.length
+    const totalJobIndicators = pipeCount + dateOnlyCount + bulletJobCount + dateFirstCount + companyHeaderCount
+
+    if (bulletRatio > 0.6 && totalJobIndicators === 0) {
+      return ResumeFormat.FUNCTIONAL
+    }
+
+    // Determine primary format with priority system
+    // Pure formats get highest priority when they dominate
+    if (pipeCount >= 2 && pipeCount > bulletJobCount && pipeCount > dateOnlyCount) {
+      return ResumeFormat.INLINE_PIPE
+    }
+
+    if (dateFirstCount >= 2 && dateFirstCount > pipeCount) {
+      return ResumeFormat.DATE_FIRST
+    }
+
+    if (companyHeaderCount >= 2) {
+      return ResumeFormat.COMPANY_HEADERS
+    }
+
+    // HYBRID: Mixed patterns (check this BEFORE bullet_jobs)
+    // If we have both date-only lines AND bullet jobs, it's hybrid
+    if (dateOnlyCount >= 1 && bulletJobCount >= 1) return ResumeFormat.HYBRID
+    if (pipeCount >= 1 && (dateOnlyCount >= 1 || bulletJobCount >= 1)) return ResumeFormat.HYBRID
+    if (traditionalCount >= 1 && (dateOnlyCount >= 1 || bulletJobCount >= 1)) return ResumeFormat.HYBRID
+
+    // Bullet jobs format (only if it's the ONLY pattern, no mixing)
+    if (bulletJobCount >= 2 && dateOnlyCount === 0 && pipeCount === 0 && dateFirstCount === 0 && traditionalCount === 0) {
+      return ResumeFormat.BULLET_JOBS
+    }
+
+    // Default to traditional for standard CVs
+    if (traditionalCount >= 1 || dateOnlyCount >= 1 || bulletJobCount >= 1 || pipeCount >= 1) {
+      return ResumeFormat.TRADITIONAL
+    }
+
+    return ResumeFormat.UNKNOWN
+  }
+
+  /**
+   * Helper: Check if text contains a date pattern
+   */
+  private containsDate(text: string): boolean {
+    return /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}\b/i.test(text) ||
+           /\b\d{4}\s*[-–—]\s*\d{4}\b/.test(text) ||
+           /\b(Present|Current)\b/i.test(text)
+  }
+
+  /**
    * Parse experience section content
+   * Detects format and delegates to appropriate parser
    */
   private parseExperienceContent(): ContentBlock[] {
+    // Detect format of this experience section
+    const format = this.detectExperienceFormat(this.currentIndex)
+    console.log(`[Parser] Detected experience format: ${format}`)
+
+    // Delegate to format-specific parser
+    switch (format) {
+      case ResumeFormat.TRADITIONAL:
+      case ResumeFormat.HYBRID:
+        return this.parseTraditionalExperience()
+
+      case ResumeFormat.INLINE_PIPE:
+        return this.parseInlinePipeExperience()
+
+      case ResumeFormat.DATE_FIRST:
+        return this.parseDateFirstExperience()
+
+      case ResumeFormat.BULLET_JOBS:
+        return this.parseBulletJobsExperience()
+
+      case ResumeFormat.COMPANY_HEADERS:
+        return this.parseCompanyHeaderExperience()
+
+      case ResumeFormat.FUNCTIONAL:
+        return this.parseFunctionalExperience()
+
+      case ResumeFormat.UNKNOWN:
+      default:
+        console.warn('[Parser] Unknown format, using traditional parser as fallback')
+        return this.parseTraditionalExperience()
+    }
+  }
+
+  /**
+   * Parse traditional/hybrid experience format
+   * Handles most common formats with separate lines for title, company, dates
+   */
+  private parseTraditionalExperience(): ContentBlock[] {
     const blocks: ContentBlock[] = []
     let currentExperience: ExperienceItem | null = null
     let achievementBuffer: BulletItem[] = []
@@ -567,6 +760,389 @@ export class ResumeStructureParser {
     }
 
     return deduplicated
+  }
+
+  /**
+   * Parse inline pipe format: "Title | Company | Dates"
+   */
+  private parseInlinePipeExperience(): ContentBlock[] {
+    const blocks: ContentBlock[] = []
+
+    while (this.currentIndex < this.lines.length) {
+      const line = this.lines[this.currentIndex].trim()
+
+      // Stop at next section
+      if (this.isHeading(this.lines[this.currentIndex]) && line.toUpperCase() !== 'ACHIEVEMENTS') {
+        break
+      }
+
+      if (!line || this.isBullet(line)) {
+        this.currentIndex++
+        continue
+      }
+
+      // Parse pipe-delimited job entry
+      if (line.includes('|')) {
+        const parts = line.split('|').map(p => p.trim())
+        if (parts.length >= 2) {
+          let jobTitle = parts[0]
+          let company = ''
+          let startDate = ''
+          let endDate = ''
+          let location = ''
+
+          // Second part could be company or dates
+          if (this.containsDate(parts[1])) {
+            // Format: "Title | Dates"
+            const dateInfo = this.parseDateLine(parts[1])
+            startDate = dateInfo.startDate
+            endDate = dateInfo.endDate
+          } else {
+            // Format: "Title | Company | ..."
+            company = parts[1]
+            if (parts.length >= 3 && this.containsDate(parts[2])) {
+              const dateInfo = this.parseDateLine(parts[2])
+              startDate = dateInfo.startDate
+              endDate = dateInfo.endDate
+              location = dateInfo.location
+            }
+          }
+
+          const exp: ExperienceItem = {
+            id: uuidv4(),
+            jobTitle,
+            company,
+            location,
+            startDate,
+            endDate,
+            achievements: [],
+          }
+
+          // Parse achievements (bullets following the job line)
+          this.currentIndex++
+          const achievements: BulletItem[] = []
+          while (this.currentIndex < this.lines.length) {
+            const achievementLine = this.lines[this.currentIndex].trim()
+            if (!achievementLine) {
+              this.currentIndex++
+              continue
+            }
+            if (this.isHeading(this.lines[this.currentIndex]) || (achievementLine.includes('|') && this.containsDate(achievementLine))) {
+              break
+            }
+            if (this.isBullet(achievementLine)) {
+              achievements.push({
+                id: uuidv4(),
+                text: this.extractBulletText(achievementLine),
+              })
+            }
+            this.currentIndex++
+          }
+
+          exp.achievements = achievements
+          blocks.push({
+            id: uuidv4(),
+            type: 'experience_item',
+            content: exp,
+          })
+          continue
+        }
+      }
+
+      this.currentIndex++
+    }
+
+    return blocks
+  }
+
+  /**
+   * Parse date-first format: Dates appear before job title/company
+   */
+  private parseDateFirstExperience(): ContentBlock[] {
+    const blocks: ContentBlock[] = []
+
+    while (this.currentIndex < this.lines.length) {
+      const line = this.lines[this.currentIndex].trim()
+
+      // Stop at next section
+      if (this.isHeading(this.lines[this.currentIndex]) && !this.isDateRangeLine(line)) {
+        break
+      }
+
+      if (!line) {
+        this.currentIndex++
+        continue
+      }
+
+      // Look for date line
+      if (this.isDateLine(line) || this.isDateRangeLine(line)) {
+        const dateInfo = this.parseDateLine(line)
+        this.currentIndex++
+
+        // Next line should be job title
+        let jobTitle = ''
+        let company = ''
+        let location = dateInfo.location
+
+        if (this.currentIndex < this.lines.length) {
+          const titleLine = this.lines[this.currentIndex].trim()
+          if (titleLine && !this.isBullet(titleLine)) {
+            jobTitle = titleLine
+            this.currentIndex++
+          }
+        }
+
+        // Next line might be company
+        if (this.currentIndex < this.lines.length) {
+          const companyLine = this.lines[this.currentIndex].trim()
+          if (companyLine && !this.isBullet(companyLine) && !this.isDateLine(companyLine)) {
+            company = companyLine
+            this.currentIndex++
+          }
+        }
+
+        // Parse achievements
+        const achievements: BulletItem[] = []
+        while (this.currentIndex < this.lines.length) {
+          const achievementLine = this.lines[this.currentIndex].trim()
+          if (!achievementLine) {
+            this.currentIndex++
+            continue
+          }
+          if (this.isHeading(this.lines[this.currentIndex]) || this.isDateLine(achievementLine)) {
+            break
+          }
+          if (this.isBullet(achievementLine)) {
+            achievements.push({
+              id: uuidv4(),
+              text: this.extractBulletText(achievementLine),
+            })
+          }
+          this.currentIndex++
+        }
+
+        blocks.push({
+          id: uuidv4(),
+          type: 'experience_item',
+          content: {
+            id: uuidv4(),
+            jobTitle,
+            company,
+            location,
+            startDate: dateInfo.startDate,
+            endDate: dateInfo.endDate,
+            achievements,
+          },
+        })
+        continue
+      }
+
+      this.currentIndex++
+    }
+
+    return blocks
+  }
+
+  /**
+   * Parse bullet jobs format: Each job is a bullet point
+   */
+  private parseBulletJobsExperience(): ContentBlock[] {
+    const blocks: ContentBlock[] = []
+
+    while (this.currentIndex < this.lines.length) {
+      const line = this.lines[this.currentIndex].trim()
+
+      // Stop at next section
+      if (this.isHeading(this.lines[this.currentIndex])) {
+        break
+      }
+
+      if (!line) {
+        this.currentIndex++
+        continue
+      }
+
+      if (this.isBullet(line)) {
+        const embeddedJob = this.extractEmbeddedJob(line)
+        if (embeddedJob) {
+          blocks.push({
+            id: uuidv4(),
+            type: 'experience_item',
+            content: embeddedJob,
+          })
+        }
+      }
+
+      this.currentIndex++
+    }
+
+    return blocks
+  }
+
+  /**
+   * Parse company header format: Company names as section headers with jobs underneath
+   */
+  private parseCompanyHeaderExperience(): ContentBlock[] {
+    const blocks: ContentBlock[] = []
+
+    while (this.currentIndex < this.lines.length) {
+      const line = this.lines[this.currentIndex].trim()
+
+      // Check if this is a company header (ALL CAPS, not too long)
+      const isCompanyHeader = line === line.toUpperCase() &&
+                               line.length > 5 &&
+                               line.length < 50 &&
+                               !this.isDateLine(line) &&
+                               !this.isBullet(line)
+
+      if (isCompanyHeader) {
+        const company = line
+        this.currentIndex++
+
+        // Parse jobs under this company
+        while (this.currentIndex < this.lines.length) {
+          const jobLine = this.lines[this.currentIndex].trim()
+
+          // Stop if we hit another company header or section
+          if ((jobLine === jobLine.toUpperCase() && jobLine.length > 5) ||
+              this.isHeading(this.lines[this.currentIndex])) {
+            break
+          }
+
+          if (!jobLine) {
+            this.currentIndex++
+            continue
+          }
+
+          // Parse job title and dates
+          if (!this.isBullet(jobLine)) {
+            let jobTitle = jobLine
+            let startDate = ''
+            let endDate = ''
+            let location = ''
+
+            // Check if dates are on same line
+            if (this.containsDate(jobLine)) {
+              const parts = jobLine.split('|').map(p => p.trim())
+              if (parts.length >= 2) {
+                jobTitle = parts[0]
+                const dateInfo = this.parseDateLine(parts[1])
+                startDate = dateInfo.startDate
+                endDate = dateInfo.endDate
+                location = dateInfo.location
+              }
+            }
+
+            this.currentIndex++
+
+            // Check next line for dates if not found
+            if (!startDate && this.currentIndex < this.lines.length) {
+              const nextLine = this.lines[this.currentIndex].trim()
+              if (this.isDateLine(nextLine)) {
+                const dateInfo = this.parseDateLine(nextLine)
+                startDate = dateInfo.startDate
+                endDate = dateInfo.endDate
+                location = dateInfo.location
+                this.currentIndex++
+              }
+            }
+
+            // Parse achievements
+            const achievements: BulletItem[] = []
+            while (this.currentIndex < this.lines.length) {
+              const achievementLine = this.lines[this.currentIndex].trim()
+              if (!achievementLine) {
+                this.currentIndex++
+                continue
+              }
+              if ((achievementLine === achievementLine.toUpperCase() && achievementLine.length > 5) ||
+                  this.isHeading(this.lines[this.currentIndex]) ||
+                  (!this.isBullet(achievementLine) && achievementLine.length > 10)) {
+                break
+              }
+              if (this.isBullet(achievementLine)) {
+                achievements.push({
+                  id: uuidv4(),
+                  text: this.extractBulletText(achievementLine),
+                })
+              }
+              this.currentIndex++
+            }
+
+            blocks.push({
+              id: uuidv4(),
+              type: 'experience_item',
+              content: {
+                id: uuidv4(),
+                jobTitle,
+                company,
+                location,
+                startDate,
+                endDate,
+                achievements,
+              },
+            })
+          } else {
+            this.currentIndex++
+          }
+        }
+      } else {
+        // Stop at next section
+        if (this.isHeading(this.lines[this.currentIndex])) {
+          break
+        }
+        this.currentIndex++
+      }
+    }
+
+    return blocks
+  }
+
+  /**
+   * Parse functional resume format: Skill-based sections with bullets
+   */
+  private parseFunctionalExperience(): ContentBlock[] {
+    const blocks: ContentBlock[] = []
+
+    // For functional resumes, create a single "experience" entry with all bullets
+    const achievements: BulletItem[] = []
+
+    while (this.currentIndex < this.lines.length) {
+      const line = this.lines[this.currentIndex].trim()
+
+      // Stop at next section
+      if (this.isHeading(this.lines[this.currentIndex])) {
+        break
+      }
+
+      if (this.isBullet(line)) {
+        achievements.push({
+          id: uuidv4(),
+          text: this.extractBulletText(line),
+        })
+      }
+
+      this.currentIndex++
+    }
+
+    // Create a single functional experience entry
+    if (achievements.length > 0) {
+      blocks.push({
+        id: uuidv4(),
+        type: 'experience_item',
+        content: {
+          id: uuidv4(),
+          jobTitle: 'Professional Experience',
+          company: '',
+          location: '',
+          startDate: '',
+          endDate: '',
+          achievements,
+        },
+      })
+    }
+
+    return blocks
   }
 
   /**
