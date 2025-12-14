@@ -127,42 +127,20 @@ export default function OptimizePage() {
   const handleApply = async (createNewVersion: boolean) => {
     if (!result) return
 
-    setApplying(true)
-    setError(null)
+    // Save optimization data to sessionStorage for edit page
+    const acceptedChangesList = result.changes.filter(c =>
+      acceptedChanges.has(c.id)
+    )
 
-    try {
-      const acceptedChangesList = result.changes.filter(c =>
-        acceptedChanges.has(c.id)
-      )
+    sessionStorage.setItem(`optimized_resume_${resumeId}`, JSON.stringify({
+      optimizedResume: result.optimizedResume,
+      optimizedJson: result.optimizedJson,
+      acceptedChanges: acceptedChangesList,
+      createNewVersion,
+    }))
 
-      const response = await fetch('/api/optimize/apply', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          resumeId,
-          optimizedResume: result.optimizedResume,
-          optimizedJson: result.optimizedJson, // Include JSON for professional template
-          acceptedChanges: acceptedChangesList,
-          createNewVersion,
-        }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to apply changes')
-      }
-
-      // Redirect to the download page
-      const downloadUrl = jobId
-        ? `/download/${data.resumeId}?jobId=${jobId}`
-        : `/download/${data.resumeId}`
-      router.push(downloadUrl)
-    } catch (err: any) {
-      setError(err.message)
-    } finally {
-      setApplying(false)
-    }
+    // Redirect to edit page
+    router.push(`/optimize/${resumeId}/edit`)
   }
 
   const acceptedCount = acceptedChanges.size
