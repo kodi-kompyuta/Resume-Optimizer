@@ -55,16 +55,20 @@ export async function POST(request: Request) {
     let buffer: Buffer
     const resumeData = resume.structured_data || resume.resume_text
 
-    // Check if resume has optimized_json_data (new template format)
-    if (resume.optimized_json_data) {
-      console.log('[DOCX Export] Using new professional template with optimized JSON data')
-      buffer = await fillResumeTemplate(resume.optimized_json_data)
-    }
-    // Otherwise use structured data or plain text with old generator
-    else {
-      console.log('[DOCX Export] Using legacy generator')
-      buffer = await generateDocx(resumeData, filename)
-    }
+    // TEMPORARILY DISABLED: Professional template is generating malformed DOCX files
+    // Validation shows re-parsed DOCX has 0 jobs when original has 6
+    // Using legacy generator until template can be fixed
+    console.log('[DOCX Export] Using legacy generator (professional template disabled)')
+    buffer = await generateDocx(resumeData, filename)
+
+    // if (resume.optimized_json_data) {
+    //   console.log('[DOCX Export] Using new professional template with optimized JSON data')
+    //   buffer = await fillResumeTemplate(resume.optimized_json_data)
+    // }
+    // else {
+    //   console.log('[DOCX Export] Using legacy generator')
+    //   buffer = await generateDocx(resumeData, filename)
+    // }
 
     // CRITICAL: Validate the exported DOCX maintains correct structure
     // This prevents broken exports with duplicate jobs
