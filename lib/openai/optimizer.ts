@@ -487,6 +487,50 @@ export async function optimizeResume(
     console.log('[Optimizer] All bullets are clean (no newlines found)')
   }
 
+  // CRITICAL: Validate content count - ensure nothing was removed
+  const originalExpCount = structuredResume.sections
+    .find(s => s.type === 'experience')?.content
+    .filter(b => b.type === 'experience_item').length || 0
+
+  const optimizedExpCount = optimizedResume.sections
+    .find(s => s.type === 'experience')?.content
+    .filter(b => b.type === 'experience_item').length || 0
+
+  console.log(`[Optimizer] Content validation: Original has ${originalExpCount} jobs, optimized has ${optimizedExpCount} jobs`)
+
+  if (optimizedExpCount < originalExpCount) {
+    console.error(`[Optimizer] ❌ CONTENT VALIDATION FAILED: ${originalExpCount - optimizedExpCount} jobs were removed during optimization!`)
+    console.error(`[Optimizer] Reverting to original resume to prevent data loss`)
+
+    const fallbackJson = convertStructuredResumeToCleanJson(structuredResume)
+
+    return {
+      originalResume: structuredResume,
+      optimizedResume: structuredResume, // Use original instead
+      optimizedJson: fallbackJson,
+      changes: [],
+      summary: {
+        totalChanges: 0,
+        changesByCategory: {
+          bullet_point: 0,
+          keyword: 0,
+          grammar: 0,
+          clarity: 0,
+          section_content: 0,
+          formatting: 0,
+        },
+        keywordsAdded: [],
+        estimatedImpact: 'Optimization failed - work experience was removed. No changes applied to prevent data loss.',
+      },
+      preview: {
+        sections: [],
+        highlightedChanges: [],
+      },
+    }
+  }
+
+  console.log('[Optimizer] ✅ Content validation passed: All jobs preserved')
+
   // CRITICAL: Validate structure preservation using JSON Schema
   const validation = validateStructurePreservation(structuredResume, optimizedResume)
 
