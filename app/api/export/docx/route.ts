@@ -49,8 +49,48 @@ export async function POST(request: Request) {
       )
     }
 
-    // Generate the DOCX file
-    const filename = resume.original_filename.replace(/\.[^/.]+$/, '.docx')
+    // Generate filename with version control
+    let filename = resume.original_filename.replace(/\.[^/.]+$/, '')
+
+    // Check if this is an optimized version (has parent_resume_id)
+    if (resume.parent_resume_id) {
+      // Check if optimized for a specific job
+      const { data: jobMatch } = await supabase
+        .from('job_matches')
+        .select('job_description_id, job_descriptions(job_title)')
+        .eq('resume_id', resumeId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single()
+
+      if (jobMatch?.job_descriptions?.job_title) {
+        // Job-specific optimization: use job title
+        const jobTitle = jobMatch.job_descriptions.job_title
+        // Truncate long job titles to 50 chars
+        const truncatedTitle = jobTitle.length > 50
+          ? jobTitle.substring(0, 47) + '...'
+          : jobTitle
+        filename = `${filename} - ${truncatedTitle}`
+      } else {
+        // General optimization: check if multiple versions exist
+        const { data: siblings } = await supabase
+          .from('resumes')
+          .select('id')
+          .eq('parent_resume_id', resume.parent_resume_id)
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: true })
+
+        const versionNumber = siblings?.findIndex(s => s.id === resumeId) ?? 0
+
+        if (versionNumber > 0) {
+          filename = `${filename} - Optimized v${versionNumber + 1}`
+        } else {
+          filename = `${filename} - Optimized`
+        }
+      }
+    }
+
+    filename = `${filename}.docx`
 
     let buffer: Buffer
     const resumeData = resume.structured_data || resume.resume_text
