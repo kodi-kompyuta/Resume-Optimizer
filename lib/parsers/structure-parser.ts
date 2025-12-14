@@ -95,8 +95,8 @@ export class ResumeStructureParser {
         lastContactLine = i
       }
 
-      // Phone
-      const phoneMatch = line.match(/\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/)
+      // Phone - support both US format and international format with country code
+      const phoneMatch = line.match(/(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4,}/)
       if (phoneMatch) {
         contactInfo.phone = phoneMatch[0]
         foundContact = true
@@ -294,6 +294,9 @@ export class ResumeStructureParser {
     }
     if (lower.includes('interest') || lower.includes('hobb')) {
       return 'interests'
+    }
+    if (lower.includes('reference') || lower.includes('referee')) {
+      return 'references'
     }
 
     return 'custom'
