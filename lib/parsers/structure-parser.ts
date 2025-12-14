@@ -95,9 +95,11 @@ export class ResumeStructureParser {
         lastContactLine = i
       }
 
-      // Phone - support both US format and international format with country code
-      const phoneMatch = line.match(/(\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4,}/)
-      if (phoneMatch) {
+      // Phone - flexible pattern for worldwide phone numbers (any format)
+      // Matches: +254723727791, +44 20 7946 0958, (555) 123-4567, etc.
+      const phoneMatch = line.match(/(\+\d{1,4}[\s.-]?)?(\(?\d{1,4}\)?[\s.-]?){2,5}\d{1,4}/)
+      if (phoneMatch && phoneMatch[0].replace(/\D/g, '').length >= 7) {
+        // Ensure it has at least 7 digits (minimum valid phone number)
         contactInfo.phone = phoneMatch[0]
         foundContact = true
         lastContactLine = i
@@ -1001,10 +1003,12 @@ export class ResumeStructureParser {
   }
 
   /**
-   * Helper: Check if text is phone
+   * Helper: Check if text is phone (worldwide format)
    */
   private isPhone(text: string): boolean {
-    return /^\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/.test(text.trim())
+    const trimmed = text.trim()
+    const match = trimmed.match(/^(\+\d{1,4}[\s.-]?)?(\(?\d{1,4}\)?[\s.-]?){2,5}\d{1,4}$/)
+    return match !== null && trimmed.replace(/\D/g, '').length >= 7
   }
 }
 
