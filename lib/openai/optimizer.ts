@@ -355,8 +355,9 @@ export async function optimizeResume(
   options: OptimizationOptions,
   jobDescription?: string
 ): Promise<OptimizationResult> {
-  // If job description is provided, use the new simple optimization method
-  if (jobDescription && jobDescription.trim()) {
+  // TEMPORARILY DISABLED: Direct optimization is producing bad results
+  // Falling back to section-by-section method until we can fix the AI prompt
+  if (false && jobDescription && jobDescription.trim()) {
     console.log('[Optimizer] ✅ STEP 1: Load resume and job description')
     console.log('[Optimizer] Using direct job-description-based optimization')
 
