@@ -604,11 +604,15 @@ export class ResumeStructureParser {
       if (this.isHeading(this.lines[this.currentIndex])) break
       if (this.isBullet(currentLine)) break
 
-      // If empty line, check if next line is a bullet (end of description)
+      // Stop if this looks like a new job title (Title – Company format)
+      // This prevents consuming next job's info as part of current job's description
+      if (this.looksLikeJobTitle(currentLine)) break
+
+      // If empty line, check if next line is a bullet or new job (end of description)
       if (!currentLine) {
         if (this.currentIndex + 1 < this.lines.length) {
           const nextLine = this.lines[this.currentIndex + 1].trim()
-          if (this.isBullet(nextLine)) {
+          if (this.isBullet(nextLine) || this.looksLikeJobTitle(nextLine)) {
             this.currentIndex++
             break
           }
@@ -1009,6 +1013,33 @@ export class ResumeStructureParser {
     const trimmed = text.trim()
     const match = trimmed.match(/^(\+\d{1,4}[\s.-]?)?(\(?\d{1,4}\)?[\s.-]?){2,5}\d{1,4}$/)
     return match !== null && trimmed.replace(/\D/g, '').length >= 7
+  }
+
+  /**
+   * Helper: Check if line looks like a job title
+   * Detects patterns like "Job Title – Company Name"
+   */
+  private looksLikeJobTitle(text: string): boolean {
+    const trimmed = text.trim()
+
+    // Must contain a dash or em dash separating title and company
+    if (!trimmed.includes('–') && !trimmed.includes('-')) return false
+
+    // Should not be a date line
+    if (this.isDateLine(trimmed)) return false
+
+    // Should not be a bullet point
+    if (this.isBullet(trimmed)) return false
+
+    // Should have reasonable length for a job title (not too short, not too long)
+    if (trimmed.length < 10 || trimmed.length > 150) return false
+
+    // Check for common job title patterns
+    // Typically has title case or mixed case (not all lowercase, not all uppercase)
+    const hasUpperCase = /[A-Z]/.test(trimmed)
+    const hasLowerCase = /[a-z]/.test(trimmed)
+
+    return hasUpperCase && hasLowerCase
   }
 }
 
