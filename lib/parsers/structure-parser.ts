@@ -79,7 +79,8 @@ export class ResumeStructureParser {
       if (!line) continue
 
       // Name is usually the first non-empty line, often in all caps or title case
-      if (!name && line.length < 50 && !this.isEmail(line) && !this.isPhone(line)) {
+      // Skip section headings like "CONTACT INFORMATION"
+      if (!name && line.length < 50 && !this.isEmail(line) && !this.isPhone(line) && !this.isHeading(line)) {
         name = line
         contactInfo.name = line
         foundContact = true
@@ -516,6 +517,42 @@ export class ResumeStructureParser {
       }
     }
 
+    // Pattern 3: "Job Title - Company Name Dates" or "Job Title - Company (Details) Dates"
+    // Examples:
+    // "IT Support Supervisor - Church World Service (CWS Africa) Jan 2023 – Dec 2024."
+    // "IT Infrastructure & Support Manager - African Banking Corporation Aug 2013 – Nov 2020."
+    if (text.includes('–') || text.includes('-')) {
+      // Try to split on the dash
+      const parts = text.split(/\s*[–-]\s*/)
+      if (parts.length >= 2) {
+        const potentialTitle = parts[0].trim()
+        const restOfLine = parts.slice(1).join(' - ').trim()
+
+        // Check if this looks like a job title
+        if (potentialTitle.length > 5 && potentialTitle.length < 100) {
+          // Try to extract dates from the rest
+          const dateMatch = restOfLine.match(/\b((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4})\s*[–-]\s*((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}|Present|Current)\b/i)
+
+          if (dateMatch) {
+            const startDate = dateMatch[1].trim()
+            const endDate = dateMatch[2].trim()
+
+            // Extract company (everything before the dates)
+            const companyPart = restOfLine.substring(0, dateMatch.index).trim()
+
+            return {
+              id: uuidv4(),
+              jobTitle: potentialTitle,
+              company: companyPart,
+              startDate,
+              endDate,
+              achievements: [],
+            }
+          }
+        }
+      }
+    }
+
     return null
   }
 
@@ -549,25 +586,77 @@ export class ResumeStructureParser {
   private parseExperienceItem(parseBullets: boolean = true): ExperienceItem | null {
     const startIndex = this.currentIndex
 
-    // First line: Job Title or Job Title | Company
     let line = this.lines[this.currentIndex].trim()
     if (!line || this.isBullet(line)) return null
 
-    let jobTitle = line
+    let jobTitle = ''
     let company = ''
     let location = ''
     let startDate = ''
     let endDate: string | 'Present' = ''
+    let jobTitleLine = line
 
-    // Check if job title and company are on same line
+    // CRITICAL FIX: Look ahead to find the line with dates (the actual job title line)
+    // Often resumes have a description before the "Job Title - Company | Dates" line
+    let foundJobLine = false
+    let lookAheadIndex = this.currentIndex
+
+    while (lookAheadIndex < Math.min(this.currentIndex + 5, this.lines.length)) {
+      const potentialLine = this.lines[lookAheadIndex].trim()
+
+      // Check if this line contains dates (month + year pattern)
+      const hasDatePattern = /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}\b/i.test(potentialLine)
+
+      if (hasDatePattern && (potentialLine.includes('|') || potentialLine.includes('–') || potentialLine.includes('-'))) {
+        // This is the actual job title line!
+        jobTitleLine = potentialLine
+        foundJobLine = true
+
+        // Skip any description lines before the job title line
+        if (lookAheadIndex > this.currentIndex) {
+          this.currentIndex = lookAheadIndex
+        }
+        break
+      }
+
+      lookAheadIndex++
+      if (this.isHeading(potentialLine) || this.isBullet(potentialLine)) break
+    }
+
+    // Parse the job title line
+    line = jobTitleLine
+
+    // Pattern 1: "Job Title - Company | Dates" or "Job Title | Company Dates"
     if (line.includes('|')) {
       const parts = line.split('|').map(p => p.trim())
-      jobTitle = parts[0]
-      company = parts[1] || ''
+      const leftPart = parts[0] // Could be "Job Title - Company" or just "Job Title"
+      const rightPart = parts[1] // Could be "Dates" or "Company Dates"
+
+      // Check if left part has a dash (Job Title - Company)
+      if (leftPart.includes('–') || leftPart.includes('-')) {
+        const titleCompanyParts = leftPart.split(/\s*[–-]\s*/)
+        jobTitle = titleCompanyParts[0].trim()
+        company = titleCompanyParts.slice(1).join(' - ').trim()
+      } else {
+        jobTitle = leftPart
+      }
+
+      // Extract dates from right part
+      const dateInfo = this.parseDateLine(rightPart)
+      location = dateInfo.location
+      startDate = dateInfo.startDate
+      endDate = dateInfo.endDate
+
+      // If company not found yet, check right part
+      if (!company && rightPart && !startDate) {
+        company = rightPart.split(/\s+\d{4}/).shift()?.trim() || ''
+      }
     } else if (line.includes(' at ')) {
       const parts = line.split(' at ')
       jobTitle = parts[0].trim()
       company = parts.slice(1).join(' at ').trim()
+    } else {
+      jobTitle = line
     }
 
     this.currentIndex++
@@ -575,14 +664,14 @@ export class ResumeStructureParser {
     // Next line might be company (if not already parsed)
     if (this.currentIndex < this.lines.length && !company) {
       line = this.lines[this.currentIndex].trim()
-      if (line && !this.isBullet(line) && !this.isDateLine(line)) {
+      if (line && !this.isBullet(line) && !this.isDateLine(line) && !this.looksLikeJobTitle(line)) {
         company = line
         this.currentIndex++
       }
     }
 
-    // Next line might be location and dates
-    if (this.currentIndex < this.lines.length) {
+    // Next line might be location and dates (if not already parsed)
+    if (this.currentIndex < this.lines.length && !startDate) {
       line = this.lines[this.currentIndex].trim()
       if (line && this.isDateLine(line)) {
         const dateInfo = this.parseDateLine(line)
@@ -797,7 +886,7 @@ export class ResumeStructureParser {
         // Parse skills from line (comma or bullet separated)
         const skills = this.isBullet(line)
           ? [line.replace(/^[-•*]\s*/, '')]
-          : line.split(/[,;]/).map(s => s.trim()).filter(s => s)
+          : this.splitSkills(line)
 
         currentSkills.push(...skills)
       }
@@ -1013,6 +1102,41 @@ export class ResumeStructureParser {
     const trimmed = text.trim()
     const match = trimmed.match(/^(\+\d{1,4}[\s.-]?)?(\(?\d{1,4}\)?[\s.-]?){2,5}\d{1,4}$/)
     return match !== null && trimmed.replace(/\D/g, '').length >= 7
+  }
+
+  /**
+   * Helper: Split skills by comma while preserving content in parentheses
+   * Example: "Cloud Computing (AWS, Azure)" stays as one skill
+   */
+  private splitSkills(text: string): string[] {
+    const skills: string[] = []
+    let current = ''
+    let parenDepth = 0
+
+    for (let i = 0; i < text.length; i++) {
+      const char = text[i]
+
+      if (char === '(') {
+        parenDepth++
+        current += char
+      } else if (char === ')') {
+        parenDepth--
+        current += char
+      } else if ((char === ',' || char === ';') && parenDepth === 0) {
+        // Only split on comma/semicolon if not inside parentheses
+        const trimmed = current.trim()
+        if (trimmed) skills.push(trimmed)
+        current = ''
+      } else {
+        current += char
+      }
+    }
+
+    // Add the last skill
+    const trimmed = current.trim()
+    if (trimmed) skills.push(trimmed)
+
+    return skills
   }
 
   /**
