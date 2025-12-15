@@ -64,6 +64,10 @@ export class ResumeStructureParser {
       }
     }
 
+    // Post-process: Merge split certification sections
+    // Common pattern: "PROFESSIONAL CERTIFICATIONS" followed by "AND TRAINING"
+    this.mergeCertificationSections(sections)
+
     const wordCount = this.plainText.split(/\s+/).filter(w => w.length > 0).length
 
     return {
@@ -73,6 +77,33 @@ export class ResumeStructureParser {
       },
       sections,
       rawText: this.plainText,
+    }
+  }
+
+  /**
+   * Merge split certification sections
+   * Common pattern: "PROFESSIONAL CERTIFICATIONS" (empty) followed by "AND TRAINING" (has content)
+   */
+  private mergeCertificationSections(sections: ResumeSection[]): void {
+    for (let i = 0; i < sections.length - 1; i++) {
+      const current = sections[i]
+      const next = sections[i + 1]
+
+      // Check if current is certifications section with no content
+      if (current.type === 'certifications' &&
+          current.content.length === 0 &&
+          next.heading.toUpperCase().includes('TRAINING')) {
+
+        console.log('[Parser] Merging certification sections:', current.heading, '+', next.heading)
+
+        // Merge next section's content into current
+        current.content = next.content
+        current.heading = `${current.heading} ${next.heading}`
+
+        // Remove the next section
+        sections.splice(i + 1, 1)
+        break
+      }
     }
   }
 
