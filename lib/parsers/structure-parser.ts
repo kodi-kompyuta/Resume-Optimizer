@@ -68,6 +68,9 @@ export class ResumeStructureParser {
     // Common pattern: "PROFESSIONAL CERTIFICATIONS" followed by "AND TRAINING"
     this.mergeCertificationSections(sections)
 
+    // Post-process: Deduplicate sections (e.g., multiple "EDUCATION" headings)
+    this.deduplicateSections(sections)
+
     const wordCount = this.plainText.split(/\s+/).filter(w => w.length > 0).length
 
     return {
@@ -98,11 +101,36 @@ export class ResumeStructureParser {
 
         // Merge next section's content into current
         current.content = next.content
-        current.heading = `${current.heading} ${next.heading}`
+        // Keep original heading (PROFESSIONAL CERTIFICATIONS only)
 
         // Remove the next section
         sections.splice(i + 1, 1)
         break
+      }
+    }
+  }
+
+  /**
+   * Deduplicate sections by merging duplicate section types
+   * If resume has multiple sections of same type (e.g., two "EDUCATION" headings),
+   * merge their content into the first occurrence and remove duplicates
+   */
+  private deduplicateSections(sections: ResumeSection[]): void {
+    const seen = new Map<string, number>() // type -> first occurrence index
+
+    for (let i = sections.length - 1; i >= 0; i--) {
+      const section = sections[i]
+      const key = section.type
+
+      if (seen.has(key)) {
+        const firstIdx = seen.get(key)!
+        // Merge content from duplicate into first occurrence
+        sections[firstIdx].content.push(...section.content)
+        // Remove duplicate section
+        sections.splice(i, 1)
+        console.log(`[Parser] Merged duplicate ${section.type} section: ${section.heading}`)
+      } else {
+        seen.set(key, i)
       }
     }
   }
