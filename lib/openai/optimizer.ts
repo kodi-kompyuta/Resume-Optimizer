@@ -186,7 +186,20 @@ async function optimizeResumeStrategically(
   console.log('[Optimizer] ===== STRATEGIC COMPREHENSIVE OPTIMIZATION MODE =====')
   console.log(`[Optimizer] Current match score: ${optimizationContext.current_score}`)
   console.log(`[Optimizer] Target score: ${optimizationContext.target_score}`)
-  console.log(`[Optimizer] High-value keywords (first 5): ${optimizationContext.high_value_keywords.slice(0, 5).join(', ')}`)
+  console.log(`[Optimizer] Optimization context:`, JSON.stringify({
+    hasGaps: !!optimizationContext.prioritized_gaps,
+    gapsCount: optimizationContext.prioritized_gaps?.length || 0,
+    hasKeywords: !!optimizationContext.high_value_keywords,
+    keywordsCount: optimizationContext.high_value_keywords?.length || 0
+  }))
+
+  // Safety checks - provide defaults if fields are missing
+  const prioritizedGaps = optimizationContext.prioritized_gaps || []
+  const highValueKeywords = optimizationContext.high_value_keywords || []
+  const sectionPriorities = optimizationContext.section_priorities || []
+  const strategicGuidance = optimizationContext.strategic_guidance || 'Optimize resume to match job requirements.'
+
+  console.log(`[Optimizer] High-value keywords (first 5): ${highValueKeywords.slice(0, 5).join(', ')}`)
 
   // Determine optimization aggressiveness based on current score
   const currentScore = optimizationContext.current_score
@@ -232,24 +245,30 @@ Score Gap to Close: ${scoreGap} points
 Optimization Level: ${optimizationLevel}
 
 **CRITICAL GAPS TO ADDRESS (Prioritized):**
-${optimizationContext.prioritized_gaps.slice(0, 5).map((gap: any, i: number) =>
-  `${i+1}. [${gap.severity.toUpperCase()}] ${gap.requirement}
-     Impact: ${gap.impact_points} points
-     Current: ${gap.current_level || 'Not demonstrated'}
-     Required: ${gap.required_level}
-     How to fix: ${gap.suggestion}`
-).join('\n\n')}
+${prioritizedGaps.length > 0
+  ? prioritizedGaps.slice(0, 5).map((gap: any, i: number) =>
+      `${i+1}. [${gap.severity.toUpperCase()}] ${gap.requirement}
+         Impact: ${gap.impact_points} points
+         Current: ${gap.current_level || 'Not demonstrated'}
+         Required: ${gap.required_level}
+         How to fix: ${gap.suggestion}`
+    ).join('\n\n')
+  : 'No specific gaps identified. Focus on general keyword integration and impact demonstration.'}
 
 **HIGH-VALUE KEYWORDS TO INTEGRATE (Top 15):**
-${optimizationContext.high_value_keywords.slice(0, 15).join(', ')}
+${highValueKeywords.length > 0
+  ? highValueKeywords.slice(0, 15).join(', ')
+  : 'General job-related keywords from description'}
 
 **SECTION PRIORITIES (Focus Here First):**
-${optimizationContext.section_priorities.slice(0, 3).map((sp: any) =>
-  `- ${sp.section_type} (Priority ${sp.priority}/10): ${sp.reason}`
-).join('\n')}
+${sectionPriorities.length > 0
+  ? sectionPriorities.slice(0, 3).map((sp: any) =>
+      `- ${sp.section_type} (Priority ${sp.priority}/10): ${sp.reason}`
+    ).join('\n')
+  : '- experience (Priority 10/10): Focus on demonstrating relevant achievements\n- skills (Priority 8/10): Ensure all relevant skills are listed\n- summary (Priority 7/10): Align with job requirements'}
 
 **STRATEGIC GUIDANCE:**
-${optimizationContext.strategic_guidance}
+${strategicGuidance}
 
 ---
 
@@ -574,6 +593,9 @@ export async function optimizeResume(
       const optimizedResume = jsonToStructuredResume(optimizedJson, structuredResume)
 
       // Generate comprehensive change summary
+      const gapsCount = options.optimizationContext.prioritized_gaps?.length || 0
+      const keywordsCount = options.optimizationContext.high_value_keywords?.length || 0
+
       const changes: ChangeLog[] = [{
         id: uuidv4(),
         sectionId: 'all',
@@ -582,7 +604,7 @@ export async function optimizeResume(
         changeType: 'enhance',
         originalValue: 'Original resume',
         newValue: `Strategically optimized resume (${options.optimizationContext.current_score}% → ${options.optimizationContext.target_score}% target)`,
-        reason: `Comprehensive optimization targeting ${options.optimizationContext.prioritized_gaps.length} gaps with ${options.optimizationContext.high_value_keywords.length} strategic keywords.`,
+        reason: `Comprehensive optimization targeting ${gapsCount} gaps with ${keywordsCount} strategic keywords.`,
         confidence: 0.95,
         impact: 'high',
         category: 'keyword',
@@ -604,7 +626,7 @@ export async function optimizeResume(
           after: options.optimizationContext.current_score + 8, // Estimate
           improvement: 8
         },
-        estimatedImpact: `Comprehensive optimization targeting ${options.optimizationContext.prioritized_gaps.length} gaps with ${options.optimizationContext.high_value_keywords.length} strategic keywords.`,
+        estimatedImpact: `Comprehensive optimization targeting ${gapsCount} gaps with ${keywordsCount} strategic keywords.`,
       }
 
       const preview: DiffPreview = {
