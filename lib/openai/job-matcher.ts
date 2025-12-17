@@ -167,53 +167,69 @@ export async function matchResumeToJob({
 
     console.log('[Job Matcher] Extracted missing keywords:', missingKeywords.length)
 
-    // Build optimization context for strategic optimization
-    const gaps: Gap[] = (result.gaps || []).map((gap: any) => ({
-      requirement: gap.requirement,
-      severity: gap.severity,
-      suggestion: gap.suggestion,
-      current_level: gap.current_level,
-      required_level: gap.required_level,
-      impact_points: gap.impact_points || estimateImpactPoints(gap.severity),
-      optimization_priority: gap.optimization_priority || estimatePriority(gap.severity)
-    }))
+    // Build optimization context for strategic optimization with error handling
+    let optimizationContext: OptimizationContext | undefined
 
-    // Sort gaps by optimization priority (highest first)
-    const prioritizedGaps = [...gaps].sort((a, b) =>
-      (b.optimization_priority || 0) - (a.optimization_priority || 0)
-    )
+    try {
+      console.log('[Job Matcher] Building optimization context...')
 
-    // Extract high-value keywords
-    const highValueKeywords = extractHighValueKeywords(result.missing_keywords, result.missing_preferred, missingKeywords)
+      const gaps: Gap[] = (result.gaps || []).map((gap: any) => ({
+        requirement: gap.requirement,
+        severity: gap.severity,
+        suggestion: gap.suggestion,
+        current_level: gap.current_level,
+        required_level: gap.required_level,
+        impact_points: gap.impact_points || estimateImpactPoints(gap.severity),
+        optimization_priority: gap.optimization_priority || estimatePriority(gap.severity)
+      }))
+      console.log('[Job Matcher] Processed gaps:', gaps.length)
 
-    // Infer section priorities from gaps and recommendations
-    const sectionPriorities = inferSectionPriorities(gaps, result.recommended_additions || [])
+      // Sort gaps by optimization priority (highest first)
+      const prioritizedGaps = [...gaps].sort((a, b) =>
+        (b.optimization_priority || 0) - (a.optimization_priority || 0)
+      )
+      console.log('[Job Matcher] Prioritized gaps:', prioritizedGaps.length)
 
-    // Generate strategic guidance
-    const strategicGuidance = generateStrategicGuidance(matchScore, gaps)
+      // Extract high-value keywords
+      const highValueKeywords = extractHighValueKeywords(result.missing_keywords, result.missing_preferred, missingKeywords)
+      console.log('[Job Matcher] Extracted keywords:', highValueKeywords.length)
 
-    const optimizationContext: OptimizationContext = {
-      current_score: matchScore,
-      target_score: Math.min(100, matchScore + 10), // Target +10 points improvement
-      score_breakdown: matchAnalysis.score_breakdown || {},
-      prioritized_gaps: prioritizedGaps,
-      high_value_keywords: highValueKeywords,
-      section_priorities: sectionPriorities,
-      strategic_guidance: strategicGuidance
+      // Infer section priorities from gaps and recommendations
+      const sectionPriorities = inferSectionPriorities(gaps, result.recommended_additions || [])
+      console.log('[Job Matcher] Section priorities:', sectionPriorities.length)
+
+      // Generate strategic guidance
+      const strategicGuidance = generateStrategicGuidance(matchScore, gaps)
+      console.log('[Job Matcher] Generated guidance:', strategicGuidance.substring(0, 50) + '...')
+
+      optimizationContext = {
+        current_score: matchScore,
+        target_score: Math.min(100, matchScore + 10), // Target +10 points improvement
+        score_breakdown: matchAnalysis.score_breakdown || {},
+        prioritized_gaps: prioritizedGaps,
+        high_value_keywords: highValueKeywords,
+        section_priorities: sectionPriorities,
+        strategic_guidance: strategicGuidance
+      }
+
+      console.log('[Job Matcher] ✅ Successfully built optimization context:', {
+        current_score: matchScore,
+        gaps_count: prioritizedGaps.length,
+        keywords_count: highValueKeywords.length,
+        section_priorities_count: sectionPriorities.length
+      })
+    } catch (contextError) {
+      console.error('[Job Matcher] ⚠️ Error building optimization context:', contextError)
+      console.error('[Job Matcher] Will proceed without optimization context')
+      // Continue without optimization context - it's optional
+      optimizationContext = undefined
     }
-
-    console.log('[Job Matcher] Built optimization context:', {
-      current_score: matchScore,
-      gaps_count: prioritizedGaps.length,
-      keywords_count: highValueKeywords.length,
-      section_priorities_count: sectionPriorities.length
-    })
 
     return {
       match_analysis: matchAnalysis,
       missing_keywords: missingKeywords,
       recommended_additions: result.recommended_additions || [],
-      gaps: gaps,
+      gaps: result.gaps || [],
       optimization_context: optimizationContext
     }
   } catch (error) {
