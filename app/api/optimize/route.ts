@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { optimizeResume } from '@/lib/openai/optimizer'
 import { parseResumeStructure } from '@/lib/parsers/structure-parser'
-import { OptimizationOptions, StructuredResume } from '@/types'
+import { OptimizationOptions, StructuredResume, OptimizationContext, Gap, RecommendedAddition, MatchAnalysis, SectionType } from '@/types'
 
 export async function POST(request: NextRequest) {
   try {
@@ -77,9 +77,12 @@ export async function POST(request: NextRequest) {
         .eq('id', resumeId)
     }
 
-    // Fetch job description if provided
+    // Fetch job description and match analysis if provided
     let jobDescription: string | undefined
+    let optimizationContext: OptimizationContext | undefined
+
     if (jobDescriptionId) {
+      console.log('[Optimize API] Fetching job description...')
       const { data: jobData, error: jobError } = await supabase
         .from('job_descriptions')
         .select('job_description')
@@ -89,13 +92,71 @@ export async function POST(request: NextRequest) {
 
       if (!jobError && jobData) {
         jobDescription = jobData.job_description
+        console.log('[Optimize API] Job description fetched')
+
+        // Fetch match analysis if it exists
+        console.log('[Optimize API] Fetching match analysis...')
+        const { data: matchData, error: matchError } = await supabase
+          .from('resume_job_matches')
+          .select('match_score, match_analysis, gaps, recommended_additions, missing_keywords')
+          .eq('resume_id', resumeId)
+          .eq('job_description_id', jobDescriptionId)
+          .maybeSingle()
+
+        if (!matchError && matchData) {
+          console.log('[Optimize API] Found existing match analysis, score:', matchData.match_score)
+
+          // Build optimization context from match data
+          const matchAnalysis = matchData.match_analysis as MatchAnalysis
+          const gaps = (matchData.gaps || []) as Gap[]
+          const recommendedAdditions = (matchData.recommended_additions || []) as RecommendedAddition[]
+
+          // Prioritize gaps by optimization_priority (if available) or estimate
+          const prioritizedGaps = gaps
+            .map(gap => ({
+              ...gap,
+              optimization_priority: gap.optimization_priority || estimatePriority(gap.severity),
+              impact_points: gap.impact_points || estimateImpact(gap.severity)
+            }))
+            .sort((a, b) => (b.optimization_priority || 0) - (a.optimization_priority || 0))
+
+          // Extract high-value keywords
+          const highValueKeywords = extractKeywords(matchData.missing_keywords)
+
+          // Infer section priorities from gaps and recommendations
+          const sectionPriorities = inferSectionPriorities(gaps, recommendedAdditions)
+
+          optimizationContext = {
+            current_score: matchData.match_score || 0,
+            target_score: Math.min(100, (matchData.match_score || 0) + 10),
+            score_breakdown: matchAnalysis.score_breakdown || {},
+            prioritized_gaps,
+            high_value_keywords: highValueKeywords,
+            section_priorities: sectionPriorities,
+            strategic_guidance: generateGuidance(matchData.match_score || 0, gaps)
+          }
+
+          console.log('[Optimize API] Built optimization context:', {
+            current_score: matchData.match_score,
+            gaps_count: prioritizedGaps.length,
+            keywords_count: highValueKeywords.length
+          })
+        } else {
+          console.log('[Optimize API] No match analysis found, will perform match-blind optimization')
+        }
       }
     }
 
-    // Perform optimization
+    // Perform optimization with context
+    const enhancedOptions: OptimizationOptions = {
+      ...options,
+      optimizationContext,
+      enable_comprehensive_rewrite: !!optimizationContext && (optimizationContext.current_score < 90)
+    }
+
     const optimizationResult = await optimizeResume(
       structuredData,
-      options,
+      enhancedOptions,
       jobDescription
     )
 
@@ -126,5 +187,71 @@ export async function POST(request: NextRequest) {
       { error: 'Optimization failed. Please try again.' },
       { status: 500 }
     )
+  }
+}
+
+// Helper functions for optimization context building
+
+function estimatePriority(severity: string): number {
+  switch (severity) {
+    case 'critical': return 10
+    case 'important': return 7
+    case 'nice-to-have': return 3
+    default: return 5
+  }
+}
+
+function estimateImpact(severity: string): number {
+  switch (severity) {
+    case 'critical': return 8
+    case 'important': return 5
+    case 'nice-to-have': return 2
+    default: return 3
+  }
+}
+
+function extractKeywords(missingKeywords: any): string[] {
+  const keywords: string[] = []
+  if (Array.isArray(missingKeywords)) {
+    keywords.push(...missingKeywords)
+  } else if (typeof missingKeywords === 'object' && missingKeywords !== null) {
+    // Flatten categorized keywords
+    Object.values(missingKeywords).forEach((kws: any) => {
+      if (Array.isArray(kws)) keywords.push(...kws)
+    })
+  }
+  return [...new Set(keywords)].slice(0, 15)
+}
+
+function inferSectionPriorities(gaps: Gap[], additions: RecommendedAddition[]): any[] {
+  const sectionScores: Record<string, { score: number, count: number }> = {}
+
+  additions.forEach(add => {
+    const section = add.section
+    if (!sectionScores[section]) {
+      sectionScores[section] = { score: 0, count: 0 }
+    }
+    sectionScores[section].score += (add.impact_points || 3)
+    sectionScores[section].count++
+  })
+
+  return Object.entries(sectionScores)
+    .sort((a, b) => b[1].score - a[1].score)
+    .map(([section, data]) => ({
+      section_type: section as SectionType,
+      priority: Math.min(10, Math.ceil(data.score)),
+      reason: `${data.count} high-impact recommendation${data.count > 1 ? 's' : ''} with ${data.score} total impact points`
+    }))
+}
+
+function generateGuidance(score: number, gaps: Gap[]): string {
+  const criticalGaps = gaps.filter(g => g.severity === 'critical').length
+
+  if (score >= 85) {
+    return `Good foundation - focus on integrating missing keywords and emphasizing existing strengths to push toward excellent match.`
+  } else if (score >= 70) {
+    return `Moderate match - comprehensively rewrite bullets to demonstrate required qualifications and integrate critical keywords. Address ${criticalGaps} critical gaps.`
+  } else {
+    return `Significant gaps - major rewrite needed. Reframe all experience to align with job requirements, address ${criticalGaps} critical gaps, and integrate all missing keywords.`
   }
 }

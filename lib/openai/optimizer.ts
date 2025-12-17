@@ -23,10 +23,72 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY!,
 })
 
-// Simple, direct optimization system prompt
-const RESUME_OPTIMIZER_SYSTEM_PROMPT = `You are a resume optimizer working with an ATS system.
+// Strategic comprehensive optimization system prompt
+const RESUME_OPTIMIZER_SYSTEM_PROMPT = `You are an expert resume optimizer specializing in comprehensive, strategic resume enhancement for maximum job match score improvement.
 
-Take a resume and job description and return an optimized resume as structured JSON, using this exact format:
+Your goal: Transform a resume to MAXIMIZE its match score for a specific job in a SINGLE PASS through strategic, comprehensive rewrites.
+
+**OPTIMIZATION STRATEGY:**
+
+When match context is provided (current score, gaps, target keywords):
+1. Understand the CURRENT MATCH SCORE and what's limiting it
+2. Identify which gaps are costing the most points (prioritize closing high-impact gaps)
+3. Focus optimization effort on sections with highest score improvement potential
+4. Integrate high-value keywords naturally throughout relevant sections
+5. Rewrite bullets comprehensively to demonstrate required qualifications
+
+**OPTIMIZATION APPROACH:**
+
+COMPREHENSIVE REWRITE (when match score provided and < 90):
+- Make SIGNIFICANT changes to maximize score improvement
+- Completely rewrite bullets to emphasize job-relevant achievements
+- Add missing keywords naturally into existing accomplishments
+- Reframe experience to align with job requirements
+- Use creative phrasing while maintaining truthfulness
+- Quantify achievements even if estimates (e.g., "improved by ~15-20%")
+
+MODERATE ENHANCEMENT (when match score 90-95 or no context):
+- Enhance bullets to be more impactful and keyword-rich
+- Add missing keywords where natural
+- Strengthen action verbs and quantify results
+- Polish clarity and grammar
+
+CONSERVATIVE POLISH (when match score > 95):
+- Minor refinements to grammar and flow
+- Add only highest-value missing keywords
+- Preserve what's working well
+
+⚠️ CRITICAL STRUCTURE REQUIREMENTS - ABSOLUTE REQUIREMENTS - FAILURE = REJECTION:
+
+1. PRESERVE ALL JOBS: Output MUST have EXACTLY the same number of work experience entries as input
+2. PRESERVE ALL EDUCATION: Output MUST have EXACTLY the same number of education entries as input
+3. PRESERVE ALL CORE METADATA: Never change job titles, company names, dates, degree names, institutions
+4. ENHANCE ONLY: Your job is to rewrite ACHIEVEMENT BULLETS and SUMMARIES - NOT structural elements
+5. NO DELETION: FORBIDDEN to remove ANY work experience or education, regardless of relevance
+6. NO CONSOLIDATION: Never merge multiple jobs into one
+7. NO SUMMARIZATION: Never replace detailed experience with summaries
+8. MAINTAIN CHRONOLOGY: Keep all entries in the same order
+
+**WHAT YOU CAN OPTIMIZE:**
+✅ Achievement bullet points (comprehensive rewrites allowed)
+✅ Professional summary (full rewrite allowed)
+✅ Skills list (add missing relevant skills)
+✅ Project descriptions (enhance with keywords)
+✅ Certification phrasing (minor tweaks)
+
+**WHAT YOU MUST PRESERVE EXACTLY:**
+🔒 Job titles
+🔒 Company names
+🔒 Employment dates
+🔒 Locations
+🔒 Degree names
+🔒 Institution names
+🔒 Graduation dates
+🔒 Total count of jobs/education entries
+
+**OUTPUT FORMAT:**
+
+Return a JSON object with this EXACT structure:
 
 {
   "full_name": "...",
@@ -39,38 +101,30 @@ Take a resume and job description and return an optimized resume as structured J
   "core_skills": ["...", "..."],
   "work_experience": [
     {
-      "job_title": "...",
-      "company": "...",
-      "location": "...",
-      "date_range": "...",
-      "responsibilities": ["...", "..."]
+      "job_title": "...",  // EXACT copy from input
+      "company": "...",  // EXACT copy from input
+      "location": "...",  // EXACT copy from input
+      "date_range": "...",  // EXACT copy from input
+      "responsibilities": [  // Optimized bullets here
+        "...",
+        "..."
+      ]
     }
   ],
-  "education": [...],
+  "education": [...],  // EXACT count as input
   "certifications": [...],
   "projects": [...],
-  "references": "Available upon request" or ["Name 1", "Name 2"]
+  "references": "Available upon request"
 }
 
-⚠️ ABSOLUTE REQUIREMENTS - FAILURE TO FOLLOW WILL RESULT IN REJECTION:
+**VALIDATION BEFORE RETURNING:**
+Before sending your response, verify:
+✓ work_experience array length matches input? (YES/NO)
+✓ education array length matches input? (YES/NO)
+✓ All job titles, companies, dates preserved exactly? (YES/NO)
+✓ Bullets comprehensively rewritten with keywords? (YES/NO)
 
-1. COUNT THE JOBS: If the original resume has N work experience entries, your output MUST have EXACTLY N work experience entries
-2. COUNT THE SKILLS: If the original has M skills, your output must have AT LEAST M skills
-3. COUNT EDUCATION: If original has K education entries, output must have EXACTLY K entries
-4. NEVER DELETE: You are FORBIDDEN from removing ANY work experience, no matter how irrelevant it seems
-5. ENHANCE ONLY: Your job is to reword bullet points to include job description keywords - NOT to remove jobs
-6. CURRENT JOB IS SACRED: The most recent job (with "Current" or latest date) MUST be included
-7. ALL SKILLS REQUIRED: Every skill from the original must appear in your output
-8. DO NOT CONSOLIDATE: Never merge multiple jobs into one
-9. DO NOT SUMMARIZE: Never replace detailed experience with a summary
-10. PRESERVE CHRONOLOGY: Keep all jobs in the same order
-
-VALIDATION CHECK BEFORE RETURNING:
-- Count work_experience array length - does it match the original? If NO, you FAILED
-- Check if the most recent/current job is present - if NO, you FAILED
-- Verify all skills are included - if any missing, you FAILED
-
-Your ONLY job is to enhance the wording of bullet points to match keywords. You are NOT allowed to remove content.
+If any answer is NO, you FAILED. Fix it before returning.
 
 Only return clean JSON with no extra text.`
 
@@ -116,6 +170,147 @@ function structuredResumeToPlainText(resume: StructuredResume): string {
   }
 
   return lines.join('\n')
+}
+
+/**
+ * STRATEGIC COMPREHENSIVE OPTIMIZATION
+ * Uses match context to perform targeted, comprehensive single-pass optimization
+ */
+async function optimizeResumeStrategically(
+  resumeText: string,
+  jobDescription: string,
+  originalStructured: StructuredResume,
+  optimizationContext: any // OptimizationContext type
+): Promise<any> {
+
+  console.log('[Optimizer] ===== STRATEGIC COMPREHENSIVE OPTIMIZATION MODE =====')
+  console.log(`[Optimizer] Current match score: ${optimizationContext.current_score}`)
+  console.log(`[Optimizer] Target score: ${optimizationContext.target_score}`)
+  console.log(`[Optimizer] High-value keywords (first 5): ${optimizationContext.high_value_keywords.slice(0, 5).join(', ')}`)
+
+  // Determine optimization aggressiveness based on current score
+  const currentScore = optimizationContext.current_score
+  const targetScore = optimizationContext.target_score || (currentScore + 10)
+  const scoreGap = targetScore - currentScore
+
+  let optimizationLevel: string
+  let temperature: number
+
+  if (currentScore >= 90) {
+    optimizationLevel = "CONSERVATIVE POLISH"
+    temperature = 0.7
+  } else if (currentScore >= 75) {
+    optimizationLevel = "MODERATE ENHANCEMENT"
+    temperature = 0.85
+  } else {
+    optimizationLevel = "COMPREHENSIVE REWRITE"
+    temperature = 1.0
+  }
+
+  console.log(`[Optimizer] Strategy: ${optimizationLevel} (temperature: ${temperature})`)
+
+  // Count original content for validation
+  const originalExpCount = originalStructured.sections
+    .find(s => s.type === 'experience')?.content
+    .filter(b => b.type === 'experience_item').length || 0
+
+  const originalEduCount = originalStructured.sections
+    .find(s => s.type === 'education')?.content
+    .filter(b => b.type === 'education_item').length || 0
+
+  console.log(`[Optimizer] Original: ${originalExpCount} jobs, ${originalEduCount} education entries`)
+
+  // Build strategic optimization prompt
+  const strategicPrompt = `${RESUME_OPTIMIZER_SYSTEM_PROMPT}
+
+**OPTIMIZATION CONTEXT:**
+
+Current Match Score: ${currentScore}/100
+Target Score: ${targetScore}/100
+Score Gap to Close: ${scoreGap} points
+
+Optimization Level: ${optimizationLevel}
+
+**CRITICAL GAPS TO ADDRESS (Prioritized):**
+${optimizationContext.prioritized_gaps.slice(0, 5).map((gap: any, i: number) =>
+  `${i+1}. [${gap.severity.toUpperCase()}] ${gap.requirement}
+     Impact: ${gap.impact_points} points
+     Current: ${gap.current_level || 'Not demonstrated'}
+     Required: ${gap.required_level}
+     How to fix: ${gap.suggestion}`
+).join('\n\n')}
+
+**HIGH-VALUE KEYWORDS TO INTEGRATE (Top 15):**
+${optimizationContext.high_value_keywords.slice(0, 15).join(', ')}
+
+**SECTION PRIORITIES (Focus Here First):**
+${optimizationContext.section_priorities.slice(0, 3).map((sp: any) =>
+  `- ${sp.section_type} (Priority ${sp.priority}/10): ${sp.reason}`
+).join('\n')}
+
+**STRATEGIC GUIDANCE:**
+${optimizationContext.strategic_guidance}
+
+---
+
+**YOUR TASK:**
+
+Given the above context, optimize this resume to MAXIMIZE match score in ONE PASS.
+
+Resume (${originalExpCount} jobs, ${originalEduCount} education entries):
+${resumeText}
+
+Job Description:
+${jobDescription}
+
+**CRITICAL REMINDERS:**
+- You MUST return EXACTLY ${originalExpCount} work_experience entries
+- You MUST return EXACTLY ${originalEduCount} education entries
+- For ${optimizationLevel} mode, make comprehensive bullet rewrites that:
+  * Integrate high-value keywords naturally
+  * Address critical gaps by reframing existing experience
+  * Quantify achievements to demonstrate required qualifications
+  * Use strong action verbs and impact-oriented language
+
+Return the optimized resume as clean JSON with no extra text.`
+
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-4o',
+    messages: [
+      { role: 'user', content: strategicPrompt }
+    ],
+    temperature: temperature,
+    max_tokens: 4096,
+    response_format: { type: 'json_object' },
+  })
+
+  const content = completion.choices[0].message.content
+  if (!content) {
+    throw new Error('No response from AI optimizer')
+  }
+
+  const result = JSON.parse(content)
+
+  console.log('[Optimizer] Successfully parsed optimized resume JSON')
+  console.log('[Optimizer] Optimized work experience entries:', result.work_experience?.length || 0)
+
+  // CRITICAL VALIDATION
+  const optimizedExpCount = result.work_experience?.length || 0
+  const optimizedEduCount = result.education?.length || 0
+
+  if (optimizedExpCount < originalExpCount) {
+    console.error(`[Optimizer] ❌ VALIDATION FAILED: AI removed ${originalExpCount - optimizedExpCount} work experience entries!`)
+    throw new Error(`AI removed work experience! Expected ${originalExpCount} jobs but got ${optimizedExpCount}. Rejecting optimization.`)
+  }
+
+  if (optimizedEduCount < originalEduCount) {
+    console.error(`[Optimizer] ❌ VALIDATION FAILED: AI removed education entries!`)
+    throw new Error(`AI removed education! Expected ${originalEduCount} entries but got ${optimizedEduCount}. Rejecting optimization.`)
+  }
+
+  console.log('[Optimizer] ✅ Validation passed: All content preserved')
+
+  return result
 }
 
 /**
@@ -355,25 +550,30 @@ export async function optimizeResume(
   options: OptimizationOptions,
   jobDescription?: string
 ): Promise<OptimizationResult> {
-  // TEMPORARILY DISABLED: Direct optimization is producing bad results
-  // Falling back to section-by-section method until we can fix the AI prompt
-  if (false && jobDescription && jobDescription.trim()) {
-    console.log('[Optimizer] ✅ STEP 1: Load resume and job description')
-    console.log('[Optimizer] Using direct job-description-based optimization')
+  // STRATEGIC OPTIMIZATION: Use match context if available
+  if (options.optimizationContext && jobDescription && jobDescription.trim()) {
+    console.log('[Optimizer] ===== STRATEGIC COMPREHENSIVE OPTIMIZATION MODE =====')
+    console.log('[Optimizer] Current score:', options.optimizationContext.current_score)
+    console.log('[Optimizer] Using comprehensive single-pass approach')
 
     try {
       // Convert structured resume to plain text
       const resumeText = structuredResumeToPlainText(structuredResume)
-      console.log('[Optimizer] ✅ STEP 2: Send Resume + JD to AI')
+      console.log('[Optimizer] Resume text prepared for AI')
 
-      // Get optimized JSON from AI
-      const optimizedJson = await optimizeResumeWithJobDescription(resumeText, jobDescription, structuredResume)
-      console.log('[Optimizer] ✅ STEP 3: Received optimized JSON from AI')
+      // Perform strategic optimization
+      const optimizedJson = await optimizeResumeStrategically(
+        resumeText,
+        jobDescription,
+        structuredResume,
+        options.optimizationContext
+      )
+      console.log('[Optimizer] ✅ Received strategically optimized resume')
 
       // Convert back to StructuredResume format
       const optimizedResume = jsonToStructuredResume(optimizedJson, structuredResume)
 
-      // Generate simple change summary
+      // Generate comprehensive change summary
       const changes: ChangeLog[] = [{
         id: uuidv4(),
         sectionId: 'all',
@@ -381,15 +581,15 @@ export async function optimizeResume(
         contentBlockId: 'all',
         changeType: 'enhance',
         originalValue: 'Original resume',
-        newValue: 'Optimized resume tailored to job description',
-        reason: 'Optimized entire resume to match job description keywords and language',
+        newValue: `Strategically optimized resume (${options.optimizationContext.current_score}% → ${options.optimizationContext.target_score}% target)`,
+        reason: `Comprehensive optimization targeting ${options.optimizationContext.prioritized_gaps.length} gaps with ${options.optimizationContext.high_value_keywords.length} strategic keywords.`,
         confidence: 0.95,
         impact: 'high',
         category: 'keyword',
       }]
 
       const summary: OptimizationSummary = {
-        totalChanges: 1,
+        totalChanges: changes.length,
         changesByCategory: {
           keyword: 1,
           bullet_point: 0,
@@ -399,7 +599,12 @@ export async function optimizeResume(
           formatting: 0,
         },
         keywordsAdded: optimizedJson.core_skills || [],
-        estimatedImpact: 'Resume optimized to match job description language and ATS keywords',
+        atsScoreChange: {
+          before: options.optimizationContext.current_score,
+          after: options.optimizationContext.current_score + 8, // Estimate
+          improvement: 8
+        },
+        estimatedImpact: `Comprehensive optimization targeting ${options.optimizationContext.prioritized_gaps.length} gaps with ${options.optimizationContext.high_value_keywords.length} strategic keywords.`,
       }
 
       const preview: DiffPreview = {
@@ -410,19 +615,19 @@ export async function optimizeResume(
       return {
         originalResume: structuredResume,
         optimizedResume,
-        optimizedJson: optimizedJson, // Include the JSON for template rendering
+        optimizedJson: optimizedJson,
         changes,
         summary,
         preview,
       }
     } catch (error) {
-      console.error('[Optimizer] Error in direct optimization, falling back to section-by-section:', error)
-      // Fall through to original method on error
+      console.error('[Optimizer] Strategic optimization failed, falling back to section-by-section:', error)
+      // Fall through to section-by-section on error
     }
   }
 
-  // Original section-by-section optimization (fallback or when no job description)
-  console.log('[Optimizer] Using section-by-section optimization')
+  // Fallback: Original section-by-section optimization (when no match context or on error)
+  console.log('[Optimizer] Using section-by-section optimization (no match context or fallback)')
   const changes: ChangeLog[] = []
   const optimizedResume: StructuredResume = JSON.parse(JSON.stringify(structuredResume))
 

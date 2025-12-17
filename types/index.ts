@@ -129,6 +129,8 @@ export interface RecommendedAddition {
   reason: string
   priority: 'high' | 'medium' | 'low'
   impact?: string
+  impact_points?: number // NEW: Expected point improvement (0-10)
+  specific_keywords?: string[] // NEW: Exact keywords to integrate
 }
 
 export interface Gap {
@@ -137,6 +139,28 @@ export interface Gap {
   suggestion: string
   current_level?: string
   required_level?: string
+  impact_points?: number // NEW: How many points closing this gap could add (0-10)
+  optimization_priority?: number // NEW: 1-10, higher = optimize first
+}
+
+// Optimization Context - Strategic context passed from matcher to optimizer
+export interface OptimizationContext {
+  current_score: number // Current match score (e.g., 85)
+  target_score?: number // Target score (optional, defaults to "maximize")
+  score_breakdown: {
+    required_qualifications?: number
+    preferred_qualifications?: number
+    relevant_experience?: number
+    demonstrated_achievements?: number
+  }
+  prioritized_gaps: Gap[] // Sorted by optimization_priority (highest first)
+  high_value_keywords: string[] // Top 15 keywords to integrate
+  section_priorities: {
+    section_type: SectionType
+    priority: number // 1-10, higher = focus here first
+    reason: string // Why this section needs attention
+  }[]
+  strategic_guidance: string // Overall optimization strategy message
 }
 
 // Cover Letter Types
@@ -335,6 +359,8 @@ export interface OptimizationOptions {
   targetIndustry?: string
   preserveLength?: boolean // Try to keep similar length
   aggressiveness?: 'conservative' | 'moderate' | 'aggressive' // How much to change
+  optimizationContext?: OptimizationContext // NEW: Strategic context from matcher
+  enable_comprehensive_rewrite?: boolean // NEW: Allow major rewrites vs minor tweaks
 }
 
 export interface OptimizationResult {

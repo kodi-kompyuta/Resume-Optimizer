@@ -1,5 +1,5 @@
 import OpenAI from 'openai'
-import { MatchAnalysis, RecommendedAddition, Gap } from '@/types'
+import { MatchAnalysis, RecommendedAddition, Gap, OptimizationContext, SectionType } from '@/types'
 import { JOB_MATCH_SCORING_INSTRUCTIONS, JOB_MATCH_RESPONSE_FORMAT } from '@/lib/config/job-match-scoring'
 
 const openai = new OpenAI({
@@ -48,6 +48,12 @@ const JOB_MATCH_PROMPT = `Analyze how well this resume matches the job requireme
 
 4. Provide specific, actionable feedback for improving the match.
 
+5. **PRIORITIZE OPTIMIZATION OPPORTUNITIES:**
+   - For each gap, estimate how many points (0-10) closing it could add to the match score
+   - Rank gaps by optimization priority (1-10, where 10 = highest priority to address)
+   - Identify the top 15 high-value keywords from the job description that would most improve the match
+   - Recommend which resume sections should be optimized first and why
+
 ---
 
 JOB TITLE: {jobTitle}
@@ -75,6 +81,7 @@ interface JobMatchResult {
   missing_keywords: string[]
   recommended_additions: RecommendedAddition[]
   gaps: Gap[]
+  optimization_context?: OptimizationContext // NEW: Strategic optimization context
 }
 
 export async function matchResumeToJob({
@@ -160,11 +167,54 @@ export async function matchResumeToJob({
 
     console.log('[Job Matcher] Extracted missing keywords:', missingKeywords.length)
 
+    // Build optimization context for strategic optimization
+    const gaps: Gap[] = (result.gaps || []).map((gap: any) => ({
+      requirement: gap.requirement,
+      severity: gap.severity,
+      suggestion: gap.suggestion,
+      current_level: gap.current_level,
+      required_level: gap.required_level,
+      impact_points: gap.impact_points || estimateImpactPoints(gap.severity),
+      optimization_priority: gap.optimization_priority || estimatePriority(gap.severity)
+    }))
+
+    // Sort gaps by optimization priority (highest first)
+    const prioritizedGaps = [...gaps].sort((a, b) =>
+      (b.optimization_priority || 0) - (a.optimization_priority || 0)
+    )
+
+    // Extract high-value keywords
+    const highValueKeywords = extractHighValueKeywords(result.missing_keywords, result.missing_preferred, missingKeywords)
+
+    // Infer section priorities from gaps and recommendations
+    const sectionPriorities = inferSectionPriorities(gaps, result.recommended_additions || [])
+
+    // Generate strategic guidance
+    const strategicGuidance = generateStrategicGuidance(matchScore, gaps)
+
+    const optimizationContext: OptimizationContext = {
+      current_score: matchScore,
+      target_score: Math.min(100, matchScore + 10), // Target +10 points improvement
+      score_breakdown: matchAnalysis.score_breakdown || {},
+      prioritized_gaps: prioritizedGaps,
+      high_value_keywords: highValueKeywords,
+      section_priorities: sectionPriorities,
+      strategic_guidance: strategicGuidance
+    }
+
+    console.log('[Job Matcher] Built optimization context:', {
+      current_score: matchScore,
+      gaps_count: prioritizedGaps.length,
+      keywords_count: highValueKeywords.length,
+      section_priorities_count: sectionPriorities.length
+    })
+
     return {
       match_analysis: matchAnalysis,
       missing_keywords: missingKeywords,
       recommended_additions: result.recommended_additions || [],
-      gaps: result.gaps || []
+      gaps: gaps,
+      optimization_context: optimizationContext
     }
   } catch (error) {
     console.error('[Job Matcher] Error in matchResumeToJob:', error)
@@ -173,5 +223,93 @@ export async function matchResumeToJob({
       console.error('[Job Matcher] Error stack:', error.stack)
     }
     throw new Error('Failed to match resume to job')
+  }
+}
+
+// Helper functions for optimization context building
+
+function estimateImpactPoints(severity: string): number {
+  switch (severity) {
+    case 'critical': return 8
+    case 'important': return 5
+    case 'nice-to-have': return 2
+    default: return 3
+  }
+}
+
+function estimatePriority(severity: string): number {
+  switch (severity) {
+    case 'critical': return 10
+    case 'important': return 7
+    case 'nice-to-have': return 3
+    default: return 5
+  }
+}
+
+function extractHighValueKeywords(missingKeywords: any, missingPreferred: any, flatMissing: string[]): string[] {
+  const keywords: string[] = []
+
+  // Add from missing_keywords object
+  if (typeof missingKeywords === 'object' && missingKeywords !== null) {
+    Object.values(missingKeywords).forEach((kws: any) => {
+      if (Array.isArray(kws)) {
+        keywords.push(...kws)
+      }
+    })
+  }
+
+  // Add from missing_preferred
+  if (Array.isArray(missingPreferred)) {
+    keywords.push(...missingPreferred)
+  }
+
+  // Add from flat missing keywords
+  if (Array.isArray(flatMissing)) {
+    keywords.push(...flatMissing)
+  }
+
+  // Dedupe and return top 15
+  return [...new Set(keywords)].slice(0, 15)
+}
+
+function inferSectionPriorities(gaps: Gap[], additions: RecommendedAddition[]): any[] {
+  const sectionScores: Record<string, { score: number, count: number, reasons: string[] }> = {}
+
+  // Score based on recommended additions
+  additions.forEach(add => {
+    const section = add.section
+    if (!sectionScores[section]) {
+      sectionScores[section] = { score: 0, count: 0, reasons: [] }
+    }
+    sectionScores[section].score += (add.impact_points || 3)
+    sectionScores[section].count++
+    if (add.reason && !sectionScores[section].reasons.includes(add.reason)) {
+      sectionScores[section].reasons.push(add.reason)
+    }
+  })
+
+  // Convert to priority list
+  return Object.entries(sectionScores)
+    .sort((a, b) => b[1].score - a[1].score)
+    .map(([section, data]) => ({
+      section_type: section as SectionType,
+      priority: Math.min(10, Math.ceil(data.score)),
+      reason: `${data.count} high-impact recommendation${data.count > 1 ? 's' : ''} (${data.score} total impact points)`
+    }))
+    .slice(0, 5) // Top 5 sections
+}
+
+function generateStrategicGuidance(score: number, gaps: Gap[]): string {
+  const criticalGaps = gaps.filter(g => g.severity === 'critical').length
+  const importantGaps = gaps.filter(g => g.severity === 'important').length
+
+  if (score >= 90) {
+    return 'Excellent foundation. Focus on highlighting existing strengths and adding missing preferred keywords to push toward outstanding match.'
+  } else if (score >= 75) {
+    return `Good match with room for improvement. Comprehensively rewrite bullets to demonstrate required qualifications and integrate critical keywords. Address ${criticalGaps} critical gap${criticalGaps !== 1 ? 's' : ''}.`
+  } else if (score >= 60) {
+    return `Moderate match requiring significant enhancement. Rewrite experience bullets to emphasize relevant achievements and integrate all missing keywords. Address ${criticalGaps} critical and ${importantGaps} important gaps.`
+  } else {
+    return `Significant gaps detected. Major rewrite needed - reframe all experience to align with job requirements, address ${criticalGaps} critical gaps, and integrate all missing qualifications and keywords.`
   }
 }

@@ -93,7 +93,8 @@ export async function POST(request: NextRequest) {
         missing_keywords: matchResult.missing_keywords,
         recommended_additions: matchResult.recommended_additions,
         strengths: matchResult.match_analysis.key_strengths,
-        gaps: matchResult.gaps
+        gaps: matchResult.gaps,
+        optimization_context: matchResult.optimization_context || null // NEW: Strategic optimization context
       })
       .select()
       .single()
