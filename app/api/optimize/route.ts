@@ -64,11 +64,45 @@ export async function POST(request: NextRequest) {
 
     // Get structured data or parse it if not available
     let structuredData: StructuredResume
+
+    console.log('[Optimize API] Resume info:', {
+      id: resumeId,
+      filename: resume.original_filename,
+      has_parent: !!resume.parent_resume_id,
+      parent_id: resume.parent_resume_id,
+      has_structured_data: !!resume.structured_data
+    })
+
     if (resume.structured_data) {
       structuredData = resume.structured_data as StructuredResume
+
+      // Log job count from structured data
+      const jobCount = structuredData.sections
+        .find(s => s.type === 'experience')?.content
+        .filter(b => b.type === 'experience_item').length || 0
+      const eduCount = structuredData.sections
+        .find(s => s.type === 'education')?.content
+        .filter(b => b.type === 'education_item').length || 0
+
+      console.log('[Optimize API] Using cached structured_data:', {
+        jobs: jobCount,
+        education: eduCount
+      })
+
+      // WARNING: If this is an optimized version with lost jobs, we're compounding the problem
+      if (resume.parent_resume_id && jobCount < 2) {
+        console.warn('[Optimize API] ⚠️ WARNING: Optimizing an already-optimized resume with only', jobCount, 'job(s)')
+        console.warn('[Optimize API] Consider re-parsing from original resume text instead')
+      }
     } else {
       // Parse on the fly if structured data wasn't generated during upload
+      console.log('[Optimize API] No structured_data found, parsing from resume_text...')
       structuredData = parseResumeStructure(resume.resume_text)
+
+      const jobCount = structuredData.sections
+        .find(s => s.type === 'experience')?.content
+        .filter(b => b.type === 'experience_item').length || 0
+      console.log('[Optimize API] Parsed', jobCount, 'jobs from resume_text')
 
       // Update database with structured data for future use
       await supabase
