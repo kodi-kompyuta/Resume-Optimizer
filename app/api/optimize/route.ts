@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
             current_score: matchData.match_score || 0,
             target_score: Math.min(100, (matchData.match_score || 0) + 10),
             score_breakdown: matchAnalysis.score_breakdown || {},
-            prioritized_gaps,
+            prioritized_gaps: prioritizedGaps,
             high_value_keywords: highValueKeywords,
             section_priorities: sectionPriorities,
             strategic_guidance: generateGuidance(matchData.match_score || 0, gaps)
