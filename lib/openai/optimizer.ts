@@ -569,9 +569,14 @@ export async function optimizeResume(
   options: OptimizationOptions,
   jobDescription?: string
 ): Promise<OptimizationResult> {
-  // STRATEGIC OPTIMIZATION: Use match context if available
-  // Note: Content loss was caused by parser bug (only 1 job extracted), not optimizer
-  if (options.optimizationContext && jobDescription && jobDescription.trim()) {
+  // STRATEGIC OPTIMIZATION: DISABLED - Breaking critical features
+  // Issues identified:
+  // 1. No detailed change preview (just 1 generic change vs detailed per-section)
+  // 2. Rigid template drops custom sections, references, additional info
+  // 3. Not actually reducing rounds needed (still iterative in practice)
+  // 4. Content loss risk if parser has bugs
+  // Keeping section-by-section which preserves all content and shows detailed changes
+  if (false && options.optimizationContext && jobDescription && jobDescription.trim()) {
     console.log('[Optimizer] ===== STRATEGIC COMPREHENSIVE OPTIMIZATION MODE =====')
     console.log('[Optimizer] Current score:', options.optimizationContext.current_score)
     console.log('[Optimizer] Using comprehensive single-pass approach')
