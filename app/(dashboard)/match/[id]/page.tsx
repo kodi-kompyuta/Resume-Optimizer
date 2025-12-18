@@ -274,7 +274,7 @@ export default async function MatchResultsPage({ params }: { params: Promise<{ i
             Be prepared to discuss these areas in your interview to demonstrate your fit for this role:
           </p>
           <ul className="space-y-2">
-            {matchAnalysis.interview_focus_areas.map((area, index) => (
+            {matchAnalysis.interview_focus_areas.map((area: string, index: number) => (
               <li key={index} className="flex items-start">
                 <span className="text-purple-600 mr-3 mt-1">•</span>
                 <span className="text-gray-700">{area}</span>

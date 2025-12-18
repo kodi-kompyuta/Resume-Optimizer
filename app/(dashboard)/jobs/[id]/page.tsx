@@ -129,66 +129,66 @@ export default async function MatchResultsPage({ params }: { params: Promise<{ i
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
         <h3 className="text-xl font-bold text-gray-900 mb-6">Match Breakdown</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Technical Match */}
+          {/* Required Qualifications */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-gray-700">Technical Skills</span>
-              <span className={`text-2xl font-bold ${getScoreColor(matchAnalysis.technical_match)}`}>
-                {matchAnalysis.technical_match}%
+              <span className="text-sm font-medium text-gray-700">Required Qualifications</span>
+              <span className={`text-2xl font-bold ${getScoreColor(matchAnalysis.score_breakdown?.required_qualifications || 0)}`}>
+                {matchAnalysis.score_breakdown?.required_qualifications || 0}%
               </span>
             </div>
             <div className="bg-gray-200 rounded-full h-3">
               <div
-                className={`${getScoreBg(matchAnalysis.technical_match)} h-3 rounded-full transition-all`}
-                style={{ width: `${matchAnalysis.technical_match}%` }}
+                className={`${getScoreBg(matchAnalysis.score_breakdown?.required_qualifications || 0)} h-3 rounded-full transition-all`}
+                style={{ width: `${matchAnalysis.score_breakdown?.required_qualifications || 0}%` }}
               />
             </div>
           </div>
 
-          {/* Experience Match */}
+          {/* Preferred Qualifications */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-gray-700">Experience Level</span>
-              <span className={`text-2xl font-bold ${getScoreColor(matchAnalysis.experience_match)}`}>
-                {matchAnalysis.experience_match}%
+              <span className="text-sm font-medium text-gray-700">Preferred Qualifications</span>
+              <span className={`text-2xl font-bold ${getScoreColor(matchAnalysis.score_breakdown?.preferred_qualifications || 0)}`}>
+                {matchAnalysis.score_breakdown?.preferred_qualifications || 0}%
               </span>
             </div>
             <div className="bg-gray-200 rounded-full h-3">
               <div
-                className={`${getScoreBg(matchAnalysis.experience_match)} h-3 rounded-full transition-all`}
-                style={{ width: `${matchAnalysis.experience_match}%` }}
+                className={`${getScoreBg(matchAnalysis.score_breakdown?.preferred_qualifications || 0)} h-3 rounded-full transition-all`}
+                style={{ width: `${matchAnalysis.score_breakdown?.preferred_qualifications || 0}%` }}
               />
             </div>
           </div>
 
-          {/* Education Match */}
+          {/* Relevant Experience */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-gray-700">Education</span>
-              <span className={`text-2xl font-bold ${getScoreColor(matchAnalysis.education_match)}`}>
-                {matchAnalysis.education_match}%
+              <span className="text-sm font-medium text-gray-700">Relevant Experience</span>
+              <span className={`text-2xl font-bold ${getScoreColor(matchAnalysis.score_breakdown?.relevant_experience || 0)}`}>
+                {matchAnalysis.score_breakdown?.relevant_experience || 0}%
               </span>
             </div>
             <div className="bg-gray-200 rounded-full h-3">
               <div
-                className={`${getScoreBg(matchAnalysis.education_match)} h-3 rounded-full transition-all`}
-                style={{ width: `${matchAnalysis.education_match}%` }}
+                className={`${getScoreBg(matchAnalysis.score_breakdown?.relevant_experience || 0)} h-3 rounded-full transition-all`}
+                style={{ width: `${matchAnalysis.score_breakdown?.relevant_experience || 0}%` }}
               />
             </div>
           </div>
 
-          {/* Skills Match */}
+          {/* Demonstrated Achievements */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-gray-700">Listed Skills</span>
-              <span className={`text-2xl font-bold ${getScoreColor(matchAnalysis.skills_match)}`}>
-                {matchAnalysis.skills_match}%
+              <span className="text-sm font-medium text-gray-700">Demonstrated Achievements</span>
+              <span className={`text-2xl font-bold ${getScoreColor(matchAnalysis.score_breakdown?.demonstrated_achievements || 0)}`}>
+                {matchAnalysis.score_breakdown?.demonstrated_achievements || 0}%
               </span>
             </div>
             <div className="bg-gray-200 rounded-full h-3">
               <div
-                className={`${getScoreBg(matchAnalysis.skills_match)} h-3 rounded-full transition-all`}
-                style={{ width: `${matchAnalysis.skills_match}%` }}
+                className={`${getScoreBg(matchAnalysis.score_breakdown?.demonstrated_achievements || 0)} h-3 rounded-full transition-all`}
+                style={{ width: `${matchAnalysis.score_breakdown?.demonstrated_achievements || 0}%` }}
               />
             </div>
           </div>

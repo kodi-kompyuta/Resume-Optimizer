@@ -137,49 +137,49 @@ export default function EditOptimizedResumePage() {
               {section.type === 'contact' && (
                 <ContactEditor
                   content={section.content}
-                  onChange={(newContent) => updateSection(sectionIndex, newContent)}
+                  onChange={(newContent: any) => updateSection(sectionIndex, newContent)}
                 />
               )}
 
               {section.type === 'summary' && (
                 <SummaryEditor
                   content={section.content}
-                  onChange={(newContent) => updateSection(sectionIndex, newContent)}
+                  onChange={(newContent: any) => updateSection(sectionIndex, newContent)}
                 />
               )}
 
               {section.type === 'skills' && (
                 <SkillsEditor
                   content={section.content}
-                  onChange={(newContent) => updateSection(sectionIndex, newContent)}
+                  onChange={(newContent: any) => updateSection(sectionIndex, newContent)}
                 />
               )}
 
               {section.type === 'experience' && (
                 <ExperienceEditor
                   content={section.content}
-                  onChange={(newContent) => updateSection(sectionIndex, newContent)}
+                  onChange={(newContent: any) => updateSection(sectionIndex, newContent)}
                 />
               )}
 
               {section.type === 'education' && (
                 <EducationEditor
                   content={section.content}
-                  onChange={(newContent) => updateSection(sectionIndex, newContent)}
+                  onChange={(newContent: any) => updateSection(sectionIndex, newContent)}
                 />
               )}
 
               {section.type === 'certifications' && (
                 <CertificationsEditor
                   content={section.content}
-                  onChange={(newContent) => updateSection(sectionIndex, newContent)}
+                  onChange={(newContent: any) => updateSection(sectionIndex, newContent)}
                 />
               )}
 
               {section.type === 'references' && (
                 <ReferencesEditor
                   content={section.content}
-                  onChange={(newContent) => updateSection(sectionIndex, newContent)}
+                  onChange={(newContent: any) => updateSection(sectionIndex, newContent)}
                 />
               )}
             </div>

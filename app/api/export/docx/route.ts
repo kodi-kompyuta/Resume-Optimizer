@@ -63,9 +63,9 @@ export async function POST(request: Request) {
         .limit(1)
         .single()
 
-      if (jobMatch?.job_descriptions?.job_title) {
+      if (jobMatch?.job_descriptions && !Array.isArray(jobMatch.job_descriptions) && (jobMatch.job_descriptions as any)?.job_title) {
         // Job-specific optimization: use job title
-        const jobTitle = jobMatch.job_descriptions.job_title
+        const jobTitle = (jobMatch.job_descriptions as any).job_title
         // Truncate long job titles to 50 chars
         const truncatedTitle = jobTitle.length > 50
           ? jobTitle.substring(0, 47) + '...'
