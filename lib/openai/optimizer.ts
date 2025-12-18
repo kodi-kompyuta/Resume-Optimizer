@@ -569,8 +569,9 @@ export async function optimizeResume(
   options: OptimizationOptions,
   jobDescription?: string
 ): Promise<OptimizationResult> {
-  // STRATEGIC OPTIMIZATION: Use match context if available
-  if (options.optimizationContext && jobDescription && jobDescription.trim()) {
+  // STRATEGIC OPTIMIZATION: TEMPORARILY DISABLED DUE TO CONTENT LOSS BUG
+  // Re-enable after fixing validation issues
+  if (false && options.optimizationContext && jobDescription && jobDescription.trim()) {
     console.log('[Optimizer] ===== STRATEGIC COMPREHENSIVE OPTIMIZATION MODE =====')
     console.log('[Optimizer] Current score:', options.optimizationContext.current_score)
     console.log('[Optimizer] Using comprehensive single-pass approach')
