@@ -576,7 +576,8 @@ export async function optimizeResume(
   // 3. Not actually reducing rounds needed (still iterative in practice)
   // 4. Content loss risk if parser has bugs
   // Keeping section-by-section which preserves all content and shows detailed changes
-  if (false && options.optimizationContext && jobDescription && jobDescription.trim()) {
+  /* DISABLED STRATEGIC OPTIMIZATION CODE - Commented out to avoid TypeScript errors
+  if (false && options.optimizationContext && jobDescription && jobDescription?.trim()) {
     console.log('[Optimizer] ===== STRATEGIC COMPREHENSIVE OPTIMIZATION MODE =====')
     console.log('[Optimizer] Current score:', options.optimizationContext.current_score)
     console.log('[Optimizer] Using comprehensive single-pass approach')
@@ -653,6 +654,7 @@ export async function optimizeResume(
       // Fall through to section-by-section on error
     }
   }
+  */
 
   // Fallback: Original section-by-section optimization (when no match context or on error)
   console.log('[Optimizer] Using section-by-section optimization (no match context or fallback)')
@@ -935,10 +937,16 @@ async function optimizeExperienceItem(
 
   // Optimize bullet points (if any exist)
   if (options.improveBulletPoints && expItem.achievements && expItem.achievements.length > 0) {
+    // Extract keywords and gaps from optimization context if available
+    const highValueKeywords = options.optimizationContext?.high_value_keywords || []
+    const prioritizedGaps = options.optimizationContext?.prioritized_gaps || []
+
     const optimizedBullets = await optimizeBullets(
       expItem.achievements.map(b => b.text),
       options,
-      jobDescription
+      jobDescription,
+      highValueKeywords,
+      prioritizedGaps
     )
 
     optimizedBullets.forEach((optimized, index) => {
@@ -992,10 +1000,16 @@ async function optimizeEducationItem(
 
   // Optimize achievements if present
   if (options.improveBulletPoints && eduItem.achievements && eduItem.achievements.length > 0) {
+    // Extract keywords and gaps from optimization context if available
+    const highValueKeywords = options.optimizationContext?.high_value_keywords || []
+    const prioritizedGaps = options.optimizationContext?.prioritized_gaps || []
+
     const optimizedBullets = await optimizeBullets(
       eduItem.achievements.map(b => b.text),
       options,
-      jobDescription
+      jobDescription,
+      highValueKeywords,
+      prioritizedGaps
     )
 
     optimizedBullets.forEach((optimized, index) => {
@@ -1035,10 +1049,16 @@ async function optimizeBulletList(
   const bulletList = block.content as { items: BulletItem[] }
 
   if (options.improveBulletPoints) {
+    // Extract keywords and gaps from optimization context if available
+    const highValueKeywords = options.optimizationContext?.high_value_keywords || []
+    const prioritizedGaps = options.optimizationContext?.prioritized_gaps || []
+
     const optimizedBullets = await optimizeBullets(
       bulletList.items.map(b => b.text),
       options,
-      jobDescription
+      jobDescription,
+      highValueKeywords,
+      prioritizedGaps
     )
 
     optimizedBullets.forEach((optimized, index) => {
@@ -1145,7 +1165,9 @@ async function optimizeSkillGroup(
 async function optimizeBullets(
   bullets: string[],
   options: OptimizationOptions,
-  jobDescription?: string
+  jobDescription?: string,
+  highValueKeywords?: string[],
+  prioritizedGaps?: any[]
 ): Promise<Array<{
   original: string
   improved: string
@@ -1215,12 +1237,12 @@ OPTIMIZATION GUIDELINES (prioritize ATS score improvement):
 
 CRITICAL RULES:
 - If original has good keywords, KEEP them (don't replace for style)
-- If original is concise, keep it concise (don't add unnecessary words)
-- If original is clear, don't make it more complex
-- ONLY change what needs changing to improve ATS score
-- When in doubt, make MINIMAL changes
-${options.aggressiveness === 'conservative' ? '- Make MINIMAL changes, focus ONLY on grammar and keyword preservation' : ''}
-${options.aggressiveness === 'aggressive' ? '- You can rewrite more significantly but MUST preserve keywords and maintain clarity' : ''}
+- Make COMPREHENSIVE improvements to maximize job match and ATS score
+- Integrate missing keywords naturally where they fit
+- Rewrite bullets to better demonstrate qualifications and achievements
+- Focus on substance over style - add metrics, impact, and relevant skills
+${highValueKeywords && highValueKeywords.length > 0 ? `\nHIGH-VALUE KEYWORDS TO INTEGRATE (naturally incorporate these where relevant):\n${highValueKeywords.join(', ')}\n` : ''}
+${prioritizedGaps && prioritizedGaps.length > 0 ? `\nCRITICAL GAPS TO ADDRESS (rewrite bullets to demonstrate these if applicable):\n${prioritizedGaps.slice(0, 3).map((g: any, i: number) => `${i+1}. ${g.requirement} (${g.severity})`).join('\n')}\n` : ''}
 
 Respond with JSON only:
 {
@@ -1248,7 +1270,7 @@ Respond with JSON only:
           content: prompt,
         },
       ],
-      temperature: options.aggressiveness === 'conservative' ? 0.3 : 0.7,
+      temperature: options.aggressiveness === 'conservative' ? 0.8 : 1.0,
       max_tokens: 3000,
       response_format: { type: 'json_object' },
     })
@@ -1355,7 +1377,7 @@ Respond with JSON only:
           content: prompt,
         },
       ],
-      temperature: options.aggressiveness === 'conservative' ? 0.3 : 0.7,
+      temperature: options.aggressiveness === 'conservative' ? 0.8 : 1.0,
       max_tokens: 1000,
       response_format: { type: 'json_object' },
     })

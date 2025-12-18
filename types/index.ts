@@ -22,6 +22,13 @@ export interface Resume {
 
 export interface AnalysisData {
   ats_score: number
+  score_breakdown?: {
+    ats_compatibility?: number
+    keywords?: number
+    impact?: number
+    clarity?: number
+    completeness?: number
+  }
   overall_assessment: string
   strengths: string[]
   weaknesses: Weakness[]
@@ -245,6 +252,7 @@ export type SectionType =
   | 'languages'
   | 'volunteer'
   | 'interests'
+  | 'references'
   | 'custom'
 
 export interface SectionMetadata {
