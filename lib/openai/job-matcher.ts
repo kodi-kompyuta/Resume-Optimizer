@@ -26,6 +26,18 @@ IMPORTANT REMINDERS:
 
 const JOB_MATCH_PROMPT = `Analyze how well this resume matches the job requirements below.
 
+**CRITICAL: Domain Alignment Check**
+Before analyzing the match, determine:
+1. The candidate's primary domain/industry from their resume (e.g., Healthcare/Medicine, Information Technology, Engineering, Finance, Marketing, Legal, etc.)
+2. The job's domain/industry from the job description
+3. Whether these domains are compatible for optimization
+
+**Domain Compatibility Rules:**
+- COMPATIBLE: Same domain (IT → IT, Healthcare → Healthcare) or closely related (Software Engineer → DevOps, Marketing → Brand Management)
+- INCOMPATIBLE: Completely different domains (Doctor → IT Engineer, Lawyer → Graphic Designer, Accountant → Nurse)
+
+If domains are INCOMPATIBLE, set a flag: domain_mismatch = true and explain why optimization would be inappropriate.
+
 **Your Task:**
 1. Carefully read the job description and identify:
    - Required qualifications (must-haves)
@@ -132,6 +144,16 @@ export async function matchResumeToJob({
     console.log('[Job Matcher] Match level:', result.match_level)
     console.log('[Job Matcher] Interview recommendation:', result.interview_recommendation)
 
+    // Check for domain mismatch
+    const domainMismatch = result.domain_mismatch === true
+    if (domainMismatch) {
+      console.warn('[Job Matcher] ⚠️ DOMAIN MISMATCH DETECTED')
+      console.warn(`[Job Matcher] Candidate Domain: ${result.candidate_domain}`)
+      console.warn(`[Job Matcher] Job Domain: ${result.job_domain}`)
+      console.warn(`[Job Matcher] Reason: ${result.domain_mismatch_reason}`)
+      console.warn('[Job Matcher] Optimization will be BLOCKED for this match')
+    }
+
     // Build the match analysis object
     const matchAnalysis: MatchAnalysis = {
       match_score: matchScore,
@@ -147,7 +169,12 @@ export async function matchResumeToJob({
       match_level: result.match_level,
       interview_recommendation: result.interview_recommendation,
       interview_focus_areas: result.interview_focus_areas || [],
-      experience_level_match: result.experience_level_match
+      experience_level_match: result.experience_level_match,
+      // Domain alignment fields
+      candidate_domain: result.candidate_domain,
+      job_domain: result.job_domain,
+      domain_mismatch: domainMismatch,
+      domain_mismatch_reason: result.domain_mismatch_reason
     }
 
     // Extract missing keywords (flatten the object structure)

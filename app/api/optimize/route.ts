@@ -142,6 +142,25 @@ export async function POST(request: NextRequest) {
 
           // Build optimization context from match data
           const matchAnalysis = matchData.match_analysis as MatchAnalysis
+
+          // CRITICAL: Check for domain mismatch
+          if (matchAnalysis.domain_mismatch) {
+            console.error('[Optimize API] ❌ DOMAIN MISMATCH - Optimization BLOCKED')
+            console.error(`[Optimize API] Candidate Domain: ${matchAnalysis.candidate_domain}`)
+            console.error(`[Optimize API] Job Domain: ${matchAnalysis.job_domain}`)
+            console.error(`[Optimize API] Reason: ${matchAnalysis.domain_mismatch_reason}`)
+
+            return NextResponse.json(
+              {
+                error: 'Domain Mismatch: Optimization Not Allowed',
+                details: matchAnalysis.domain_mismatch_reason ||
+                  `Cannot optimize a ${matchAnalysis.candidate_domain} resume for a ${matchAnalysis.job_domain} position. Resume optimization must stay within the same professional domain to maintain authenticity and relevance.`,
+                candidate_domain: matchAnalysis.candidate_domain,
+                job_domain: matchAnalysis.job_domain
+              },
+              { status: 400 }
+            )
+          }
           const gaps = (matchData.gaps || []) as Gap[]
           const recommendedAdditions = (matchData.recommended_additions || []) as RecommendedAddition[]
 

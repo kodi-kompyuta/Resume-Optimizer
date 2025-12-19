@@ -105,20 +105,21 @@ export async function generateDocx(
           })
         )
       } else if (trimmedLine.startsWith('•') || trimmedLine.startsWith('-') || trimmedLine.startsWith('*')) {
-        // Bullet points
+        // Bullet points - justified alignment
         paragraphs.push(
           new Paragraph({
             text: trimmedLine.replace(/^[•\-*]\s*/, ''),
             bullet: {
               level: 0,
             },
+            alignment: AlignmentType.BOTH, // Justified text
             spacing: {
               after: 80,
             },
           })
         )
       } else {
-        // Regular paragraphs
+        // Regular paragraphs - justified alignment
         paragraphs.push(
           new Paragraph({
             children: [
@@ -126,6 +127,7 @@ export async function generateDocx(
                 text: trimmedLine,
               }),
             ],
+            alignment: AlignmentType.BOTH, // Justified text
             spacing: {
               after: 120,
             },

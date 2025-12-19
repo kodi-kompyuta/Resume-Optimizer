@@ -121,6 +121,11 @@ export interface MatchAnalysis {
   match_level?: string
   interview_recommendation?: string
   interview_focus_areas?: string[]
+  // Domain alignment checking
+  candidate_domain?: string // e.g., "Information Technology", "Healthcare"
+  job_domain?: string // e.g., "Software Engineering", "Medicine"
+  domain_mismatch?: boolean // true if domains are incompatible for optimization
+  domain_mismatch_reason?: string // explanation of why domains don't align
   experience_level_match?: {
     job_level: string
     your_level?: string // Candidate-focused language
