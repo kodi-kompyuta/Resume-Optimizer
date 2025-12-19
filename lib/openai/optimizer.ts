@@ -656,8 +656,25 @@ export async function optimizeResume(
   }
   */
 
-  // Fallback: Original section-by-section optimization (when no match context or on error)
-  console.log('[Optimizer] Using section-by-section optimization (no match context or fallback)')
+  // Section-by-section optimization with match context awareness
+  const hasMatchContext = options.optimizationContext && options.optimizationContext.current_score > 0
+
+  if (hasMatchContext) {
+    console.log('[Optimizer] ⚡ COMPREHENSIVE SINGLE-PASS OPTIMIZATION MODE')
+    console.log(`[Optimizer] Current Score: ${options.optimizationContext!.current_score}%`)
+    console.log(`[Optimizer] Target Score: 90%+`)
+    console.log(`[Optimizer] Keywords: ${options.optimizationContext!.high_value_keywords?.length || 0}`)
+    console.log(`[Optimizer] Gaps: ${options.optimizationContext!.prioritized_gaps?.length || 0}`)
+
+    // Force aggressive mode for single-pass comprehensive optimization
+    options = {
+      ...options,
+      aggressiveness: 'aggressive'
+    }
+  } else {
+    console.log('[Optimizer] Using section-by-section optimization (no match context)')
+  }
+
   const changes: ChangeLog[] = []
   const optimizedResume: StructuredResume = JSON.parse(JSON.stringify(structuredResume))
 
@@ -1175,74 +1192,110 @@ async function optimizeBullets(
   confidence: number
   impact: 'high' | 'medium' | 'low'
 }>> {
-  const prompt = `You are an expert ATS (Applicant Tracking System) optimization specialist and resume writer.
+  // Build context-aware header based on optimization context
+  const currentScore = options.optimizationContext?.current_score || 0
+  const hasMatchContext = currentScore > 0 && (highValueKeywords?.length || 0) > 0
 
-CRITICAL: Optimize these bullet points to IMPROVE ATS SCORE using these exact criteria:
+  const optimizationHeader = hasMatchContext
+    ? `You are an expert resume optimizer. Your MISSION: Transform this resume from ${currentScore}% match to 90%+ match in ONE PASS.
 
-ATS SCORING CRITERIA (optimize for these in order of importance):
-1. ATS Compatibility (30% weight) - Keep formatting simple, use standard terms, avoid special characters
-2. Keywords (25% weight) - Preserve industry-specific keywords, add job-relevant skills
-3. Impact (20% weight) - Quantify achievements, use strong action verbs
-4. Clarity (15% weight) - Keep concise, easy to scan, clear structure
-5. Completeness (10% weight) - Ensure all relevant info is present
+**CURRENT MATCH SCORE: ${currentScore}%**
+**TARGET MATCH SCORE: 90%+**
+**IMPROVEMENT NEEDED: ${90 - currentScore} points in THIS optimization**
 
-CRITICAL STRUCTURE PRESERVATION REQUIREMENTS:
-You are ONLY optimizing the CONTENT of each bullet point.
-You MUST return EXACTLY ${bullets.length} bullet points in your response.
-The "optimized_bullets" array MUST contain ${bullets.length} items.
-DO NOT remove, change, or add bullet points.
-DO NOT skip any bullets.
+This is NOT about minor tweaks - this is a MAJOR COMPREHENSIVE REWRITE to maximize job match.`
+    : `You are an expert ATS (Applicant Tracking System) optimization specialist and resume writer.
+This is a COMPREHENSIVE rewrite to maximize ATS score and job match - not minor improvements.`
 
-JSON Schema Requirements:
-- Input count: ${bullets.length} bullets
-- Output count: MUST be ${bullets.length} bullets (will be validated)
-- Each bullet MUST have: original, improved, reason, confidence, impact
-- Any deviation from ${bullets.length} items will be rejected
+  const prompt = `${optimizationHeader}
 
-${jobDescription ? `Target Job Description (extract keywords from this):\n${jobDescription}\n\n` : ''}
+CRITICAL STRUCTURE PRESERVATION:
+- You MUST return EXACTLY ${bullets.length} bullet points
+- DO NOT remove, add, or skip bullets
+- Output must have ${bullets.length} items (will be validated)
 
-Bullet Points to Optimize (ALL ${bullets.length} must be returned):
+${jobDescription ? `**TARGET JOB DESCRIPTION:**\n${jobDescription}\n\n` : ''}
+
+**BULLET POINTS TO TRANSFORM (${bullets.length} bullets - optimize ALL):**
 ${bullets.map((b, i) => `${i + 1}. ${b}`).join('\n')}
 
-OPTIMIZATION GUIDELINES (prioritize ATS score improvement):
+${hasMatchContext ? `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚠️  CRITICAL OPTIMIZATION REQUIREMENTS (MANDATORY - NOT OPTIONAL)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-1. ATS COMPATIBILITY (30% - HIGHEST PRIORITY):
-   - Keep bullets concise and scannable (avoid overly long sentences)
-   - Use standard industry terminology (don't replace technical terms)
-   - Avoid special characters that confuse ATS
-   - Maintain clean, simple structure
+${highValueKeywords && highValueKeywords.length > 0 ? `
+🎯 **HIGH-VALUE KEYWORDS YOU MUST INTEGRATE:**
+${highValueKeywords.map((kw, i) => `   ${i+1}. ${kw}`).join('\n')}
 
-2. KEYWORDS (25% - SECOND PRIORITY):
-   - PRESERVE all industry-specific keywords and technical terms
-   - Add relevant keywords from job description ONLY if natural
-   - Don't remove existing keywords to make room for fancy language
-   - Prioritize skill names, tools, technologies, methodologies
+REQUIREMENT: Distribute these ${highValueKeywords.length} keywords across ALL ${bullets.length} bullets.
+- Every bullet should integrate 1-3 of these keywords
+- Make integration natural but ENSURE ALL keywords are used
+- These keywords are CRITICAL for job match - they MUST appear
+` : ''}
 
-3. IMPACT (20%):
-   - Add metrics/numbers ONLY if they enhance credibility
-   - Use strong action verbs (led, developed, implemented, achieved)
-   - Highlight business value and results
-   - Keep impact statements concise
+${prioritizedGaps && prioritizedGaps.length > 0 ? `
+🚨 **CRITICAL GAPS TO CLOSE:**
+${prioritizedGaps.slice(0, 5).map((g: any, i: number) => `   ${i+1}. [${g.severity.toUpperCase()}] ${g.requirement}
+      Impact: ${g.impact_points || 0} points | Priority: ${g.optimization_priority || 0}/10`).join('\n\n')}
 
-4. CLARITY (15%):
-   - Keep bullet length similar or SHORTER than original
-   - Make easy to scan (avoid complex sentence structures)
+REQUIREMENT: Rewrite bullets to demonstrate these qualifications.
+- Address ALL critical and important gaps
+- Show evidence of these skills/qualifications in achievements
+- Use specific examples and metrics
+` : ''}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+**YOUR OPTIMIZATION APPROACH:**
+
+1. **INTEGRATE ALL KEYWORDS** (Non-negotiable)
+   - All ${highValueKeywords?.length || 0} keywords MUST appear across bullets
+   - Rewrite sentences to naturally include them
+   - Don't just append - weave them into achievements
+
+2. **CLOSE ALL GAPS** (Critical for score improvement)
+   - Transform bullets to demonstrate missing qualifications
+   - Add metrics, tools, methodologies that address gaps
+   - Show concrete evidence of required skills
+
+3. **MAXIMIZE IMPACT** (Every word counts)
+   - Add quantifiable metrics (%, $, #, time saved)
+   - Use powerful action verbs
+   - Show business outcomes and value delivered
+
+4. **ENHANCE CLARITY** (ATS-optimized)
+   - Clear, scannable structure
+   - Standard industry terminology
+   - No fluff or vague statements
+` : `
+**OPTIMIZATION APPROACH:**
+
+1. **ATS COMPATIBILITY** (30%):
+   - Standard industry terminology
+   - Clean, scannable structure
+   - No special characters
+
+2. **KEYWORDS** (25%):
+   - Preserve existing technical terms
+   - Add job-relevant keywords from description
+   - Include skill names, tools, technologies
+
+3. **IMPACT** (20%):
+   - Quantify achievements with metrics
+   - Strong action verbs
+   - Business value and results
+
+4. **CLARITY** (15%):
+   - Concise and scannable
    - One main idea per bullet
-   - Clear, direct language
+   - Direct language
 
-5. GRAMMAR:
-   - Fix obvious grammar/spelling errors
-   - Ensure consistent tense
-   - Clean up awkward phrasing
-
-CRITICAL RULES:
-- If original has good keywords, KEEP them (don't replace for style)
-- Make COMPREHENSIVE improvements to maximize job match and ATS score
-- Integrate missing keywords naturally where they fit
-- Rewrite bullets to better demonstrate qualifications and achievements
-- Focus on substance over style - add metrics, impact, and relevant skills
-${highValueKeywords && highValueKeywords.length > 0 ? `\nHIGH-VALUE KEYWORDS TO INTEGRATE (naturally incorporate these where relevant):\n${highValueKeywords.join(', ')}\n` : ''}
-${prioritizedGaps && prioritizedGaps.length > 0 ? `\nCRITICAL GAPS TO ADDRESS (rewrite bullets to demonstrate these if applicable):\n${prioritizedGaps.slice(0, 3).map((g: any, i: number) => `${i+1}. ${g.requirement} (${g.severity})`).join('\n')}\n` : ''}
+5. **COMPLETENESS** (10%):
+   - All relevant info included
+   - Fix grammar/spelling
+   - Consistent tense
+`}
 
 Respond with JSON only:
 {
@@ -1258,6 +1311,21 @@ Respond with JSON only:
 }`
 
   try {
+    // Use maximum creativity when we have match context for comprehensive single-pass optimization
+    const temperature = hasMatchContext ? 1.0 : (options.aggressiveness === 'conservative' ? 0.8 : 1.0)
+    const maxTokens = hasMatchContext ? 4096 : 3000 // More tokens for comprehensive rewrites
+
+    if (hasMatchContext) {
+      console.log(`[Optimizer] 🎯 COMPREHENSIVE BULLET REWRITE: ${bullets.length} bullets`)
+      console.log(`[Optimizer]    - Current Score: ${currentScore}% → Target: 90%+`)
+      console.log(`[Optimizer]    - Keywords to integrate: ${highValueKeywords?.length || 0}`)
+      console.log(`[Optimizer]    - Gaps to address: ${prioritizedGaps?.length || 0}`)
+      console.log(`[Optimizer]    - Temperature: ${temperature} (MAX creativity)`)
+      console.log(`[Optimizer]    - Max Tokens: ${maxTokens}`)
+    } else {
+      console.log(`[Optimizer] Optimizing ${bullets.length} bullets (Temperature: ${temperature}, Max Tokens: ${maxTokens})`)
+    }
+
     const completion = await openai.chat.completions.create({
       model: 'gpt-4o',
       messages: [
@@ -1270,8 +1338,8 @@ Respond with JSON only:
           content: prompt,
         },
       ],
-      temperature: options.aggressiveness === 'conservative' ? 0.8 : 1.0,
-      max_tokens: 3000,
+      temperature: temperature,
+      max_tokens: maxTokens,
       response_format: { type: 'json_object' },
     })
 
