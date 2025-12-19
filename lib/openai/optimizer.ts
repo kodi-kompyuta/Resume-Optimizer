@@ -1203,9 +1203,17 @@ async function optimizeBullets(
 **TARGET MATCH SCORE: 90%+**
 **IMPROVEMENT NEEDED: ${90 - currentScore} points in THIS optimization**
 
-This is NOT about minor tweaks - this is a MAJOR COMPREHENSIVE REWRITE to maximize job match.`
+This is a MAJOR COMPREHENSIVE REWRITE to maximize job match by reframing their ACTUAL experience.
+
+⚠️ CRITICAL: HONESTY OVER SCORES
+- Your goal is 90%+ BUT ONLY through honest optimization
+- NEVER fabricate experience, technologies, or skills they don't have
+- If honest optimization can't reach 90%, that's OK - integrity matters more
+- Reword what they DID, don't invent what they DIDN'T do`
     : `You are an expert ATS (Applicant Tracking System) optimization specialist and resume writer.
-This is a COMPREHENSIVE rewrite to maximize ATS score and job match - not minor improvements.`
+This is a COMPREHENSIVE rewrite to maximize ATS score and job match - not minor improvements.
+
+⚠️ RULE: Only optimize what they ACTUALLY did - no fabrication.`
 
   const prompt = `${optimizationHeader}
 
@@ -1225,49 +1233,87 @@ ${hasMatchContext ? `
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ${highValueKeywords && highValueKeywords.length > 0 ? `
-🎯 **HIGH-VALUE KEYWORDS YOU MUST INTEGRATE:**
+🎯 **HIGH-VALUE KEYWORDS (Use ONLY if they fit real experience):**
 ${highValueKeywords.map((kw, i) => `   ${i+1}. ${kw}`).join('\n')}
 
-REQUIREMENT: Distribute these ${highValueKeywords.length} keywords across ALL ${bullets.length} bullets.
-- Every bullet should integrate 1-3 of these keywords
-- Make integration natural but ENSURE ALL keywords are used
-- These keywords are CRITICAL for job match - they MUST appear
+REQUIREMENT: Integrate keywords ONLY where they honestly match the candidate's actual work.
+- Review each bullet and ask: "Did they ACTUALLY use this technology/skill?"
+- If YES → Reword the bullet to include it naturally
+- If NO → DO NOT add it to work experience (it can go in Skills section instead)
+- NEVER fabricate experience with tools/technologies they didn't use
+- It's OK if not all keywords fit - HONESTY is more important than keyword stuffing
 ` : ''}
 
 ${prioritizedGaps && prioritizedGaps.length > 0 ? `
-🚨 **CRITICAL GAPS TO CLOSE:**
+🚨 **CRITICAL GAPS (Address ONLY if candidate has relevant experience):**
 ${prioritizedGaps.slice(0, 5).map((g: any, i: number) => `   ${i+1}. [${g.severity.toUpperCase()}] ${g.requirement}
       Impact: ${g.impact_points || 0} points | Priority: ${g.optimization_priority || 0}/10`).join('\n\n')}
 
-REQUIREMENT: Rewrite bullets to demonstrate these qualifications.
-- Address ALL critical and important gaps
-- Show evidence of these skills/qualifications in achievements
-- Use specific examples and metrics
+REQUIREMENT: Show how their ACTUAL experience relates to these requirements.
+- Look for transferable skills in their real work history
+- Reframe existing accomplishments to highlight relevant aspects
+- Use terminology that bridges what they DID with what's required
+- DO NOT claim they have skills/experience they don't actually have
+- If a gap is real (they truly lack experience), DON'T fabricate it
 ` : ''}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 **YOUR OPTIMIZATION APPROACH:**
 
-1. **INTEGRATE ALL KEYWORDS** (Non-negotiable)
-   - All ${highValueKeywords?.length || 0} keywords MUST appear across bullets
-   - Rewrite sentences to naturally include them
-   - Don't just append - weave them into achievements
+⚠️ CRITICAL ETHICAL RULE - DO NOT FABRICATE EXPERIENCE:
+- NEVER add technologies/tools/skills the candidate didn't actually use
+- NEVER claim they worked with systems they haven't touched
+- ONLY reword/reframe what they ACTUALLY did in their role
+- If a keyword doesn't fit their real experience, DON'T force it into work experience
+- Keywords that don't match experience can go in Skills section (not in work bullets)
 
-2. **CLOSE ALL GAPS** (Critical for score improvement)
-   - Transform bullets to demonstrate missing qualifications
-   - Add metrics, tools, methodologies that address gaps
-   - Show concrete evidence of required skills
+EXAMPLES OF GOOD VS BAD OPTIMIZATION:
 
-3. **MAXIMIZE IMPACT** (Every word counts)
-   - Add quantifiable metrics (%, $, #, time saved)
-   - Use powerful action verbs
-   - Show business outcomes and value delivered
+❌ BAD (Fabrication):
+Original: "Fixed bugs in web application"
+Bad: "Led Kubernetes migration and implemented microservices architecture using Docker"
+→ This INVENTS experience with Kubernetes and Docker that never happened
 
-4. **ENHANCE CLARITY** (ATS-optimized)
+✅ GOOD (Honest reframing):
+Original: "Fixed bugs in web application"
+Good: "Debugged and resolved critical production issues in web application, improving system stability by 30%"
+→ This enhances ACTUAL work with metrics, no fabrication
+
+❌ BAD (Adding fake tech):
+Original: "Managed database queries"
+Bad: "Architected distributed database system using MongoDB, Redis, and Elasticsearch"
+→ This claims technologies they never used
+
+✅ GOOD (Emphasize what they did):
+Original: "Managed database queries"
+Good: "Optimized database queries and indexing strategies, reducing query response time by 40%"
+→ This enhances their REAL database work with impact
+
+1. **REFRAME EXISTING EXPERIENCE** (Honest optimization)
+   - Look at what they ACTUALLY accomplished
+   - Reword it using job-relevant terminology
+   - If they "managed a team" → "Led cross-functional team using Agile" (if Agile was actually used)
+   - If they "fixed bugs" → DON'T say "implemented Kubernetes" if they never used it
+   - Only add keywords that REASONABLY align with what they actually did
+
+2. **EMPHASIZE TRANSFERABLE SKILLS** (Honest framing)
+   - Highlight aspects of their work that align with job requirements
+   - Use industry-standard terminology for what they DID do
+   - Focus on methodologies, approaches, outcomes they achieved
+   - DON'T invent technologies they never used
+
+3. **ADD METRICS TO REAL ACHIEVEMENTS** (Quantify truth)
+   - Add quantifiable metrics (%, $, #, time saved) to REAL accomplishments
+   - Use powerful action verbs for what they ACTUALLY did
+   - Show business outcomes they ACTUALLY delivered
+   - DON'T fabricate metrics for work they didn't do
+
+4. **ENHANCE CLARITY** (Better presentation of truth)
    - Clear, scannable structure
-   - Standard industry terminology
+   - Standard industry terminology for ACTUAL work
    - No fluff or vague statements
+   - Professional framing of REAL experience
 ` : `
 **OPTIMIZATION APPROACH:**
 
