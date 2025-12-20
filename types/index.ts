@@ -231,6 +231,9 @@ export interface FormattingStyle {
     underline?: boolean
     uppercase?: boolean
   }
+  // Job/education header format preference
+  experienceFormat?: 'single-line' | 'multi-line' // Single: "Title - Company | Dates", Multi: separate lines
+  educationFormat?: 'single-line' | 'multi-line'
 }
 
 export interface ResumeSection {

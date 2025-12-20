@@ -34,6 +34,8 @@ enum ResumeFormat {
 export class ResumeStructureParser {
   private lines: string[]
   private currentIndex: number = 0
+  private detectedExperienceFormat: ResumeFormat = ResumeFormat.UNKNOWN
+  private detectedEducationFormat: 'single-line' | 'multi-line' = 'multi-line'
 
   constructor(private plainText: string) {
     this.lines = plainText.split('\n').map(line => line.trimEnd())
@@ -73,10 +75,18 @@ export class ResumeStructureParser {
 
     const wordCount = this.plainText.split(/\s+/).filter(w => w.length > 0).length
 
+    // Determine format preferences for export
+    const experienceFormat = this.detectedExperienceFormat === ResumeFormat.INLINE_PIPE ? 'single-line' : 'multi-line'
+    const educationFormat = this.detectedEducationFormat
+
     return {
       metadata: {
         parsedAt: new Date().toISOString(),
         wordCount,
+        formatting: {
+          experienceFormat,
+          educationFormat,
+        },
       },
       sections,
       rawText: this.plainText,
@@ -546,6 +556,9 @@ export class ResumeStructureParser {
     // Detect format of this experience section
     const format = this.detectExperienceFormat(this.currentIndex)
     console.log(`[Parser] Detected experience format: ${format}`)
+
+    // Store detected format for later use in export
+    this.detectedExperienceFormat = format
 
     // Delegate to format-specific parser
     switch (format) {
