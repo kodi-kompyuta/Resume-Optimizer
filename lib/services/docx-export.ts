@@ -192,21 +192,37 @@ function convertStructuredToFormattedText(structured: StructuredResume): string 
 
         case 'experience_item':
           const exp = block.content as any
-          // CRITICAL: Always preserve job title, company, location, dates, and description
-          if (exp.jobTitle) lines.push(exp.jobTitle)
-          if (exp.company) lines.push(exp.company)
+          // CRITICAL: Export in ATS-friendly one-line header format
+          // Format: "Job Title - Company | Location | Dates"
+          // This matches what the parser expects and prevents corruption on re-upload
 
-          // Build date line if we have location or dates
-          if (exp.location || exp.startDate || exp.endDate) {
-            const dateParts: string[] = []
-            if (exp.location) dateParts.push(exp.location)
-            if (exp.startDate || exp.endDate) {
-              const dateRange = [exp.startDate, exp.endDate].filter(Boolean).join(' - ')
-              if (dateRange) dateParts.push(dateRange)
+          const headerParts: string[] = []
+
+          // Part 1: Job Title - Company
+          if (exp.jobTitle && exp.company) {
+            headerParts.push(`${exp.jobTitle} - ${exp.company}`)
+          } else if (exp.jobTitle) {
+            headerParts.push(exp.jobTitle)
+          } else if (exp.company) {
+            headerParts.push(exp.company)
+          }
+
+          // Part 2: Location (if present)
+          if (exp.location) {
+            headerParts.push(exp.location)
+          }
+
+          // Part 3: Date range
+          if (exp.startDate || exp.endDate) {
+            const dateRange = [exp.startDate, exp.endDate].filter(Boolean).join(' - ')
+            if (dateRange) {
+              headerParts.push(dateRange)
             }
-            if (dateParts.length > 0) {
-              lines.push(dateParts.join(' | '))
-            }
+          }
+
+          // Combine all parts with | separator
+          if (headerParts.length > 0) {
+            lines.push(headerParts.join(' | '))
           }
 
           // CRITICAL: Add position summary/description if present
@@ -232,14 +248,35 @@ function convertStructuredToFormattedText(structured: StructuredResume): string 
 
         case 'education_item':
           const edu = block.content as any
-          lines.push(edu.degree)
-          if (edu.institution) lines.push(edu.institution)
-          if (edu.location || edu.graduationDate) {
-            const dateLine = [edu.location, edu.graduationDate]
-              .filter(Boolean)
-              .join(' | ')
-            lines.push(dateLine)
+          // CRITICAL: Export in ATS-friendly one-line header format
+          // Format: "Degree - Institution | Location | Date"
+
+          const eduHeaderParts: string[] = []
+
+          // Part 1: Degree - Institution
+          if (edu.degree && edu.institution) {
+            eduHeaderParts.push(`${edu.degree} - ${edu.institution}`)
+          } else if (edu.degree) {
+            eduHeaderParts.push(edu.degree)
+          } else if (edu.institution) {
+            eduHeaderParts.push(edu.institution)
           }
+
+          // Part 2: Location (if present)
+          if (edu.location) {
+            eduHeaderParts.push(edu.location)
+          }
+
+          // Part 3: Graduation date
+          if (edu.graduationDate) {
+            eduHeaderParts.push(edu.graduationDate)
+          }
+
+          // Combine all parts with | separator
+          if (eduHeaderParts.length > 0) {
+            lines.push(eduHeaderParts.join(' | '))
+          }
+
           if (edu.gpa) lines.push(`GPA: ${edu.gpa}`)
           if (edu.achievements) {
             edu.achievements.forEach((bullet: any) => {
