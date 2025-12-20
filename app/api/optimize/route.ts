@@ -62,62 +62,21 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get structured data or parse it if not available
+    // Get structured data - support iterative re-optimization
     let structuredData: StructuredResume
 
     console.log('[Optimize API] Resume info:', {
       id: resumeId,
       filename: resume.original_filename,
-      has_parent: !!resume.parent_resume_id,
+      is_optimized: !!resume.parent_resume_id,
       parent_id: resume.parent_resume_id,
       has_structured_data: !!resume.structured_data
     })
 
-    // CRITICAL FIX: If this is an already-optimized resume (has parent_resume_id),
-    // fetch the ORIGINAL resume's structured_data to avoid compounding corruption
-    if (resume.parent_resume_id) {
-      console.log('[Optimize API] 🔄 Re-optimization detected - fetching ORIGINAL resume data')
-      console.log('[Optimize API] Original resume ID:', resume.parent_resume_id)
-
-      const { data: originalResume, error: originalError } = await supabase
-        .from('resumes')
-        .select('structured_data, resume_text')
-        .eq('id', resume.parent_resume_id)
-        .eq('user_id', user.id)
-        .single()
-
-      if (originalError || !originalResume) {
-        console.error('[Optimize API] ❌ Could not fetch original resume:', originalError)
-        return NextResponse.json(
-          { error: 'Could not fetch original resume for re-optimization' },
-          { status: 500 }
-        )
-      }
-
-      if (originalResume.structured_data) {
-        structuredData = originalResume.structured_data as StructuredResume
-        console.log('[Optimize API] ✅ Using ORIGINAL resume structured_data')
-      } else {
-        console.log('[Optimize API] 📝 Parsing ORIGINAL resume text')
-        structuredData = parseResumeStructure(originalResume.resume_text)
-      }
-
-      const jobCount = structuredData.sections
-        .find(s => s.type === 'experience')?.content
-        .filter(b => b.type === 'experience_item').length || 0
-      const eduCount = structuredData.sections
-        .find(s => s.type === 'education')?.content
-        .filter(b => b.type === 'education_item').length || 0
-
-      console.log('[Optimize API] Original resume data:', {
-        jobs: jobCount,
-        education: eduCount
-      })
-    } else if (resume.structured_data) {
-      // First-time optimization - use resume's own structured data
+    if (resume.structured_data) {
+      // Use the resume's structured data (could be original OR already optimized)
       structuredData = resume.structured_data as StructuredResume
 
-      // Log job count from structured data
       const jobCount = structuredData.sections
         .find(s => s.type === 'experience')?.content
         .filter(b => b.type === 'experience_item').length || 0
@@ -125,7 +84,12 @@ export async function POST(request: NextRequest) {
         .find(s => s.type === 'education')?.content
         .filter(b => b.type === 'education_item').length || 0
 
-      console.log('[Optimize API] Using cached structured_data:', {
+      if (resume.parent_resume_id) {
+        console.log('[Optimize API] 🔄 Re-optimizing already-optimized resume')
+        console.log('[Optimize API] Will preserve and improve existing optimization')
+      }
+
+      console.log('[Optimize API] Using structured_data:', {
         jobs: jobCount,
         education: eduCount
       })
@@ -242,11 +206,67 @@ export async function POST(request: NextRequest) {
       enable_comprehensive_rewrite: !!optimizationContext && (optimizationContext.current_score < 90)
     }
 
+    // Store original counts for validation
+    const originalJobCount = structuredData.sections
+      .find(s => s.type === 'experience')?.content
+      .filter(b => b.type === 'experience_item').length || 0
+    const originalEduCount = structuredData.sections
+      .find(s => s.type === 'education')?.content
+      .filter(b => b.type === 'education_item').length || 0
+
+    console.log('[Optimize API] Before optimization:', {
+      jobs: originalJobCount,
+      education: originalEduCount
+    })
+
     const optimizationResult = await optimizeResume(
       structuredData,
       enhancedOptions,
       jobDescription
     )
+
+    // CRITICAL VALIDATION: Ensure job/education counts preserved
+    const optimizedJobCount = optimizationResult.optimizedResume.sections
+      .find(s => s.type === 'experience')?.content
+      .filter(b => b.type === 'experience_item').length || 0
+    const optimizedEduCount = optimizationResult.optimizedResume.sections
+      .find(s => s.type === 'education')?.content
+      .filter(b => b.type === 'education_item').length || 0
+
+    console.log('[Optimize API] After optimization:', {
+      jobs: optimizedJobCount,
+      education: optimizedEduCount
+    })
+
+    if (optimizedJobCount !== originalJobCount) {
+      console.error('[Optimize API] ❌ CORRUPTION DETECTED: Job count mismatch!')
+      console.error(`[Optimize API] Before: ${originalJobCount} jobs, After: ${optimizedJobCount} jobs`)
+      return NextResponse.json(
+        {
+          error: 'Optimization corrupted job data',
+          details: `Job count changed from ${originalJobCount} to ${optimizedJobCount}. This indicates a corruption bug.`,
+          before_count: originalJobCount,
+          after_count: optimizedJobCount
+        },
+        { status: 500 }
+      )
+    }
+
+    if (optimizedEduCount !== originalEduCount) {
+      console.error('[Optimize API] ❌ CORRUPTION DETECTED: Education count mismatch!')
+      console.error(`[Optimize API] Before: ${originalEduCount} education, After: ${optimizedEduCount} education`)
+      return NextResponse.json(
+        {
+          error: 'Optimization corrupted education data',
+          details: `Education count changed from ${originalEduCount} to ${optimizedEduCount}. This indicates a corruption bug.`,
+          before_count: originalEduCount,
+          after_count: optimizedEduCount
+        },
+        { status: 500 }
+      )
+    }
+
+    console.log('[Optimize API] ✅ Validation passed: All job and education entries preserved')
 
     // Track usage
     await supabase
