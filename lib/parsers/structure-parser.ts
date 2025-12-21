@@ -1841,12 +1841,23 @@ export class ResumeStructureParser {
    * Check if line contains date information
    */
   private isDateLine(line: string): boolean {
+    // CRITICAL: Must match actual DATE RANGES, not just presence of years/months
+    // Previously matched "May Corporation" or "2020 Technologies" as date lines!
+    //
     // Matches patterns like:
     // Jan 2020 - Present
     // 2018 - 2020
     // January 2020 - December 2020
     // San Francisco, CA | Jan 2020 - Present
-    return /\d{4}|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|Present/i.test(line)
+    //
+    // Does NOT match:
+    // May Corporation (no date range separator)
+    // 2020 Technologies (no date range separator)
+
+    // Check for date range pattern: date-like content, separator (-, –, —), date-like content
+    const hasDateRange = /(\d{4}|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s*\d{4})\s*[-–—]\s*(\d{4}|Present|Current|Now|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s*\d{4})/i.test(line)
+
+    return hasDateRange
   }
 
   /**
