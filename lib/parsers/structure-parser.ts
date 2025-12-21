@@ -1633,35 +1633,137 @@ export class ResumeStructureParser {
   private parseEducationItem(): EducationItem | null {
     const startIndex = this.currentIndex
 
-    // First line: Degree or Institution
     let line = this.lines[this.currentIndex].trim()
     if (!line || this.isBullet(line)) return null
 
-    let degree = line
+    let degree = ''
     let institution = ''
     let location = ''
     let graduationDate = ''
     let gpa = ''
 
-    this.currentIndex++
+    // CRITICAL: Check if first line is a date range (date-first format)
+    // Format: "2022 - 2025" followed by "Degree - Institution"
+    // This must come BEFORE treating the line as a degree name!
+    if (this.looksLikeDateRangeLine(line)) {
+      // This is date-first format
+      const dateInfo = this.parseDateLine(line)
+      graduationDate = dateInfo.endDate || dateInfo.startDate
+      location = dateInfo.location
+      this.currentIndex++
 
-    // Next line might be institution
-    if (this.currentIndex < this.lines.length) {
-      line = this.lines[this.currentIndex].trim()
-      if (line && !this.isBullet(line) && !this.isDateLine(line)) {
-        institution = line
+      // Next line should have Degree - Institution
+      if (this.currentIndex < this.lines.length) {
+        line = this.lines[this.currentIndex].trim()
+
+        // Parse "Degree - Institution" or "Degree – Institution" format
+        if (line.includes(' - ') || line.includes(' – ')) {
+          const separator = line.includes(' – ') ? ' – ' : ' - '
+          const parts = line.split(separator)
+          degree = parts[0].trim()
+          institution = parts.slice(1).join(separator).trim()
+        } else {
+          // No separator, entire line is the degree
+          degree = line
+        }
         this.currentIndex++
+
+        // CRITICAL: Check if next line(s) are continuations of broken words
+        // Handles cases like "British Technical" + "Education" + "al Council"
+        while (this.currentIndex < this.lines.length) {
+          const nextLine = this.lines[this.currentIndex].trim()
+
+          // Skip blank lines
+          if (!nextLine) {
+            this.currentIndex++
+            continue
+          }
+
+          // Check if this is a continuation line:
+          // 1. Starts with lowercase (e.g., "al Council")
+          // 2. Is a partial word that would complete the previous line (e.g., "Education" after "British Technical")
+          const startsWithLowercase = /^[a-z]/.test(nextLine)
+          const looksLikePartialWord = nextLine.length < 20 && !nextLine.includes(' ') && !nextLine.match(/[-–—]/)
+
+          if ((startsWithLowercase || looksLikePartialWord) && !this.isBullet(nextLine)) {
+            // This is a continuation - merge it
+            if (degree && !institution) {
+              // Merge with degree (e.g., "British Technical" + "Education" + "al Council")
+              degree = degree + nextLine
+            } else if (institution) {
+              // Merge with institution
+              institution = institution + ' ' + nextLine
+            }
+
+            this.currentIndex++
+
+            // Re-check if merged line has separator
+            const merged = degree
+            if (merged.includes(' - ') || merged.includes(' – ')) {
+              const separator = merged.includes(' – ') ? ' – ' : ' - '
+              const parts = merged.split(separator)
+              degree = parts[0].trim()
+              institution = parts.slice(1).join(separator).trim()
+            }
+          } else {
+            // Not a continuation line, stop merging
+            break
+          }
+        }
       }
-    }
+    } else {
+      // Traditional format: Degree, Institution, Date
+      degree = line
+      this.currentIndex++
 
-    // Look for date and location
-    if (this.currentIndex < this.lines.length) {
-      line = this.lines[this.currentIndex].trim()
-      if (line && this.isDateLine(line)) {
-        const dateInfo = this.parseDateLine(line)
-        location = dateInfo.location
-        graduationDate = dateInfo.endDate || dateInfo.startDate
-        this.currentIndex++
+      // Check if degree line has "Degree - Institution" format
+      if (degree.includes(' - ') || degree.includes(' – ')) {
+        const separator = degree.includes(' – ') ? ' – ' : ' - '
+        const parts = degree.split(separator)
+        const firstPart = parts[0].trim()
+        const secondPart = parts.slice(1).join(separator).trim()
+
+        // Only split if second part looks like an institution
+        // (not a date or location)
+        if (!this.looksLikeDateRangeLine(secondPart)) {
+          degree = firstPart
+          institution = secondPart
+        }
+      }
+
+      // If no institution yet, next line might be institution
+      if (!institution && this.currentIndex < this.lines.length) {
+        line = this.lines[this.currentIndex].trim()
+        // CRITICAL: Never treat date ranges as institution names!
+        if (line && !this.isBullet(line) && !this.isDateLine(line) && !this.looksLikeDateRangeLine(line)) {
+          institution = line
+          this.currentIndex++
+        }
+      }
+
+      // Look for date line (skip up to 2 blank lines)
+      if (!graduationDate && this.currentIndex < this.lines.length) {
+        let dateSearchIndex = this.currentIndex
+        while (dateSearchIndex < Math.min(this.currentIndex + 3, this.lines.length)) {
+          line = this.lines[dateSearchIndex].trim()
+
+          if (line && (this.isDateLine(line) || this.looksLikeDateRangeLine(line))) {
+            const dateInfo = this.parseDateLine(line)
+            if (!location && dateInfo.location) {
+              location = dateInfo.location
+            }
+            graduationDate = dateInfo.endDate || dateInfo.startDate
+            this.currentIndex = dateSearchIndex + 1
+            break
+          }
+
+          // Stop if we hit a bullet or what looks like a new education item
+          if (line && this.isBullet(line)) {
+            break
+          }
+
+          dateSearchIndex++
+        }
       }
     }
 
