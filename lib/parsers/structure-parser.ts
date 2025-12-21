@@ -863,20 +863,34 @@ export class ResumeStructureParser {
           let endDate = ''
           let location = ''
 
-          // Second part could be company or dates
-          if (this.containsDate(parts[1])) {
-            // Format: "Title | Dates"
-            const dateInfo = this.parseDateLine(parts[1])
-            startDate = dateInfo.startDate
-            endDate = dateInfo.endDate
-          } else {
-            // Format: "Title | Company | ..."
-            company = parts[1]
-            if (parts.length >= 3 && this.containsDate(parts[2])) {
-              const dateInfo = this.parseDateLine(parts[2])
+          // Check if first part contains " - " (job title - company)
+          if (parts[0].includes(' - ')) {
+            const dashParts = parts[0].split(' - ')
+            jobTitle = dashParts[0].trim()
+            company = dashParts.slice(1).join(' - ').trim()
+          } else if (parts[0].includes(' – ')) {
+            const dashParts = parts[0].split(' – ')
+            jobTitle = dashParts[0].trim()
+            company = dashParts.slice(1).join(' – ').trim()
+          }
+
+          // Process remaining parts (location and/or dates)
+          for (let i = 1; i < parts.length; i++) {
+            const part = parts[i]
+            if (this.containsDate(part)) {
+              const dateInfo = this.parseDateLine(part)
               startDate = dateInfo.startDate
               endDate = dateInfo.endDate
-              location = dateInfo.location
+              if (dateInfo.location && !location) {
+                location = dateInfo.location
+              }
+            } else if (!location && part) {
+              // If not dates and no location yet, this is location or company
+              if (!company) {
+                company = part
+              } else {
+                location = part
+              }
             }
           }
 
@@ -1392,30 +1406,52 @@ export class ResumeStructureParser {
     // Parse the job title line
     line = jobTitleLine
 
-    // Pattern 1: "Job Title - Company | Dates" or "Job Title | Company Dates"
+    // Pattern 1: Handle pipe-separated format
+    // Supports: "Job Title - Company | Location | Dates" or "Job Title | Company | Dates" or "Job Title - Company | Dates"
     if (line.includes('|')) {
       const parts = line.split('|').map(p => p.trim())
-      const leftPart = parts[0] // Could be "Job Title - Company" or just "Job Title"
-      const rightPart = parts[1] // Could be "Dates" or "Company Dates"
 
-      // Check if left part has a dash (Job Title - Company)
-      if (leftPart.includes('–') || leftPart.includes('-')) {
-        const titleCompanyParts = leftPart.split(/\s*[–-]\s*/)
-        jobTitle = titleCompanyParts[0].trim()
-        company = titleCompanyParts.slice(1).join(' - ').trim()
+      // Part 0: Always contains job title (and possibly company)
+      const firstPart = parts[0]
+
+      // Check if first part has " - " (job title - company format)
+      // Use more specific pattern to avoid splitting on hyphens in words
+      if (firstPart.includes(' - ')) {
+        const dashParts = firstPart.split(' - ')
+        jobTitle = dashParts[0].trim()
+        company = dashParts.slice(1).join(' - ').trim()
+      } else if (firstPart.includes(' – ')) {
+        // Handle en-dash
+        const dashParts = firstPart.split(' – ')
+        jobTitle = dashParts[0].trim()
+        company = dashParts.slice(1).join(' – ').trim()
       } else {
-        jobTitle = leftPart
+        jobTitle = firstPart
       }
 
-      // Extract dates from right part
-      const dateInfo = this.parseDateLine(rightPart)
-      location = dateInfo.location
-      startDate = dateInfo.startDate
-      endDate = dateInfo.endDate
+      // Remaining parts: Could be location and/or dates
+      // Try to find dates in any remaining part
+      for (let i = 1; i < parts.length; i++) {
+        const part = parts[i]
 
-      // If company not found yet, check right part
-      if (!company && rightPart && !startDate) {
-        company = rightPart.split(/\s+\d{4}/).shift()?.trim() || ''
+        // Check if this part contains dates
+        if (this.containsDate(part)) {
+          const dateInfo = this.parseDateLine(part)
+          if (dateInfo.startDate) {
+            startDate = dateInfo.startDate
+            endDate = dateInfo.endDate
+            // Location might be in the same part before dates
+            if (dateInfo.location) {
+              location = dateInfo.location
+            }
+          }
+        } else if (!location && part && !company) {
+          // If no dates and no location yet, this might be location or company
+          location = part
+        } else if (!company && part && location) {
+          // If we have location but no company, this might be company
+          company = part
+        }
       }
     } else if (line.includes(' at ')) {
       const parts = line.split(' at ')
