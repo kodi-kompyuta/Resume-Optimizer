@@ -302,7 +302,8 @@ export class ResumeStructureParser {
    * Must be exact match or very close match to avoid false positives
    */
   private isCommonSectionName(text: string): boolean {
-    const normalized = text.toLowerCase().trim()
+    // CRITICAL: Strip trailing colons before checking (e.g., "KEY SKILLS:" -> "key skills")
+    const normalized = text.toLowerCase().trim().replace(/:+$/, '')
     const commonNames = [
       'summary',
       'objective',
