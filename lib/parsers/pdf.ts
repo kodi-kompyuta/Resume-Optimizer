@@ -1,6 +1,7 @@
 import { PDFParse } from 'pdf-parse'
 import { pathToFileURL } from 'url'
 import path from 'path'
+import { normalizeResumeText } from './text-normalizer'
 
 // Dynamically set the worker source for pdfjs-dist
 let workerInitialized = false
@@ -45,7 +46,12 @@ export async function parsePDF(buffer: Buffer): Promise<string> {
 
     const result = await parser.getText()
     await parser.destroy()
-    return result.text
+
+    // CRITICAL: Apply text normalization (same as DOCX parser)
+    // This fixes section headers, date formats, multi-column layouts, etc.
+    const normalizedText = normalizeResumeText(result.text)
+
+    return normalizedText
   } catch (error) {
     console.error('PDF parsing error:', error)
     throw new Error('Failed to parse PDF file')
