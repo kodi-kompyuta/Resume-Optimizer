@@ -278,19 +278,23 @@ export class ResumeStructureParser {
   private isHeading(line: string): boolean {
     const trimmed = line.trim()
 
-    // Headings are usually:
-    // 1. All caps (EXPERIENCE, EDUCATION)
-    // 2. Short (< 50 chars)
-    // 3. Not starting with bullet points or numbers
-    // 4. Common section names
+    // Headings must be:
+    // 1. Short (< 50 chars)
+    // 2. Not starting with bullet points or numbers
+    // 3. A known section name (to avoid treating all-caps job titles as headings)
 
     if (trimmed.length === 0 || trimmed.length > 50) return false
     if (/^[-•*\d]/.test(trimmed)) return false
 
-    const isAllCaps = trimmed === trimmed.toUpperCase() && /[A-Z]/.test(trimmed)
+    // CRITICAL FIX: Only treat as heading if it's a KNOWN section name
+    // This prevents all-caps job titles like "SENIOR PROJECT MANAGER" from being treated as headings
     const isCommonSection = this.isCommonSectionName(trimmed)
 
-    return isAllCaps || isCommonSection
+    // Also check if it's all caps AND a very short word (likely an acronym section like "IT" or "HR")
+    const isAllCaps = trimmed === trimmed.toUpperCase() && /[A-Z]/.test(trimmed)
+    const isShortAcronym = isAllCaps && trimmed.length <= 15 && !trimmed.includes(' ')
+
+    return isCommonSection || isShortAcronym
   }
 
   /**
