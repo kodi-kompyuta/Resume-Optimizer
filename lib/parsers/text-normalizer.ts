@@ -45,9 +45,35 @@ const SECTION_HEADERS = [
  * - Achievement paragraphs
  * - Multi-column layouts
  * - Date formats
+ * - PDF-specific issues (page numbers, broken lines, headers/footers)
  */
-export function normalizeResumeText(text: string): string {
+export function normalizeResumeText(text: string, isPDF: boolean = false): string {
   let normalized = text
+
+  // PDF-SPECIFIC: Remove page numbers, headers, footers
+  if (isPDF) {
+    normalized = cleanPDFArtifacts(normalized)
+  }
+
+  // PDF-SPECIFIC: Merge broken sentences
+  if (isPDF) {
+    normalized = mergeBrokenLines(normalized)
+  }
+
+  // PDF-SPECIFIC: Merge broken date ranges
+  if (isPDF) {
+    normalized = mergeBrokenDateRanges(normalized)
+  }
+
+  // PDF-SPECIFIC: Split inline dates from job titles
+  if (isPDF) {
+    normalized = splitInlineDates(normalized)
+  }
+
+  // PDF-SPECIFIC: Fix job descriptions formatted as bullets
+  if (isPDF) {
+    normalized = fixBulletDescriptions(normalized)
+  }
 
   // CRITICAL FIX: Split embedded section headers
   // Look for patterns like "...text, WORK EXPERIENCEMore text"
@@ -159,6 +185,263 @@ function splitAchievementParagraphs(text: string): string {
     } else {
       result.push(line)
     }
+  }
+
+  return result.join('\n')
+}
+
+/**
+ * Clean PDF-specific artifacts (page numbers, headers, footers, page breaks)
+ */
+function cleanPDFArtifacts(text: string): string {
+  const lines = text.split('\n')
+  const cleaned: string[] = []
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim()
+
+    // Skip empty lines
+    if (!line) {
+      cleaned.push('')
+      continue
+    }
+
+    // Remove standalone page numbers (just a number)
+    if (/^\d+$/.test(line) && line.length < 4) {
+      continue
+    }
+
+    // Remove "X of Y" page markers
+    if (/^--\s*\d+\s+of\s+\d+\s*--$/i.test(line)) {
+      continue
+    }
+
+    // Remove common header/footer patterns
+    if (/^page\s+\d+/i.test(line)) {
+      continue
+    }
+
+    // Keep the line
+    cleaned.push(line)
+  }
+
+  return cleaned.join('\n')
+}
+
+/**
+ * Merge broken lines that were split mid-sentence by PDF extraction
+ * Examples:
+ * - "This is a sentence that was split across"
+ * - "two lines because of PDF layout"
+ * Should become:
+ * - "This is a sentence that was split across two lines because of PDF layout"
+ */
+function mergeBrokenLines(text: string): string {
+  const lines = text.split('\n')
+  const merged: string[] = []
+  let currentLine = ''
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim()
+
+    // Empty line resets
+    if (!line) {
+      if (currentLine) {
+        merged.push(currentLine)
+        currentLine = ''
+      }
+      merged.push('')
+      continue
+    }
+
+    // Check if this line should be merged with previous
+    const shouldMerge = currentLine && (
+      // Previous line ends with lowercase letter or comma (incomplete sentence)
+      /[a-z,]$/.test(currentLine) &&
+      // Current line starts with lowercase (continuation)
+      /^[a-z]/.test(line) &&
+      // Current line doesn't look like a bullet point
+      !/^[•\-*]/.test(line) &&
+      // Neither line is a section header
+      !isLikelyHeader(currentLine) &&
+      !isLikelyHeader(line)
+    )
+
+    if (shouldMerge) {
+      // Merge with space
+      currentLine = currentLine + ' ' + line
+    } else {
+      // Start new line
+      if (currentLine) {
+        merged.push(currentLine)
+      }
+      currentLine = line
+    }
+  }
+
+  // Don't forget the last line
+  if (currentLine) {
+    merged.push(currentLine)
+  }
+
+  return merged.join('\n')
+}
+
+/**
+ * Check if a line looks like a section header
+ */
+function isLikelyHeader(line: string): boolean {
+  const trimmed = line.trim()
+
+  // All caps and reasonable length
+  if (trimmed === trimmed.toUpperCase() && trimmed.length > 2 && trimmed.length < 50) {
+    return true
+  }
+
+  // Check against known section headers (case-insensitive)
+  const normalized = trimmed.toLowerCase().replace(/:+$/, '')
+  return SECTION_HEADERS.some(header => header.toLowerCase() === normalized)
+}
+
+/**
+ * Split inline dates that appear on the same line as job titles
+ * Example: "Job Title - Company July 2025" -> "Job Title - Company\nJuly 2025"
+ */
+function splitInlineDates(text: string): string {
+  const lines = text.split('\n')
+  const result: string[] = []
+
+  for (const line of lines) {
+    // Check if line has job title format followed by a date at the end
+    // Pattern: "Something - Something ElseMonth Year" or "Something - Something ElseMonth Year -"
+    const match = line.match(/^(.+?[-–—].+?)\s+((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}(?:\s*[-–—]\s*(?:Present|Current|Now|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4})?)?)$/i)
+
+    if (match) {
+      const [, titleCompany, dates] = match
+      // Split into two lines
+      result.push(titleCompany.trim())
+      result.push(dates.trim())
+    } else {
+      result.push(line)
+    }
+  }
+
+  return result.join('\n')
+}
+
+/**
+ * Merge broken date ranges that were split across lines by PDF extraction
+ * Examples:
+ * - "Jan 2024 –\nJune 2025" -> "Jan 2024 – June 2025"
+ * - "July\n2025" -> "July 2025"
+ */
+function mergeBrokenDateRanges(text: string): string {
+  const lines = text.split('\n')
+  const result: string[] = []
+  let i = 0
+
+  while (i < lines.length) {
+    const line = lines[i].trim()
+    const nextLine = i + 1 < lines.length ? lines[i + 1].trim() : ''
+
+    // Case 1: Line ends with month/year followed by dash, next line is month/year or year
+    // Example: "Jan 2024 –" + "June 2025"
+    if (line && /(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}\s*[-–—]\s*$/i.test(line) && 
+        nextLine && /^(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}|^Present|^Current|^Now|^\d{4}/i.test(nextLine)) {
+      result.push(line + nextLine)
+      i += 2
+      continue
+    }
+
+    // Case 2: Line is just a month, next line is a year
+    // Example: "July" + "2025"
+    if (line && /^(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?$/i.test(line) && 
+        nextLine && /^\d{4}/.test(nextLine)) {
+      result.push(line + ' ' + nextLine)
+      i += 2
+      continue
+    }
+
+    // Case 3: Line is a year or month-year, next line starts with dash and date
+    // Example: "2024" + "– June 2025"
+    if (line && /\d{4}$/.test(line) && 
+        nextLine && /^[-–—]\s*(?:Present|Current|Now|\d{4}|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec))/i.test(nextLine)) {
+      result.push(line + ' ' + nextLine)
+      i += 2
+      continue
+    }
+
+    result.push(line)
+    i++
+  }
+
+  return result.join('\n')
+}
+
+/**
+ * Fix job descriptions that are formatted as bullets in PDFs
+ * In PDFs, sometimes job descriptions appear as bullet points instead of plain text
+ * This converts them back to plain paragraphs when they appear right after a job title
+ */
+function fixBulletDescriptions(text: string): string {
+  const lines = text.split('\n')
+  const result: string[] = []
+  let i = 0
+
+  while (i < lines.length) {
+    const line = lines[i].trim()
+    result.push(lines[i])
+
+    // Check if this looks like a job title line (has " - " or " at ")
+    const isJobTitleLine = line && (
+      (line.includes(' - ') || line.includes(' – ') || line.includes(' at ')) &&
+      !line.startsWith('•') &&
+      !line.startsWith('-')
+    )
+
+    if (isJobTitleLine) {
+      i++
+      // Check if next few lines are bullets that are actually job descriptions
+      let collectedBullets: string[] = []
+      let hasAchievementsHeader = false
+
+      while (i < lines.length) {
+        const nextLine = lines[i].trim()
+
+        // Stop if we hit "Achievements" header
+        if (nextLine.toUpperCase() === 'ACHIEVEMENTS') {
+          hasAchievementsHeader = true
+          break
+        }
+
+        // Stop if we hit another section or another job title
+        if (!nextLine || isLikelyHeader(nextLine) || 
+            (nextLine.includes(' - ') && !nextLine.startsWith('•'))) {
+          break
+        }
+
+        // If it's a bullet and we haven't seen "Achievements" yet, it might be a description
+        if (nextLine.startsWith('•') || nextLine.startsWith('-')) {
+          // Only collect the first 2-3 bullets as description (before Achievements header)
+          if (!hasAchievementsHeader && collectedBullets.length < 3) {
+            collectedBullets.push(nextLine.replace(/^[•\-]\s*/, ''))
+            i++
+            continue
+          }
+        }
+
+        i++
+      }
+
+      // If we collected bullets before Achievements header, convert them to plain text
+      if (collectedBullets.length > 0) {
+        result.push(collectedBullets.join(' '))
+      }
+
+      continue
+    }
+
+    i++
   }
 
   return result.join('\n')

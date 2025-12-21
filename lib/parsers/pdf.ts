@@ -47,9 +47,9 @@ export async function parsePDF(buffer: Buffer): Promise<string> {
     const result = await parser.getText()
     await parser.destroy()
 
-    // CRITICAL: Apply text normalization (same as DOCX parser)
-    // This fixes section headers, date formats, multi-column layouts, etc.
-    const normalizedText = normalizeResumeText(result.text)
+    // CRITICAL: Apply text normalization with PDF-specific cleanup
+    // This fixes section headers, date formats, multi-column layouts, page numbers, broken lines, etc.
+    const normalizedText = normalizeResumeText(result.text, true)
 
     return normalizedText
   } catch (error) {
