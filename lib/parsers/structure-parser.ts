@@ -1391,7 +1391,18 @@ export class ResumeStructureParser {
       // Check if this line contains dates (month + year pattern)
       const hasDatePattern = /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}\b/i.test(potentialLine)
 
-      if (hasDatePattern && (potentialLine.includes('|') || potentialLine.includes('–') || potentialLine.includes('-'))) {
+      // CRITICAL: Skip date-only lines (e.g., "Jan 2024 - Present", "2018 - 2020")
+      // Check if line looks like ONLY dates (date range pattern)
+      const looksLikeDateOnly = this.looksLikeDateRangeLine(potentialLine)
+
+      if (hasDatePattern && looksLikeDateOnly) {
+        // This is just a date line, not a job title line - skip it
+        lookAheadIndex++
+        continue
+      }
+
+      // Check if this line has dates AND other content (job title/company)
+      if (hasDatePattern && !looksLikeDateOnly && (potentialLine.includes('|') || potentialLine.includes('–') || potentialLine.includes('-'))) {
         // This is the actual job title line!
         jobTitleLine = potentialLine
         foundJobLine = true
@@ -1458,10 +1469,23 @@ export class ResumeStructureParser {
         }
       }
     } else if (line.includes(' at ')) {
+      // Pattern 2: "Job Title at Company" format
       const parts = line.split(' at ')
       jobTitle = parts[0].trim()
       company = parts.slice(1).join(' at ').trim()
+    } else if (line.includes(' - ') && !this.isDateRangeLine(line)) {
+      // Pattern 3: "Job Title - Company" format (without pipes, dates on separate line)
+      // CRITICAL: Only split on " - " if this is NOT a date range line
+      const dashParts = line.split(' - ')
+      jobTitle = dashParts[0].trim()
+      company = dashParts.slice(1).join(' - ').trim()
+    } else if (line.includes(' – ') && !this.isDateRangeLine(line)) {
+      // Pattern 4: "Job Title – Company" format (en-dash)
+      const dashParts = line.split(' – ')
+      jobTitle = dashParts[0].trim()
+      company = dashParts.slice(1).join(' – ').trim()
     } else {
+      // Fallback: entire line is job title
       jobTitle = line
     }
 
@@ -1476,15 +1500,30 @@ export class ResumeStructureParser {
       }
     }
 
-    // Next line might be location and dates (if not already parsed)
+    // Next line(s) might be location and dates (if not already parsed)
+    // CRITICAL: Skip blank lines to find the date line
     if (this.currentIndex < this.lines.length && !startDate) {
-      line = this.lines[this.currentIndex].trim()
-      if (line && this.isDateLine(line)) {
-        const dateInfo = this.parseDateLine(line)
-        location = dateInfo.location
-        startDate = dateInfo.startDate
-        endDate = dateInfo.endDate
-        this.currentIndex++
+      // Skip up to 2 blank lines
+      let dateSearchIndex = this.currentIndex
+      while (dateSearchIndex < Math.min(this.currentIndex + 3, this.lines.length)) {
+        line = this.lines[dateSearchIndex].trim()
+
+        if (line && this.isDateLine(line)) {
+          // Found date line!
+          const dateInfo = this.parseDateLine(line)
+          location = dateInfo.location
+          startDate = dateInfo.startDate
+          endDate = dateInfo.endDate
+          this.currentIndex = dateSearchIndex + 1
+          break
+        }
+
+        // Stop if we hit a bullet or new job title
+        if (line && (this.isBullet(line) || this.looksLikeJobTitle(line))) {
+          break
+        }
+
+        dateSearchIndex++
       }
     }
 
@@ -1932,6 +1971,43 @@ export class ResumeStructureParser {
     const dateRangePattern = /^(JAN(?:UARY)?|FEB(?:RUARY)?|MAR(?:CH)?|APR(?:IL)?|MAY|JUN(?:E)?|JUL(?:Y)?|AUG(?:UST)?|SEP(?:TEMBER)?|OCT(?:OBER)?|NOV(?:EMBER)?|DEC(?:EMBER)?)[A-Z]*\.?\s+\d{4}\s*[–—-]\s*(JAN(?:UARY)?|FEB(?:RUARY)?|MAR(?:CH)?|APR(?:IL)?|MAY|JUN(?:E)?|JUL(?:Y)?|AUG(?:UST)?|SEP(?:TEMBER)?|OCT(?:OBER)?|NOV(?:EMBER)?|DEC(?:EMBER)?)[A-Z]*\.?\s+\d{4}\s*$/i
 
     return dateRangePattern.test(trimmed)
+  }
+
+  /**
+   * Helper: Check if line looks like a date range (more flexible than isDateRangeLine)
+   * Matches: "Jan 2024 - Present", "2018 - 2020", "January 2005 — MAY 2008"
+   * Does NOT match: "Regional Head of Client Services & Projects - Echotel International"
+   *
+   * Strategy: If the line has date content and a separator, check if most of the content
+   * is dates/years/Present/Current (not job titles or company names)
+   */
+  private looksLikeDateRangeLine(text: string): boolean {
+    const trimmed = text.trim()
+
+    // Must have a separator
+    if (!(/[-–—]/.test(trimmed))) return false
+
+    // Pattern 1: Month Year - Month Year (e.g., "Jan 2024 - Dec 2024")
+    if (/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}\s*[-–—]\s*(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}\s*$/i.test(trimmed)) {
+      return true
+    }
+
+    // Pattern 2: Month Year - Present/Current (e.g., "Jan 2024 - Present")
+    if (/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}\s*[-–—]\s*(Present|Current|Now)\s*$/i.test(trimmed)) {
+      return true
+    }
+
+    // Pattern 3: Year - Year (e.g., "2018 - 2020")
+    if (/^\d{4}\s*[-–—]\s*\d{4}\s*$/i.test(trimmed)) {
+      return true
+    }
+
+    // Pattern 4: Year - Present (e.g., "2020 - Present")
+    if (/^\d{4}\s*[-–—]\s*(Present|Current|Now)\s*$/i.test(trimmed)) {
+      return true
+    }
+
+    return false
   }
 
   /**
