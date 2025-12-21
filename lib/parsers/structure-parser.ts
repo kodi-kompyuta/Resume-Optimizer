@@ -1391,12 +1391,7 @@ export class ResumeStructureParser {
       // Check if this line contains dates (month + year pattern)
       const hasDatePattern = /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}\b/i.test(potentialLine)
 
-      // CRITICAL: Check if this is a date-ONLY line (not a job title line)
-      // Example: "Jan 2020 - Present" should NOT be treated as a job title line
-      const isDateOnlyLine = hasDatePattern && this.isDateRangeLine(potentialLine)
-
-      // Only treat as job title line if it has dates AND (pipe separator OR contains non-date content)
-      if (hasDatePattern && !isDateOnlyLine && (potentialLine.includes('|') || potentialLine.includes('–') || potentialLine.includes('-'))) {
+      if (hasDatePattern && (potentialLine.includes('|') || potentialLine.includes('–') || potentialLine.includes('-'))) {
         // This is the actual job title line!
         jobTitleLine = potentialLine
         foundJobLine = true
@@ -1922,22 +1917,10 @@ export class ResumeStructureParser {
   private isDateRangeLine(text: string): boolean {
     const trimmed = text.trim()
 
-    // Check for various date range patterns:
-    // "JAN 2020 — MAY 2024"
-    // "Jan 2020 - Present"
-    // "2018 - 2020"
-    // "January 2020 - December 2020"
+    // Check for month year — month year pattern
+    const dateRangePattern = /^(JAN(?:UARY)?|FEB(?:RUARY)?|MAR(?:CH)?|APR(?:IL)?|MAY|JUN(?:E)?|JUL(?:Y)?|AUG(?:UST)?|SEP(?:TEMBER)?|OCT(?:OBER)?|NOV(?:EMBER)?|DEC(?:EMBER)?)[A-Z]*\.?\s+\d{4}\s*[–—-]\s*(JAN(?:UARY)?|FEB(?:RUARY)?|MAR(?:CH)?|APR(?:IL)?|MAY|JUN(?:E)?|JUL(?:Y)?|AUG(?:UST)?|SEP(?:TEMBER)?|OCT(?:OBER)?|NOV(?:EMBER)?|DEC(?:EMBER)?)[A-Z]*\.?\s+\d{4}\s*$/i
 
-    // Pattern 1: Month Year - Month Year (e.g., "JAN 2020 - MAY 2024")
-    const monthYearPattern = /^(JAN(?:UARY)?|FEB(?:RUARY)?|MAR(?:CH)?|APR(?:IL)?|MAY|JUN(?:E)?|JUL(?:Y)?|AUG(?:UST)?|SEP(?:TEMBER)?|OCT(?:OBER)?|NOV(?:EMBER)?|DEC(?:EMBER)?)[A-Z]*\.?\s+\d{4}\s*[–—-]\s*(JAN(?:UARY)?|FEB(?:RUARY)?|MAR(?:CH)?|APR(?:IL)?|MAY|JUN(?:E)?|JUL(?:Y)?|AUG(?:UST)?|SEP(?:TEMBER)?|OCT(?:OBER)?|NOV(?:EMBER)?|DEC(?:EMBER)?)[A-Z]*\.?\s+\d{4}\s*$/i
-
-    // Pattern 2: Month Year - Present (e.g., "Jan 2020 - Present")
-    const monthYearPresentPattern = /^(JAN(?:UARY)?|FEB(?:RUARY)?|MAR(?:CH)?|APR(?:IL)?|MAY|JUN(?:E)?|JUL(?:Y)?|AUG(?:UST)?|SEP(?:TEMBER)?|OCT(?:OBER)?|NOV(?:EMBER)?|DEC(?:EMBER)?)[A-Z]*\.?\s+\d{4}\s*[–—-]\s*(Present|Current|Now)\s*$/i
-
-    // Pattern 3: Year - Year (e.g., "2018 - 2020")
-    const yearPattern = /^\d{4}\s*[–—-]\s*(\d{4}|Present|Current)\s*$/i
-
-    return monthYearPattern.test(trimmed) || monthYearPresentPattern.test(trimmed) || yearPattern.test(trimmed)
+    return dateRangePattern.test(trimmed)
   }
 
   /**
