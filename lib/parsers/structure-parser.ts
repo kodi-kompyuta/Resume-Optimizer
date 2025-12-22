@@ -1681,6 +1681,7 @@ export class ResumeStructureParser {
 
     let degree = ''
     let institution = ''
+    let fieldOfStudy = ''
     let location = ''
     let graduationDate = ''
     let gpa = ''
@@ -1759,29 +1760,84 @@ export class ResumeStructureParser {
       degree = line
       this.currentIndex++
 
-      // Check if degree line has "Degree - Institution" format
+      // Check if degree line has "Degree - Something" format
       if (degree.includes(' - ') || degree.includes(' – ')) {
         const separator = degree.includes(' – ') ? ' – ' : ' - '
         const parts = degree.split(separator)
         const firstPart = parts[0].trim()
         const secondPart = parts.slice(1).join(separator).trim()
 
-        // Only split if second part looks like an institution
-        // (not a date or location)
+        // CRITICAL: Distinguish between "Degree - Institution" vs "Degree - Field of Study"
+        // Check if second part is actually an institution (not a field of study)
         if (!this.looksLikeDateRangeLine(secondPart)) {
           degree = firstPart
-          institution = secondPart
+
+          // If second part looks like an institution, use it as institution
+          // Otherwise, treat it as field of study and keep looking for institution
+          if (this.looksLikeInstitution(secondPart)) {
+            institution = secondPart
+          } else {
+            // This is likely a field of study (e.g., "MASTER OF SCIENCE - BIG DATA TECHNOLOGIES")
+            fieldOfStudy = secondPart
+            // Institution should be on a later line
+          }
         }
       }
 
-      // If no institution yet, next line might be institution
-      if (!institution && this.currentIndex < this.lines.length) {
+      // If no institution yet, look for it on subsequent lines
+      while (!institution && this.currentIndex < this.lines.length) {
         line = this.lines[this.currentIndex].trim()
-        // CRITICAL: Never treat date ranges as institution names!
-        if (line && !this.isBullet(line) && !this.isDateLine(line) && !this.looksLikeDateRangeLine(line)) {
-          institution = line
+
+        // Skip empty lines
+        if (!line) {
           this.currentIndex++
+          continue
         }
+
+        // If we encounter a date line while searching for institution, capture it
+        if (this.isDateLine(line) || this.looksLikeDateRangeLine(line)) {
+          if (!graduationDate) {
+            const dateInfo = this.parseDateLine(line)
+            graduationDate = dateInfo.endDate || dateInfo.startDate
+            if (!location && dateInfo.location) {
+              location = dateInfo.location
+            }
+          }
+          this.currentIndex++
+          continue
+        }
+
+        // Stop at bullets or next section
+        if (this.isBullet(line) || this.isHeading(this.lines[this.currentIndex])) {
+          break
+        }
+
+        // CRITICAL: Check if line looks like field info (not institution)
+        // Patterns like "IN COMPUTING - COMPUTING" are field info, not institutions
+        const looksLikeFieldInfo =
+          (line.toUpperCase().startsWith('IN ') && line.includes('-')) || // "IN COMPUTING - SOMETHING"
+          (line === line.toUpperCase() && line.length < 50 && !this.looksLikeInstitution(line)) // ALL CAPS field name
+
+        if (looksLikeFieldInfo) {
+          // This is field information, store it and continue looking for institution
+          if (!fieldOfStudy) {
+            fieldOfStudy = line
+          }
+          this.currentIndex++
+          continue
+        }
+
+        // This should be the institution
+        if (!this.looksLikeInstitution(line)) {
+          // Double-check: if it doesn't look like an institution, it might be continuation
+          // of degree or other metadata. Continue searching.
+          this.currentIndex++
+          continue
+        }
+
+        institution = line
+        this.currentIndex++
+        break
       }
 
       // Look for date line (skip up to 2 blank lines)
@@ -1832,6 +1888,7 @@ export class ResumeStructureParser {
       id: uuidv4(),
       degree,
       institution,
+      fieldOfStudy: fieldOfStudy || undefined,
       location,
       graduationDate,
       gpa,
@@ -2238,6 +2295,42 @@ export class ResumeStructureParser {
     const hasLowerCase = /[a-z]/.test(trimmed)
 
     return hasUpperCase && hasLowerCase
+  }
+
+  /**
+   * Check if text looks like an educational institution (vs field of study)
+   */
+  private looksLikeInstitution(text: string): boolean {
+    const trimmed = text.trim().toLowerCase()
+
+    // Institution keywords
+    const institutionKeywords = [
+      'university', 'college', 'institute', 'school', 'centre', 'center',
+      'academy', 'polytechnic', 'conservatory', 'seminary'
+    ]
+
+    // Check if contains institution keywords
+    if (institutionKeywords.some(keyword => trimmed.includes(keyword))) {
+      return true
+    }
+
+    // Check if contains location indicators (countries, cities)
+    const locationKeywords = [
+      'united kingdom', 'uk', 'usa', 'united states', 'canada', 'kenya',
+      'nairobi', 'london', 'new york', 'toronto', 'singapore'
+    ]
+
+    if (locationKeywords.some(keyword => trimmed.includes(keyword))) {
+      return true
+    }
+
+    // Check if contains comma (institutions often have "Name, Location")
+    // But field of study rarely has commas
+    if (trimmed.includes(',')) {
+      return true
+    }
+
+    return false
   }
 }
 
