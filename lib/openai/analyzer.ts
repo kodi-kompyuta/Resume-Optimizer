@@ -97,7 +97,7 @@ export async function analyzeResume(resumeText: string): Promise<AnalysisData> {
           content: prompt,
         },
       ],
-      temperature: 0.7,
+      temperature: 0.0, // CRITICAL: 0.0 for deterministic scoring (same resume = same score)
       max_tokens: 4000,
       response_format: { type: 'json_object' }, // Forces JSON response
     });

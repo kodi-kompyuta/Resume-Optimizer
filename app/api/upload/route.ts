@@ -174,7 +174,6 @@ export async function POST(request: NextRequest) {
     if (user) {
 
       // Create resume record in database
-
       const { data: resume, error: dbError } = await supabase
 
         .from('resumes')
@@ -212,8 +211,6 @@ export async function POST(request: NextRequest) {
         )
 
       }
-
-
 
       // Start AI analysis in background (don't wait for it)
 
