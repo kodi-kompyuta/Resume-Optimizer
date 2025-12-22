@@ -271,12 +271,6 @@ export default async function DownloadPage({
           ) : (
             <>
               <Link
-                href={`/analyze/${id}`}
-                className="px-8 py-3 bg-white border-2 border-blue-600 text-blue-600 font-semibold rounded-lg hover:bg-blue-50 transition-colors text-center shadow-md"
-              >
-                View Analysis Results
-              </Link>
-              <Link
                 href="/upload"
                 className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors text-center shadow-lg"
               >
