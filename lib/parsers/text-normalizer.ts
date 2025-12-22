@@ -325,17 +325,28 @@ function splitInlineDates(text: string): string {
   const result: string[] = []
 
   for (const line of lines) {
-    // Check if line has job title format followed by a date at the end
-    // Pattern: "Something - Something ElseMonth Year" or "Something - Something ElseMonth Year -"
-    const match = line.match(/^(.+?[-–—].+?)\s+((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}(?:\s*[-–—]\s*(?:Present|Current|Now|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4})?)?)$/i)
+    // Pattern 1: "Job Title - Company Month Year" or "Job Title - Company Month Year - Present"
+    // Includes all dash variants: \u2010-\u2014
+    const matchWithDash = line.match(/^(.+?[-–—‐\u2010-\u2014].+?)\s+((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}(?:\s*[-–—‐\u2010-\u2014]\s*(?:Present|Current|Now|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4})?)?)$/i)
 
-    if (match) {
-      const [, titleCompany, dates] = match
+    if (matchWithDash) {
+      const [, titleCompany, dates] = matchWithDash
       // Split into two lines
       result.push(titleCompany.trim())
       result.push(dates.trim())
     } else {
-      result.push(line)
+      // Pattern 2: "JOB TITLE Month Year - Present" (no dash before dates, all caps title)
+      // This handles formats like "CUSTOMER SERVICE MANAGER Jan 2024 - Current"
+      const matchNoDash = line.match(/^([A-Z\s&]+?)\s+((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}(?:\s*[-–—‐\u2010-\u2014]\s*(?:Present|Current|Now|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4})?)?)$/i)
+
+      if (matchNoDash) {
+        const [, title, dates] = matchNoDash
+        // Split into two lines
+        result.push(title.trim())
+        result.push(dates.trim())
+      } else {
+        result.push(line)
+      }
     }
   }
 

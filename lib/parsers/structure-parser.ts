@@ -134,11 +134,16 @@ export class ResumeStructureParser {
 
       if (seen.has(key)) {
         const firstIdx = seen.get(key)!
-        // Merge content from duplicate into first occurrence
-        sections[firstIdx].content.push(...section.content)
-        // Remove duplicate section
-        sections.splice(i, 1)
-        console.log(`[Parser] Merged duplicate ${section.type} section: ${section.heading}`)
+        // CRITICAL: Safety check - ensure target section exists
+        if (sections[firstIdx] && section.content) {
+          // Merge content from duplicate into first occurrence
+          sections[firstIdx].content.push(...section.content)
+          // Remove duplicate section
+          sections.splice(i, 1)
+          console.log(`[Parser] Merged duplicate ${section.type} section: ${section.heading}`)
+        } else {
+          console.warn(`[Parser] Cannot merge duplicate section - target or content missing`)
+        }
       } else {
         seen.set(key, i)
       }
@@ -2009,8 +2014,9 @@ export class ResumeStructureParser {
     // May Corporation (just a word that happens to be a month name)
     // 2020 Technologies (year in company name)
 
-    // Check for date range pattern: date-like content, separator (-, –, —), date-like content
-    const hasDateRange = /(\d{4}|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s*\d{4})\s*[-–—]\s*(\d{4}|Present|Current|Now|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s*\d{4})/i.test(line)
+    // Check for date range pattern: date-like content, separator (-, –, —, ‐), date-like content
+    // CRITICAL: Include \u2010 (hyphen), \u2013 (en-dash), \u2014 (em-dash), and regular hyphen
+    const hasDateRange = /(\d{4}|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s*\d{4})\s*[-–—‐\u2010-\u2014]\s*(\d{4}|Present|Current|Now|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s*\d{4})/i.test(line)
 
     // CRITICAL FIX: Also accept single dates (Month Year format) for ongoing positions
     // But make sure it's ONLY the date on the line, not part of other text
@@ -2038,8 +2044,8 @@ export class ResumeStructureParser {
     for (const part of parts) {
       // Check if part contains dates
       if (/\d{4}|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|Present/i.test(part)) {
-        // Parse date range
-        const dateMatch = part.match(/(.+?)\s*[-–—]\s*(.+)/)
+        // Parse date range - CRITICAL: Include all dash variants (\u2010-\u2014)
+        const dateMatch = part.match(/(.+?)\s*[-–—‐\u2010-\u2014]\s*(.+)/)
         if (dateMatch) {
           startDate = dateMatch[1].trim()
           endDate = dateMatch[2].trim() === 'Present' ? 'Present' : dateMatch[2].trim()
@@ -2089,7 +2095,8 @@ export class ResumeStructureParser {
     const trimmed = text.trim()
 
     // Check for month year — month year pattern
-    const dateRangePattern = /^(JAN(?:UARY)?|FEB(?:RUARY)?|MAR(?:CH)?|APR(?:IL)?|MAY|JUN(?:E)?|JUL(?:Y)?|AUG(?:UST)?|SEP(?:TEMBER)?|OCT(?:OBER)?|NOV(?:EMBER)?|DEC(?:EMBER)?)[A-Z]*\.?\s+\d{4}\s*[–—-]\s*(JAN(?:UARY)?|FEB(?:RUARY)?|MAR(?:CH)?|APR(?:IL)?|MAY|JUN(?:E)?|JUL(?:Y)?|AUG(?:UST)?|SEP(?:TEMBER)?|OCT(?:OBER)?|NOV(?:EMBER)?|DEC(?:EMBER)?)[A-Z]*\.?\s+\d{4}\s*$/i
+    // CRITICAL: Include all dash variants (\u2010-\u2014)
+    const dateRangePattern = /^(JAN(?:UARY)?|FEB(?:RUARY)?|MAR(?:CH)?|APR(?:IL)?|MAY|JUN(?:E)?|JUL(?:Y)?|AUG(?:UST)?|SEP(?:TEMBER)?|OCT(?:OBER)?|NOV(?:EMBER)?|DEC(?:EMBER)?)[A-Z]*\.?\s+\d{4}\s*[-–—‐\u2010-\u2014]\s*(JAN(?:UARY)?|FEB(?:RUARY)?|MAR(?:CH)?|APR(?:IL)?|MAY|JUN(?:E)?|JUL(?:Y)?|AUG(?:UST)?|SEP(?:TEMBER)?|OCT(?:OBER)?|NOV(?:EMBER)?|DEC(?:EMBER)?)[A-Z]*\.?\s+\d{4}\s*$/i
 
     return dateRangePattern.test(trimmed)
   }
@@ -2105,26 +2112,26 @@ export class ResumeStructureParser {
   private looksLikeDateRangeLine(text: string): boolean {
     const trimmed = text.trim()
 
-    // Must have a separator
-    if (!(/[-–—]/.test(trimmed))) return false
+    // Must have a separator - CRITICAL: Include all dash variants
+    if (!(/[-–—‐\u2010-\u2014]/.test(trimmed))) return false
 
     // Pattern 1: Month Year - Month Year (e.g., "Jan 2024 - Dec 2024")
-    if (/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}\s*[-–—]\s*(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}\s*$/i.test(trimmed)) {
+    if (/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}\s*[-–—‐\u2010-\u2014]\s*(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}\s*$/i.test(trimmed)) {
       return true
     }
 
     // Pattern 2: Month Year - Present/Current (e.g., "Jan 2024 - Present")
-    if (/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}\s*[-–—]\s*(Present|Current|Now)\s*$/i.test(trimmed)) {
+    if (/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}\s*[-–—‐\u2010-\u2014]\s*(Present|Current|Now)\s*$/i.test(trimmed)) {
       return true
     }
 
     // Pattern 3: Year - Year (e.g., "2018 - 2020")
-    if (/^\d{4}\s*[-–—]\s*\d{4}\s*$/i.test(trimmed)) {
+    if (/^\d{4}\s*[-–—‐\u2010-\u2014]\s*\d{4}\s*$/i.test(trimmed)) {
       return true
     }
 
     // Pattern 4: Year - Present (e.g., "2020 - Present")
-    if (/^\d{4}\s*[-–—]\s*(Present|Current|Now)\s*$/i.test(trimmed)) {
+    if (/^\d{4}\s*[-–—‐\u2010-\u2014]\s*(Present|Current|Now)\s*$/i.test(trimmed)) {
       return true
     }
 
