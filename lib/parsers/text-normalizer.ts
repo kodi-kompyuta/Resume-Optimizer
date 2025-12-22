@@ -47,32 +47,37 @@ const SECTION_HEADERS = [
  * - Date formats
  * - PDF-specific issues (page numbers, broken lines, headers/footers)
  */
-export function normalizeResumeText(text: string, isPDF: boolean = false): string {
+export function normalizeResumeText(text: string, isPDF: boolean = false, debug: boolean = false): string {
   let normalized = text
 
   // PDF-SPECIFIC: Remove page numbers, headers, footers
   if (isPDF) {
     normalized = cleanPDFArtifacts(normalized)
+    if (debug) console.log('[1] After cleanPDFArtifacts:\n', normalized.substring(0, 500), '\n')
   }
 
-  // PDF-SPECIFIC: Merge broken sentences
-  if (isPDF) {
-    normalized = mergeBrokenLines(normalized)
-  }
-
-  // PDF-SPECIFIC: Merge broken date ranges
+  // PDF-SPECIFIC: Merge broken date ranges FIRST (before splitting)
   if (isPDF) {
     normalized = mergeBrokenDateRanges(normalized)
+    if (debug) console.log('[2] After mergeBrokenDateRanges:\n', normalized.substring(0, 500), '\n')
   }
 
-  // PDF-SPECIFIC: Split inline dates from job titles
+  // PDF-SPECIFIC: Split inline dates from job titles SECOND
   if (isPDF) {
     normalized = splitInlineDates(normalized)
+    if (debug) console.log('[3] After splitInlineDates:\n', normalized.substring(0, 500), '\n')
+  }
+
+  // PDF-SPECIFIC: Merge broken sentences THIRD
+  if (isPDF) {
+    normalized = mergeBrokenLines(normalized)
+    if (debug) console.log('[4] After mergeBrokenLines:\n', normalized.substring(0, 500), '\n')
   }
 
   // PDF-SPECIFIC: Fix job descriptions formatted as bullets
   if (isPDF) {
     normalized = fixBulletDescriptions(normalized)
+    if (debug) console.log('[5] After fixBulletDescriptions:\n', normalized.substring(0, 500), '\n')
   }
 
   // CRITICAL FIX: Split embedded section headers
@@ -235,6 +240,8 @@ function cleanPDFArtifacts(text: string): string {
  * - "two lines because of PDF layout"
  * Should become:
  * - "This is a sentence that was split across two lines because of PDF layout"
+ *
+ * CRITICAL: Do NOT merge date lines or job title lines!
  */
 function mergeBrokenLines(text: string): string {
   const lines = text.split('\n')
@@ -254,8 +261,14 @@ function mergeBrokenLines(text: string): string {
       continue
     }
 
+    // CRITICAL: Never merge date lines
+    const isDateLine = /^(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}|^\d{4}(?:\s*[-–—]|$)/i.test(line)
+
+    // CRITICAL: Never merge lines that look like job titles
+    const isJobTitleLine = (line.includes(' - ') || line.includes(' – ') || line.includes(' at ')) && !line.startsWith('•')
+
     // Check if this line should be merged with previous
-    const shouldMerge = currentLine && (
+    const shouldMerge = currentLine && !isDateLine && !isJobTitleLine && (
       // Previous line ends with lowercase letter or comma (incomplete sentence)
       /[a-z,]$/.test(currentLine) &&
       // Current line starts with lowercase (continuation)
@@ -332,8 +345,9 @@ function splitInlineDates(text: string): string {
 /**
  * Merge broken date ranges that were split across lines by PDF extraction
  * Examples:
- * - "Jan 2024 –\nJune 2025" -> "Jan 2024 – June 2025"
- * - "July\n2025" -> "July 2025"
+ * - "Job Title - Company July\n2025" -> "Job Title - Company July 2025"
+ * - "Job Title - Company Jan 2024 –\nJune 2025" -> "Job Title - Company Jan 2024 – June 2025"
+ * - "IT Support Supervisor... Jan 2023 – Dec 2024" -> unchanged (already good)
  */
 function mergeBrokenDateRanges(text: string): string {
   const lines = text.split('\n')
@@ -341,31 +355,41 @@ function mergeBrokenDateRanges(text: string): string {
   let i = 0
 
   while (i < lines.length) {
-    const line = lines[i].trim()
+    let line = lines[i].trim()
     const nextLine = i + 1 < lines.length ? lines[i + 1].trim() : ''
 
-    // Case 1: Line ends with month/year followed by dash, next line is month/year or year
-    // Example: "Jan 2024 –" + "June 2025"
-    if (line && /(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}\s*[-–—]\s*$/i.test(line) && 
-        nextLine && /^(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}|^Present|^Current|^Now|^\d{4}/i.test(nextLine)) {
-      result.push(line + nextLine)
-      i += 2
-      continue
-    }
-
-    // Case 2: Line is just a month, next line is a year
-    // Example: "July" + "2025"
-    if (line && /^(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?$/i.test(line) && 
-        nextLine && /^\d{4}/.test(nextLine)) {
+    // Case 1: Line ends with month (like "July"), next line is just a year
+    // Example: "... July" + "2025" -> "... July 2025"
+    if (line && /(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s*$/i.test(line) &&
+        nextLine && /^\d{4}\s*$/.test(nextLine)) {
       result.push(line + ' ' + nextLine)
       i += 2
       continue
     }
 
-    // Case 3: Line is a year or month-year, next line starts with dash and date
-    // Example: "2024" + "– June 2025"
-    if (line && /\d{4}$/.test(line) && 
-        nextLine && /^[-–—]\s*(?:Present|Current|Now|\d{4}|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec))/i.test(nextLine)) {
+    // Case 2: Line ends with "Month Year –", next line starts with "Month Year" or "Present"
+    // Example: "... Jan 2024 –" + "June 2025" -> "... Jan 2024 – June 2025"
+    if (line && /(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}\s*[-–—]\s*$/i.test(line) &&
+        nextLine && /^(?:(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}|Present|Current|Now)\b/i.test(nextLine)) {
+      // Find where the next line's real content starts (after the date)
+      const dateMatch = nextLine.match(/^((?:(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}|Present|Current|Now))\s*(.*)/i)
+      if (dateMatch) {
+        result.push(line + dateMatch[1])
+        // If there's content after the date, add it as a new line
+        if (dateMatch[2]) {
+          result.push(dateMatch[2])
+        }
+      } else {
+        result.push(line + nextLine)
+      }
+      i += 2
+      continue
+    }
+
+    // Case 3: Line ends with year, next line starts with "– Month Year" or "– Present"
+    // Example: "... 2024" + "– June 2025" -> "... 2024 – June 2025"
+    if (line && /\d{4}\s*$/i.test(line) &&
+        nextLine && /^[-–—]\s*(?:(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}|Present|Current|Now)/i.test(nextLine)) {
       result.push(line + ' ' + nextLine)
       i += 2
       continue
@@ -415,7 +439,7 @@ function fixBulletDescriptions(text: string): string {
         }
 
         // Stop if we hit another section or another job title
-        if (!nextLine || isLikelyHeader(nextLine) || 
+        if (!nextLine || isLikelyHeader(nextLine) ||
             (nextLine.includes(' - ') && !nextLine.startsWith('•'))) {
           break
         }
@@ -430,6 +454,9 @@ function fixBulletDescriptions(text: string): string {
           }
         }
 
+        // CRITICAL FIX: If it's not a bullet, preserve it (dates, descriptions, etc.)
+        // Don't consume lines that aren't bullets
+        result.push(lines[i])
         i++
       }
 

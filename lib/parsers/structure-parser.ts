@@ -1374,6 +1374,18 @@ export class ResumeStructureParser {
     let line = this.lines[this.currentIndex].trim()
     if (!line || this.isBullet(line)) return null
 
+    // CRITICAL FIX: Reject lines that obviously aren't job titles
+    // (achievement bullets that had markers removed, technical jargon, etc.)
+    if (line.endsWith('.') && !line.includes(' - ') && !line.includes(' – ')) {
+      // Line ends with period but has no dash - likely a description sentence
+      return null
+    }
+
+    if (/^[a-z]/.test(line) && line.length < 100) {
+      // Starts with lowercase and is short - likely a sentence fragment
+      return null
+    }
+
     let jobTitle = ''
     let company = ''
     let location = ''
@@ -1987,19 +1999,25 @@ export class ResumeStructureParser {
     // Previously matched "May Corporation" or "2020 Technologies" as date lines!
     //
     // Matches patterns like:
-    // Jan 2020 - Present
-    // 2018 - 2020
-    // January 2020 - December 2020
-    // San Francisco, CA | Jan 2020 - Present
+    // Jan 2020 - Present (date range)
+    // 2018 - 2020 (date range)
+    // January 2020 - December 2020 (date range)
+    // San Francisco, CA | Jan 2020 - Present (date range with location)
+    // July 2025 (single date - start date only, ongoing position)
     //
     // Does NOT match:
-    // May Corporation (no date range separator)
-    // 2020 Technologies (no date range separator)
+    // May Corporation (just a word that happens to be a month name)
+    // 2020 Technologies (year in company name)
 
     // Check for date range pattern: date-like content, separator (-, –, —), date-like content
     const hasDateRange = /(\d{4}|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s*\d{4})\s*[-–—]\s*(\d{4}|Present|Current|Now|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s*\d{4})/i.test(line)
 
-    return hasDateRange
+    // CRITICAL FIX: Also accept single dates (Month Year format) for ongoing positions
+    // But make sure it's ONLY the date on the line, not part of other text
+    // Match: "July 2025" or "Jan 2024" when it's the whole line
+    const isSingleDate = /^\s*(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}\s*$/i.test(line)
+
+    return hasDateRange || isSingleDate
   }
 
   /**
@@ -2166,6 +2184,21 @@ export class ResumeStructureParser {
 
     // Should have reasonable length for a job title (not too short, not too long)
     if (trimmed.length < 10 || trimmed.length > 150) return false
+
+    // CRITICAL FIX: Reject lines ending with periods (likely sentences/descriptions)
+    if (trimmed.endsWith('.')) return false
+
+    // CRITICAL FIX: Reject lines starting with lowercase (not proper job titles)
+    if (/^[a-z]/.test(trimmed)) return false
+
+    // CRITICAL FIX: Reject lines with too many commas (likely lists, not titles)
+    const commaCount = (trimmed.match(/,/g) || []).length
+    if (commaCount >= 3) return false
+
+    // CRITICAL FIX: Reject if this looks like technical jargon or acronyms list
+    // (e.g., "ICDL, A+, N+, CCNA, CCNP...")
+    const hasMultiplePlusOrAcronyms = /[A-Z]\+.*[A-Z]\+|[A-Z]{2,}\s*,\s*[A-Z]{2,}/.test(trimmed)
+    if (hasMultiplePlusOrAcronyms) return false
 
     // Check for common job title patterns
     // Typically has title case or mixed case (not all lowercase, not all uppercase)
