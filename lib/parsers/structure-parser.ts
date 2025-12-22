@@ -455,15 +455,29 @@ export class ResumeStructureParser {
     for (let i = 0; i < analysisLines.length - 1; i++) {
       const line = analysisLines[i]
       const nextLine = analysisLines[i + 1]
+      const prevLine = i > 0 ? analysisLines[i - 1] : ''
 
       // Pattern: "Title | Company | Dates"
       if (line.includes('|') && this.containsDate(line)) {
         pipeCount++
       }
 
-      // Pattern: Date range line followed by title/company
+      // Pattern: Date range line followed by title/company (but NOT preceded by job title)
+      // CRITICAL: Only count as date_first if the PREVIOUS line is NOT a job title
       if (this.isDateRangeLine(line) && nextLine && !this.isBullet(nextLine)) {
-        dateFirstCount++
+        // Check if previous line looks like a standalone job title (ALL CAPS, reasonable length)
+        const isPrevLineJobTitle = prevLine &&
+          prevLine === prevLine.toUpperCase() &&  // ALL CAPS
+          prevLine.length >= 10 &&                // Not too short
+          prevLine.length <= 80 &&                // Not too long
+          !this.isDateLine(prevLine) &&           // Not a date
+          !this.isBullet(prevLine) &&             // Not a bullet
+          (prevLine.match(/,/g) || []).length <= 1 // Max 1 comma (not a location list)
+
+        // Only count as date_first if previous line is NOT a job title
+        if (!isPrevLineJobTitle) {
+          dateFirstCount++
+        }
       }
 
       // Pattern: Date range as standalone (like "MAY 2008 — MAY 2011")
@@ -1542,6 +1556,17 @@ export class ResumeStructureParser {
         }
 
         dateSearchIndex++
+      }
+    }
+
+    // CRITICAL FIX: After finding dates, check if next line is company
+    // Handles format: "JOB TITLE\nDates\nCompany\nDescription"
+    if (this.currentIndex < this.lines.length && !company && startDate) {
+      line = this.lines[this.currentIndex].trim()
+      // If next line is not a bullet, not a date, not a job title, it's likely the company
+      if (line && !this.isBullet(line) && !this.isDateLine(line) && !this.looksLikeJobTitle(line) && !this.isHeading(this.lines[this.currentIndex])) {
+        company = line
+        this.currentIndex++
       }
     }
 
