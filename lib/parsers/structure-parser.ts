@@ -296,8 +296,10 @@ export class ResumeStructureParser {
     const isCommonSection = this.isCommonSectionName(trimmed)
 
     // Also check if it's all caps AND a very short word (likely an acronym section like "IT" or "HR")
+    // CRITICAL: Exclude lines ending with periods - those are certification/item names, not section headings
+    // (e.g., "CCNA.", "AWS Practitioner." are certifications, not section headers)
     const isAllCaps = trimmed === trimmed.toUpperCase() && /[A-Z]/.test(trimmed)
-    const isShortAcronym = isAllCaps && trimmed.length <= 15 && !trimmed.includes(' ')
+    const isShortAcronym = isAllCaps && trimmed.length <= 15 && !trimmed.includes(' ') && !trimmed.endsWith('.')
 
     return isCommonSection || isShortAcronym
   }
@@ -411,6 +413,8 @@ export class ResumeStructureParser {
         return this.parseEducationContent()
       case 'skills':
         return this.parseSkillsContent()
+      case 'certifications':
+        return this.parseCertificationsContent()
       case 'summary':
       case 'objective':
         return this.parseTextContent()
@@ -1952,6 +1956,95 @@ export class ResumeStructureParser {
         },
       })
     }
+
+    return blocks
+  }
+
+  /**
+   * Parse certifications section
+   * Handles various formats: bullet points, period-separated items, or plain text
+   */
+  private parseCertificationsContent(): ContentBlock[] {
+    const blocks: ContentBlock[] = []
+    const certifications: string[] = []
+
+    while (this.currentIndex < this.lines.length) {
+      if (this.isHeading(this.lines[this.currentIndex])) break
+
+      const line = this.lines[this.currentIndex].trim()
+
+      // Skip empty lines
+      if (!line) {
+        this.currentIndex++
+        continue
+      }
+
+      // Handle bullet points
+      if (this.isBullet(line)) {
+        const certName = line.replace(/^[-•*]\s*/, '').trim()
+        if (certName) {
+          certifications.push(certName)
+        }
+        this.currentIndex++
+        continue
+      }
+
+      // Handle period-separated certifications (e.g., "AWS Practitioner.")
+      // Each line ending with period is treated as a separate certification
+      if (line.endsWith('.')) {
+        const certName = line.replace(/\.$/, '').trim()
+        if (certName) {
+          certifications.push(certName)
+        }
+        this.currentIndex++
+        continue
+      }
+
+      // Handle lines without periods (might be multi-line certification names)
+      // Accumulate until we hit a line with period, bullet, or next section
+      let certName = line
+      this.currentIndex++
+
+      // Check if next lines continue this certification
+      while (this.currentIndex < this.lines.length) {
+        const nextLine = this.lines[this.currentIndex].trim()
+
+        if (!nextLine || this.isHeading(this.lines[this.currentIndex]) || this.isBullet(nextLine)) {
+          break
+        }
+
+        // If line ends with period, it's the end of this certification
+        if (nextLine.endsWith('.')) {
+          certName += ' ' + nextLine.replace(/\.$/, '').trim()
+          this.currentIndex++
+          break
+        }
+
+        // Continue accumulating
+        certName += ' ' + nextLine
+        this.currentIndex++
+      }
+
+      if (certName.trim()) {
+        certifications.push(certName.trim())
+      }
+    }
+
+    // Create certification items
+    certifications.forEach(cert => {
+      blocks.push({
+        id: uuidv4(),
+        type: 'certification_item',
+        content: {
+          id: uuidv4(),
+          name: cert,
+          issuer: undefined,
+          date: undefined,
+          expiryDate: undefined,
+          credentialId: undefined,
+        },
+      })
+    })
 
     return blocks
   }
