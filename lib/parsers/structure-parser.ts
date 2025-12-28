@@ -744,6 +744,49 @@ export class ResumeStructureParser {
         continue
       }
 
+      // CRITICAL: Check if line looks like a non-bulleted achievement description
+      // (vs a new job title). This handles achievement text without • symbols.
+      const looksLikeAchievement = currentExperience && this.looksLikeAchievementText(line)
+
+      if (looksLikeAchievement) {
+        // This is an achievement description without bullet symbol
+        // Accumulate multi-line achievement text
+        let achievementText = line
+        this.currentIndex++
+
+        // Continue reading until we hit a blank line, bullet, or next job
+        while (this.currentIndex < this.lines.length) {
+          const nextLine = this.lines[this.currentIndex].trim()
+
+          // Stop conditions
+          if (!nextLine ||
+              this.isBullet(nextLine) ||
+              this.isHeading(this.lines[this.currentIndex]) ||
+              this.looksLikeJobTitle(nextLine) ||
+              this.looksLikeCompanyName(nextLine)) {
+            break
+          }
+
+          // If line ends with period, it's the end of this achievement
+          if (nextLine.endsWith('.')) {
+            achievementText += ' ' + nextLine
+            this.currentIndex++
+            break
+          }
+
+          // Continue accumulating
+          achievementText += ' ' + nextLine
+          this.currentIndex++
+        }
+
+        // Add to achievement buffer
+        achievementBuffer.push({
+          id: uuidv4(),
+          text: achievementText.trim(),
+        })
+        continue
+      }
+
       // Try to parse as traditional experience item (without consuming bullets)
       const expItem = this.parseExperienceItem(false)
       if (expItem) {
@@ -1530,8 +1573,24 @@ export class ResumeStructureParser {
     // Next line might be company (if not already parsed)
     if (this.currentIndex < this.lines.length && !company) {
       line = this.lines[this.currentIndex].trim()
+      // CRITICAL: Don't split on " - " if the line looks like a full company name
+      // (e.g., "Church World Service - Resettlement Support Centre, Nairobi, Kenya")
+      // Only split if it's clearly "Title - Company" format
       if (line && !this.isBullet(line) && !this.isDateLine(line) && !this.looksLikeJobTitle(line)) {
-        company = line
+        // Check if line contains " - " and might be "CompanyPart1 - CompanyPart2"
+        if ((line.includes(' - ') || line.includes(' – ')) && this.looksLikeCompanyName(line)) {
+          // This is a full company name with dashes (don't split it)
+          company = line
+        } else if (line.includes(' - ') && !this.looksLikeCompanyName(line)) {
+          // This might be "Department - Organization" or similar, split it
+          const parts = line.split(' - ')
+          company = parts.slice(1).join(' - ').trim() || parts[0].trim()
+        } else if (line.includes(' – ') && !this.looksLikeCompanyName(line)) {
+          const parts = line.split(' – ')
+          company = parts.slice(1).join(' – ').trim() || parts[0].trim()
+        } else {
+          company = line
+        }
         this.currentIndex++
       }
     }
@@ -1567,8 +1626,15 @@ export class ResumeStructureParser {
     // Handles format: "JOB TITLE\nDates\nCompany\nDescription"
     if (this.currentIndex < this.lines.length && !company && startDate) {
       line = this.lines[this.currentIndex].trim()
-      // If next line is not a bullet, not a date, not a job title, it's likely the company
-      if (line && !this.isBullet(line) && !this.isDateLine(line) && !this.looksLikeJobTitle(line) && !this.isHeading(this.lines[this.currentIndex])) {
+      // CRITICAL: Use looksLikeCompanyName() to identify companies
+      // Don't rely on !looksLikeJobTitle() because company names with dashes can look like job titles
+      const isCompanyLine = line &&
+        !this.isBullet(line) &&
+        !this.isDateLine(line) &&
+        !this.isHeading(this.lines[this.currentIndex]) &&
+        (this.looksLikeCompanyName(line) || !this.looksLikeJobTitle(line))
+
+      if (isCompanyLine) {
         company = line
         this.currentIndex++
       }
@@ -2388,6 +2454,64 @@ export class ResumeStructureParser {
     const hasLowerCase = /[a-z]/.test(trimmed)
 
     return hasUpperCase && hasLowerCase
+  }
+
+  /**
+   * Check if text looks like an achievement description (vs a job title)
+   * Used to identify non-bulleted achievement text
+   */
+  private looksLikeAchievementText(text: string): boolean {
+    const trimmed = text.trim()
+
+    // Must have reasonable length
+    if (trimmed.length < 10) return false
+
+    // Achievement text characteristics:
+    // 1. NOT all caps (job titles are typically ALL CAPS in resumes)
+    // 2. Usually ends with period
+    // 3. Often starts with action verbs or descriptive text
+    // 4. Contains mixed case
+
+    const isAllCaps = trimmed === trimmed.toUpperCase() && /[A-Z]/.test(trimmed)
+    if (isAllCaps) return false // Job titles are all caps
+
+    // Check if starts with common achievement patterns
+    const achievementStarters = /^(Deployment|Implementation|Currently|Deployed|Seconded|Successfully|Introduced|Supported|Managed|Led|Developed|Responsible|Interfaced|Assessed|Migrat|Oversee|Achiev|Improv)/i
+    const startsLikeAchievement = achievementStarters.test(trimmed)
+
+    // Check if ends with period (achievement descriptions usually do)
+    const endsWithPeriod = trimmed.endsWith('.')
+
+    // If it looks like achievement start OR ends with period, likely an achievement
+    return startsLikeAchievement || endsWithPeriod
+  }
+
+  /**
+   * Check if text looks like a company name
+   */
+  private looksLikeCompanyName(text: string): boolean {
+    const trimmed = text.trim()
+
+    // Company names often have:
+    // - Location (city, country) with comma
+    // - Mixed case (not all uppercase or all lowercase)
+    // - Reasonable length
+
+    if (trimmed.length < 5) return false
+
+    // Check for location indicators
+    const hasLocation = trimmed.includes(',')
+
+    // Check for mixed case
+    const hasUpperCase = /[A-Z]/.test(trimmed)
+    const hasLowerCase = /[a-z]/.test(trimmed)
+    const hasMixedCase = hasUpperCase && hasLowerCase
+
+    // Check for company keywords
+    const companyKeywords = ['ltd', 'inc', 'llc', 'corporation', 'company', 'service', 'bank', 'group', 'centre', 'center']
+    const hasCompanyKeyword = companyKeywords.some(keyword => trimmed.toLowerCase().includes(keyword))
+
+    return (hasLocation && hasMixedCase) || hasCompanyKeyword
   }
 
   /**
