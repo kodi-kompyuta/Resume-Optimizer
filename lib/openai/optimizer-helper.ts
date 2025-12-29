@@ -72,7 +72,11 @@ export function convertStructuredResumeToCleanJson(structured: StructuredResume)
   const certifications: string[] = []
   if (certSection) {
     certSection.content.forEach(block => {
-      if (block.type === 'bullet_list') {
+      if (block.type === 'certification_item') {
+        // CRITICAL FIX: Certifications are stored as certification_item, not bullet_list
+        const cert = block.content as any
+        certifications.push(cert.name)
+      } else if (block.type === 'bullet_list') {
         const bullets = block.content as any
         certifications.push(...bullets.items.map((i: any) => i.text))
       } else if (block.type === 'text') {

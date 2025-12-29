@@ -340,6 +340,14 @@ function convertStructuredToFormattedText(structured: StructuredResume): string 
           }
           lines.push(skills.skills.join(', '))
           break
+
+        case 'certification_item':
+          // CRITICAL FIX: Handle certification items in export
+          const cert = block.content as any
+          if (cert.name) {
+            lines.push(cert.name)
+          }
+          break
       }
     }
   }

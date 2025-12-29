@@ -209,18 +209,38 @@ export class ResumeStructureParser {
     })
 
     // Re-parse those job sections
+    // CRITICAL FIX: Don't rely on pre-parsed section content (which may be incomplete)
+    // Instead, find the job titles in the raw text and parse directly from there
     if (jobSectionIndicies.length > 0) {
-      console.log(`[Parser] Re-parsing ${jobSectionIndicies.length} job titles that were mistaken for section headings`)
+      console.log(`[Parser] Re-parsing ${jobSectionIndicies.length} job titles by going back to raw text`)
 
-      // Process in reverse order to avoid index issues when removing
+      const jobTitles: string[] = jobSectionIndicies.map(idx => sections[idx].heading.trim())
+
+      // Remove all job title sections first (in reverse to avoid index issues)
       for (let i = jobSectionIndicies.length - 1; i >= 0; i--) {
-        const sectionIdx = jobSectionIndicies[i]
-        const section = sections[sectionIdx]
+        sections.splice(jobSectionIndicies[i], 1)
+      }
 
-        // Create a minimal experience item from the section heading
+      // Now parse each job from raw text
+      for (const jobTitle of jobTitles) {
+        // Find this job title in the raw text
+        let jobLineIndex = -1
+        for (let i = 0; i < this.lines.length; i++) {
+          if (this.lines[i].trim() === jobTitle) {
+            jobLineIndex = i
+            break
+          }
+        }
+
+        if (jobLineIndex === -1) {
+          console.log(`[Parser] ⚠️  Could not find job "${jobTitle}" in raw text`)
+          continue
+        }
+
+        // Parse the job details from the following lines
         const jobExp: ExperienceItem = {
           id: uuidv4(),
-          jobTitle: section.heading.trim(),
+          jobTitle,
           company: '',
           location: '',
           startDate: '',
@@ -228,18 +248,85 @@ export class ResumeStructureParser {
           achievements: [],
         }
 
-        // Try to extract dates and company from section content if any
-        if (section.content.length > 0) {
-          const firstBlock = section.content[0]
-          if (firstBlock.type === 'text') {
-            const text = firstBlock.content as string
-            // Try to extract dates and company from text
-            const dateMatch = text.match(/([A-Z][a-z]+\s+\d{4})\s*[-–—‐]\s*([A-Z][a-z]+\s+\d{4}|Present|Current)/i)
-            if (dateMatch) {
-              jobExp.startDate = dateMatch[1]
-              jobExp.endDate = dateMatch[2]
+        let lineIdx = jobLineIndex + 1
+
+        // Next line(s) should be dates
+        // CRITICAL FIX: Handle dates split across two lines
+        // Format 1: "May 2008 - May 2011" (one line)
+        // Format 2: "May 2008 ‐" then "May 2011" (two lines)
+        if (lineIdx < this.lines.length) {
+          const dateLine = this.lines[lineIdx].trim()
+
+          // Try single-line date format first
+          let dateMatch = dateLine.match(/([A-Z][a-z]+\s+\d{4})\s*[-–—‐]\s*([A-Z][a-z]+\s+\d{4}|Present|Current)/i)
+
+          if (dateMatch) {
+            jobExp.startDate = dateMatch[1]
+            jobExp.endDate = dateMatch[2]
+            lineIdx++
+          } else {
+            // Try split date format: "May 2008 ‐" on one line, "May 2011" on next
+            const startDateMatch = dateLine.match(/^([A-Z][a-z]+\s+\d{4})\s*[-–—‐]\s*$/i)
+            if (startDateMatch && lineIdx + 1 < this.lines.length) {
+              const nextLine = this.lines[lineIdx + 1].trim()
+              const endDateMatch = nextLine.match(/^([A-Z][a-z]+\s+\d{4}|Present|Current)$/i)
+
+              if (endDateMatch) {
+                jobExp.startDate = startDateMatch[1]
+                jobExp.endDate = endDateMatch[1]
+                lineIdx += 2  // Skip both lines
+              } else {
+                lineIdx++  // Just skip the partial date line
+              }
+            } else {
+              lineIdx++
             }
           }
+        }
+
+        // Next line should be company and location
+        if (lineIdx < this.lines.length) {
+          const companyLine = this.lines[lineIdx].trim()
+
+          // Skip if it's another job title or major section heading
+          if (!this.isHeading(this.lines[lineIdx]) || companyLine.endsWith('Kenya')) {
+            if (companyLine.includes(',')) {
+              const parts = companyLine.split(',').map(p => p.trim())
+              jobExp.company = parts[0]
+              jobExp.location = parts.slice(1).join(', ')
+            } else if (companyLine && !this.isBullet(companyLine)) {
+              jobExp.company = companyLine
+            }
+            lineIdx++
+          }
+        }
+
+        // Remaining lines until next heading are achievements
+        while (lineIdx < this.lines.length) {
+          const line = this.lines[lineIdx].trim()
+
+          // Stop at next section or job title
+          if (this.isHeading(this.lines[lineIdx]) && !line.startsWith('•')) {
+            break
+          }
+
+          if (this.isBullet(line)) {
+            const bulletText = line.replace(/^[-•*]\s*/, '')
+            jobExp.achievements.push({
+              id: uuidv4(),
+              text: bulletText,
+              metadata: { indentLevel: 0 }
+            })
+          } else if (line && !this.isBullet(line)) {
+            // Non-bullet text is also an achievement
+            jobExp.achievements.push({
+              id: uuidv4(),
+              text: line,
+              metadata: { indentLevel: 0 }
+            })
+          }
+
+          lineIdx++
         }
 
         // Add to experience section
@@ -249,9 +336,7 @@ export class ResumeStructureParser {
           content: jobExp,
         })
 
-        // Remove the custom section
-        sections.splice(sectionIdx, 1)
-        console.log(`[Parser] Moved job "${jobExp.jobTitle}" to WORK EXPERIENCE section`)
+        console.log(`[Parser] Parsed job "${jobExp.jobTitle}" (company: "${jobExp.company}", location: "${jobExp.location}", dates: ${jobExp.startDate} - ${jobExp.endDate}, achievements: ${jobExp.achievements.length})`)
       }
     }
   }
@@ -2296,8 +2381,12 @@ export class ResumeStructureParser {
       // Parse as text
       const textLines: string[] = []
       while (this.currentIndex < this.lines.length) {
-        if (this.isHeading(this.lines[this.currentIndex])) break
-        const line = this.lines[this.currentIndex].trim()
+        const currentLine = this.lines[this.currentIndex]
+        if (this.isHeading(currentLine)) {
+          console.log(`[Parser] ⛔ Stopping generic content parse - detected heading: "${currentLine.trim().substring(0, 60)}"`)
+          break
+        }
+        const line = currentLine.trim()
         if (line) textLines.push(line)
         this.currentIndex++
       }

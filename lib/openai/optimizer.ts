@@ -515,23 +515,25 @@ function jsonToStructuredResume(json: any, originalResume: StructuredResume): St
   }
 
   // Certifications section
+  // CRITICAL FIX: Use certification_item type (not bullet_list) to match parser output
   if (json.certifications && json.certifications.length > 0) {
     sections.push({
       id: uuidv4(),
       type: 'certifications',
       heading: 'Certifications',
       order: order++,
-      content: [{
+      content: json.certifications.map((cert: string) => ({
         id: uuidv4(),
-        type: 'bullet_list',
+        type: 'certification_item',
         content: {
-          items: json.certifications.map((cert: string) => ({
-            id: uuidv4(),
-            text: cert,
-            metadata: { indentLevel: 0 }
-          }))
+          id: uuidv4(),
+          name: cert,
+          issuer: undefined,
+          date: undefined,
+          expiryDate: undefined,
+          credentialId: undefined,
         }
-      }]
+      }))
     })
   }
 
