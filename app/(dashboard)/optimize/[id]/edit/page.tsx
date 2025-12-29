@@ -563,10 +563,79 @@ function EducationEditor({ content, onChange }: any) {
 }
 
 function CertificationsEditor({ content, onChange }: any) {
-  // Certifications can be either bullet_list or text
+  // CRITICAL FIX: Certifications can be certification_item, bullet_list, or text
+  const isCertificationItem = content[0]?.type === 'certification_item'
   const isBulletList = content[0]?.type === 'bullet_list'
 
-  if (isBulletList) {
+  // Handle certification_item format (new format from parser)
+  if (isCertificationItem) {
+    const certifications = content.filter((c: any) => c.type === 'certification_item')
+
+    const updateCertification = (index: number, value: string) => {
+      const newContent = [...content]
+      newContent[index] = {
+        ...newContent[index],
+        content: {
+          ...newContent[index].content,
+          name: value
+        }
+      }
+      onChange(newContent)
+    }
+
+    const addCertification = () => {
+      const newCert = {
+        id: Date.now().toString(),
+        type: 'certification_item',
+        content: {
+          id: Date.now().toString(),
+          name: '',
+          issuer: undefined,
+          date: undefined,
+          expiryDate: undefined,
+          credentialId: undefined,
+        }
+      }
+      onChange([...content, newCert])
+    }
+
+    const removeCertification = (index: number) => {
+      const newContent = [...content]
+      newContent.splice(index, 1)
+      onChange(newContent)
+    }
+
+    return (
+      <div className="space-y-3">
+        {certifications.map((cert: any, index: number) => (
+          <div key={cert.id} className="flex items-start gap-2">
+            <div className="flex-1">
+              <input
+                type="text"
+                value={cert.content?.name || ''}
+                onChange={(e) => updateCertification(index, e.target.value)}
+                className="w-full p-2 border rounded"
+                placeholder="Certification name"
+              />
+            </div>
+            <button
+              onClick={() => removeCertification(index)}
+              className="px-3 py-2 text-red-600 hover:bg-red-50 rounded"
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+        <button
+          onClick={addCertification}
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          + Add Certification
+        </button>
+      </div>
+    )
+  } else if (isBulletList) {
+    // Handle bullet_list format
     const items = content[0]?.content?.items || []
 
     const updateCertification = (index: number, value: string) => {
