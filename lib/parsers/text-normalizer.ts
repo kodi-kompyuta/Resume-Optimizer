@@ -337,7 +337,8 @@ function splitInlineDates(text: string): string {
     } else {
       // Pattern 2: "JOB TITLE Month Year - Present" (no dash before dates, all caps title)
       // This handles formats like "CUSTOMER SERVICE MANAGER Jan 2024 - Current"
-      const matchNoDash = line.match(/^([A-Z\s&]+?)\s+((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}(?:\s*[-–—‐\u2010-\u2014]\s*(?:Present|Current|Now|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4})?)?)$/i)
+      // Or "IT SUPPORT ENGINEER / IT TRAINER Jan 2005 - May 2008"
+      const matchNoDash = line.match(/^([A-Z\s&\/]+?)\s+((?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}(?:\s*[-–—‐\u2010-\u2014]\s*(?:Present|Current|Now|(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4})?)?)$/i)
 
       if (matchNoDash) {
         const [, title, dates] = matchNoDash

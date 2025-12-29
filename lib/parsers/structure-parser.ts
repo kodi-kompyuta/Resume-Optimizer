@@ -70,7 +70,12 @@ export class ResumeStructureParser {
     // Common pattern: "PROFESSIONAL CERTIFICATIONS" followed by "AND TRAINING"
     this.mergeCertificationSections(sections)
 
+    // Post-process: Consolidate orphaned job entries FIRST
+    // Must run before deduplication to preserve job-title sections
+    this.consolidateExperienceItems(sections)
+
     // Post-process: Deduplicate sections (e.g., multiple "EDUCATION" headings)
+    // Run AFTER consolidation so job titles aren't incorrectly merged
     this.deduplicateSections(sections)
 
     const wordCount = this.plainText.split(/\s+/).filter(w => w.length > 0).length
@@ -146,6 +151,107 @@ export class ResumeStructureParser {
         }
       } else {
         seen.set(key, i)
+      }
+    }
+  }
+
+  /**
+   * Consolidate experience items that appear outside the main WORK EXPERIENCE section
+   * Handles unusual resume structures where jobs are scattered throughout the document
+   */
+  private consolidateExperienceItems(sections: ResumeSection[]): void {
+    // Find the main experience section
+    let experienceSection = sections.find(s => s.type === 'experience')
+
+    // If no experience section exists, create one
+    if (!experienceSection) {
+      experienceSection = {
+        id: uuidv4(),
+        type: 'experience',
+        heading: 'WORK EXPERIENCE',
+        content: [],
+        order: 3,
+      }
+      sections.push(experienceSection)
+    }
+
+    // Second pass: Find custom sections that look like job titles
+    // These are ALL CAPS headings with job-related keywords
+    const jobSectionIndicies: number[] = []
+
+    sections.forEach((section, idx) => {
+      const heading = section.heading.trim()
+
+      // Check if this is a job title disguised as a section heading
+      const isJobSection =
+        heading === heading.toUpperCase() &&
+        heading.length > 15 &&
+        heading.length < 100 &&
+        !this.isCommonSectionName(heading) &&
+        section.type === 'custom' &&
+        /^[A-Z\s&\/\-]+$/.test(heading) && // Only letters, spaces, &, /, -
+        (heading.includes('MANAGER') ||
+         heading.includes('ENGINEER') ||
+         heading.includes('SPECIALIST') ||
+         heading.includes('LEADER') ||
+         heading.includes('TRAINER') ||
+         heading.includes('DEVELOPER') ||
+         heading.includes('ANALYST') ||
+         heading.includes('COORDINATOR') ||
+         heading.includes('ADMINISTRATOR') ||
+         heading.includes('DIRECTOR') ||
+         heading.includes('SUPPORT'))
+
+      if (isJobSection) {
+        console.log(`[Parser] Custom section "${heading}" is actually a job title`)
+        jobSectionIndicies.push(idx)
+      }
+    })
+
+    // Re-parse those job sections
+    if (jobSectionIndicies.length > 0) {
+      console.log(`[Parser] Re-parsing ${jobSectionIndicies.length} job titles that were mistaken for section headings`)
+
+      // Process in reverse order to avoid index issues when removing
+      for (let i = jobSectionIndicies.length - 1; i >= 0; i--) {
+        const sectionIdx = jobSectionIndicies[i]
+        const section = sections[sectionIdx]
+
+        // Create a minimal experience item from the section heading
+        const jobExp: ExperienceItem = {
+          id: uuidv4(),
+          jobTitle: section.heading.trim(),
+          company: '',
+          location: '',
+          startDate: '',
+          endDate: '',
+          achievements: [],
+        }
+
+        // Try to extract dates and company from section content if any
+        if (section.content.length > 0) {
+          const firstBlock = section.content[0]
+          if (firstBlock.type === 'text') {
+            const text = firstBlock.content as string
+            // Try to extract dates and company from text
+            const dateMatch = text.match(/([A-Z][a-z]+\s+\d{4})\s*[-–—‐]\s*([A-Z][a-z]+\s+\d{4}|Present|Current)/i)
+            if (dateMatch) {
+              jobExp.startDate = dateMatch[1]
+              jobExp.endDate = dateMatch[2]
+            }
+          }
+        }
+
+        // Add to experience section
+        experienceSection.content.push({
+          id: uuidv4(),
+          type: 'experience_item',
+          content: jobExp,
+        })
+
+        // Remove the custom section
+        sections.splice(sectionIdx, 1)
+        console.log(`[Parser] Moved job "${jobExp.jobTitle}" to WORK EXPERIENCE section`)
       }
     }
   }
@@ -284,11 +390,11 @@ export class ResumeStructureParser {
     const trimmed = line.trim()
 
     // Headings must be:
-    // 1. Short (< 50 chars)
+    // 1. Reasonable length (< 100 chars for job titles, < 50 for section names)
     // 2. Not starting with bullet points or numbers
-    // 3. A known section name (to avoid treating all-caps job titles as headings)
+    // 3. A known section name OR job title pattern
 
-    if (trimmed.length === 0 || trimmed.length > 50) return false
+    if (trimmed.length === 0 || trimmed.length > 100) return false
     if (/^[-•*\d]/.test(trimmed)) return false
 
     // CRITICAL FIX: Only treat as heading if it's a KNOWN section name
@@ -301,7 +407,27 @@ export class ResumeStructureParser {
     const isAllCaps = trimmed === trimmed.toUpperCase() && /[A-Z]/.test(trimmed)
     const isShortAcronym = isAllCaps && trimmed.length <= 15 && !trimmed.includes(' ') && !trimmed.endsWith('.')
 
-    return isCommonSection || isShortAcronym
+    // CRITICAL: Detect job title headings (for resumes with scattered jobs)
+    // Job titles are ALL CAPS, contain job keywords, and have reasonable length
+    // Only detect as heading if we're NOT currently inside work experience section
+    const isJobTitleHeading = isAllCaps &&
+      trimmed.length >= 15 &&
+      trimmed.length <= 80 &&
+      !trimmed.endsWith('.') &&
+      /^[A-Z\s&\/\-]+$/.test(trimmed) && // Only letters, spaces, &, /, -
+      (trimmed.includes('MANAGER') ||
+       trimmed.includes('ENGINEER') ||
+       trimmed.includes('SPECIALIST') ||
+       trimmed.includes('LEADER') ||
+       trimmed.includes('TRAINER') ||
+       trimmed.includes('DEVELOPER') ||
+       trimmed.includes('ANALYST') ||
+       trimmed.includes('COORDINATOR') ||
+       trimmed.includes('ADMINISTRATOR') ||
+       trimmed.includes('DIRECTOR') ||
+       trimmed.includes('SUPPORT'))
+
+    return isCommonSection || isShortAcronym || isJobTitleHeading
   }
 
   /**
