@@ -1222,6 +1222,9 @@ This is a COMPREHENSIVE rewrite to maximize ATS score and job match - not minor 
 CRITICAL STRUCTURE PRESERVATION:
 - You MUST return EXACTLY ${bullets.length} bullet points
 - DO NOT remove, add, or skip bullets
+- DO NOT split one bullet into multiple bullets (even if it contains multiple ideas)
+- DO NOT merge multiple bullets into one
+- MAINTAIN 1:1 correspondence between input and output bullets
 - Output must have ${bullets.length} items (will be validated)
 
 ${jobDescription ? `**TARGET JOB DESCRIPTION:**\n${jobDescription}\n\n` : ''}
@@ -1292,6 +1295,18 @@ Original: "Managed database queries"
 Good: "Optimized database queries and indexing strategies, reducing query response time by 40%"
 → This enhances their REAL database work with impact
 
+❌ BAD (Splitting bullets):
+Original: "Led team of 5 engineers while managing project timeline and budget, delivered product 2 weeks early"
+Bad Output (2 bullets):
+  1. "Led team of 5 engineers managing project timeline and budget"
+  2. "Delivered product 2 weeks ahead of schedule"
+→ This SPLITS one bullet into two (violates structure preservation)
+
+✅ GOOD (Keep together):
+Original: "Led team of 5 engineers while managing project timeline and budget, delivered product 2 weeks early"
+Good: "Led team of 5 engineers while managing project timeline and $200K budget, delivering product 2 weeks ahead of schedule and under budget"
+→ This PRESERVES the bullet structure while enhancing content
+
 1. **REFRAME EXISTING EXPERIENCE** (Honest optimization)
    - Look at what they ACTUALLY accomplished
    - Reword it using job-relevant terminology
@@ -1336,7 +1351,7 @@ Good: "Optimized database queries and indexing strategies, reducing query respon
 
 4. **CLARITY** (15%):
    - Concise and scannable
-   - One main idea per bullet
+   - Focus on primary accomplishment (if bullet has multiple points, keep them together - DO NOT split)
    - Direct language
 
 5. **COMPLETENESS** (10%):

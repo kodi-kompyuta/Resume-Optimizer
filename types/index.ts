@@ -278,7 +278,7 @@ export interface SectionMetadata {
 export interface ContentBlock {
   id: string
   type: ContentType
-  content: string | BulletList | ExperienceItem | EducationItem | ContactInfo | SkillGroup
+  content: string | BulletList | ExperienceItem | EducationItem | ContactInfo | SkillGroup | CertificationItem
   metadata?: ContentMetadata
 }
 
@@ -289,6 +289,7 @@ export type ContentType =
   | 'education_item'
   | 'contact_info'
   | 'skill_group'
+  | 'certification_item'
 
 export interface ContentMetadata {
   indentLevel?: number
@@ -333,6 +334,7 @@ export interface EducationItem {
   id: string
   degree: string
   institution: string
+  fieldOfStudy?: string
   location?: string
   graduationDate?: string
   gpa?: string
@@ -357,6 +359,15 @@ export interface SkillGroup {
   category?: string
   skills: string[]
   displayStyle?: 'list' | 'inline' | 'table'
+}
+
+export interface CertificationItem {
+  id: string
+  name: string
+  issuer?: string
+  date?: string
+  expiryDate?: string
+  credentialId?: string
 }
 
 // Optimization Types with Change Tracking

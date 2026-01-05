@@ -28,6 +28,56 @@ enum ResumeFormat {
 }
 
 /**
+ * Convert ALL CAPS text to Title Case
+ * Preserves acronyms and special formatting
+ */
+function toTitleCase(text: string): string {
+  // If not all caps, return as-is
+  if (text !== text.toUpperCase()) {
+    return text
+  }
+
+  // List of words that should stay lowercase (unless first word)
+  const lowercaseWords = ['a', 'an', 'and', 'as', 'at', 'but', 'by', 'for', 'in', 'of', 'on', 'or', 'the', 'to', 'with']
+
+  // List of common acronyms that should stay uppercase
+  const acronyms = ['IT', 'HR', 'CEO', 'CTO', 'VP', 'USA', 'UK', 'AI', 'ML', 'API', 'UI', 'UX', 'AWS', 'GCP', 'SQL', 'NoSQL', 'PhD', 'MBA', 'BSc', 'MSc', 'BA', 'MA', 'US', 'EU', 'UN', 'NATO', 'BTEC', 'WES', 'ECA']
+
+  const words = text.split(/\s+/)
+
+  return words.map((word, index) => {
+    // Check if word (without punctuation) is an acronym
+    const cleanWord = word.replace(/[^\w]/g, '')
+    if (acronyms.includes(cleanWord)) {
+      return word
+    }
+
+    // Check if word contains special characters (like &, /)
+    if (/[&\/\-]/.test(word)) {
+      // Split by special chars and title case each part
+      return word.split(/([&\/\-])/).map(part => {
+        if (part.match(/[&\/\-]/)) return part
+        if (acronyms.includes(part)) return part
+        return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
+      }).join('')
+    }
+
+    // First word is always capitalized
+    if (index === 0) {
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    }
+
+    // Check if should be lowercase
+    if (lowercaseWords.includes(cleanWord.toLowerCase())) {
+      return word.toLowerCase()
+    }
+
+    // Default: capitalize first letter, rest lowercase
+    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+  }).join(' ')
+}
+
+/**
  * Parses plain text resume into structured format
  * Preserves all sections, bullets, and formatting metadata
  */
@@ -77,6 +127,10 @@ export class ResumeStructureParser {
     // Post-process: Deduplicate sections (e.g., multiple "EDUCATION" headings)
     // Run AFTER consolidation so job titles aren't incorrectly merged
     this.deduplicateSections(sections)
+
+    // Post-process: Reorder sections to follow standard resume structure
+    // Ensure references always appear last, education before certifications, etc.
+    this.reorderSections(sections)
 
     const wordCount = this.plainText.split(/\s+/).filter(w => w.length > 0).length
 
@@ -153,6 +207,45 @@ export class ResumeStructureParser {
         seen.set(key, i)
       }
     }
+  }
+
+  /**
+   * Reorder sections to follow standard resume structure
+   * Ensures references/referees always appear last, education before certifications, etc.
+   */
+  private reorderSections(sections: ResumeSection[]): void {
+    // Define standard section order priority (lower number = earlier in resume)
+    const sectionPriority: Record<SectionType, number> = {
+      'contact': 0,
+      'summary': 1,
+      'objective': 1,
+      'skills': 2,
+      'experience': 3,
+      'education': 4,
+      'certifications': 5,
+      'languages': 6,
+      'projects': 7,
+      'awards': 8,
+      'publications': 9,
+      'volunteer': 10,
+      'interests': 11,
+      'references': 99,  // Always last!
+      'custom': 50,      // Custom sections in the middle
+    }
+
+    // Sort sections by priority
+    sections.sort((a, b) => {
+      const priorityA = sectionPriority[a.type] ?? 50
+      const priorityB = sectionPriority[b.type] ?? 50
+      return priorityA - priorityB
+    })
+
+    // Reassign order numbers after sorting
+    sections.forEach((section, index) => {
+      section.order = index
+    })
+
+    console.log('[Parser] Sections reordered to standard resume structure')
   }
 
   /**
@@ -240,7 +333,7 @@ export class ResumeStructureParser {
         // Parse the job details from the following lines
         const jobExp: ExperienceItem = {
           id: uuidv4(),
-          jobTitle,
+          jobTitle: toTitleCase(jobTitle),  // Convert ALL CAPS to Title Case
           company: '',
           location: '',
           startDate: '',
@@ -308,6 +401,13 @@ export class ResumeStructureParser {
           // Stop at next section or job title
           if (this.isHeading(this.lines[lineIdx]) && !line.startsWith('•')) {
             break
+          }
+
+          // CRITICAL: Skip "Achievements" section labels
+          // These are just headers, not actual achievement content
+          if (line.toLowerCase() === 'achievements' || line.toLowerCase().startsWith('achievement')) {
+            lineIdx++
+            continue
           }
 
           if (this.isBullet(line)) {
@@ -480,7 +580,10 @@ export class ResumeStructureParser {
     // 3. A known section name OR job title pattern
 
     if (trimmed.length === 0 || trimmed.length > 100) return false
-    if (/^[-•*\d]/.test(trimmed)) return false
+
+    // CRITICAL: Any line with bullet formatting is NEVER a heading
+    // This includes bullets at the start OR number-based bullets
+    if (this.isBullet(trimmed) || /^[-•*\d]/.test(trimmed)) return false
 
     // CRITICAL FIX: Only treat as heading if it's a KNOWN section name
     // This prevents all-caps job titles like "SENIOR PROJECT MANAGER" from being treated as headings
@@ -489,8 +592,16 @@ export class ResumeStructureParser {
     // Also check if it's all caps AND a very short word (likely an acronym section like "IT" or "HR")
     // CRITICAL: Exclude lines ending with periods - those are certification/item names, not section headings
     // (e.g., "CCNA.", "AWS Practitioner." are certifications, not section headers)
+    // CRITICAL: Also exclude common certification acronyms (CCNA, CCNP, AWS, etc.)
     const isAllCaps = trimmed === trimmed.toUpperCase() && /[A-Z]/.test(trimmed)
-    const isShortAcronym = isAllCaps && trimmed.length <= 15 && !trimmed.includes(' ') && !trimmed.endsWith('.')
+    const isCertificationAcronym = isAllCaps && (
+      /^(CCNA|CCNP|CCDA|CCIE|MCSA|MCSE|AWS|AZURE|ITIL|PMP|CISSP|CEH|COMPTIA|A\+|N\+|S\+)$/i.test(trimmed)
+    )
+    const isShortAcronym = isAllCaps &&
+      trimmed.length <= 15 &&
+      !trimmed.includes(' ') &&
+      !trimmed.endsWith('.') &&
+      !isCertificationAcronym  // Don't treat certifications as headings
 
     // CRITICAL: Detect job title headings (for resumes with scattered jobs)
     // Job titles are ALL CAPS, contain job keywords, and have reasonable length
@@ -549,7 +660,8 @@ export class ResumeStructureParser {
       'notable projects',
       'awards',
       'honors',
-      'achievements',
+      // REMOVED: 'achievements' - This is usually a subsection label within jobs, not a standalone section
+      // If someone has an "Achievements" section, it will be detected as 'awards' type anyway
       'publications',
       'languages',
       'volunteer',
@@ -626,6 +738,11 @@ export class ResumeStructureParser {
         return this.parseSkillsContent()
       case 'certifications':
         return this.parseCertificationsContent()
+      case 'languages':
+        return this.parseLanguagesContent()
+      case 'references':
+        // References usually contain simple text like "Available upon request" or "On request"
+        return this.parseTextContent()
       case 'summary':
       case 'objective':
         return this.parseTextContent()
@@ -2167,7 +2284,7 @@ export class ResumeStructureParser {
 
     return {
       id: uuidv4(),
-      degree,
+      degree: toTitleCase(degree),  // Convert ALL CAPS to Title Case
       institution,
       fieldOfStudy: fieldOfStudy || undefined,
       location,
@@ -2185,6 +2302,10 @@ export class ResumeStructureParser {
     let currentCategory: string | undefined
     let currentSkills: string[] = []
 
+    // CRITICAL FIX: Join lines intelligently, then split by period delimiter
+    // Only join a line to previous if it's clearly a continuation
+    const rawLines: string[] = []
+
     while (this.currentIndex < this.lines.length) {
       if (this.isHeading(this.lines[this.currentIndex])) break
 
@@ -2196,7 +2317,15 @@ export class ResumeStructureParser {
 
       // Check if line is a category (ends with colon)
       if (line.endsWith(':')) {
-        // Save previous group
+        // Process accumulated lines before starting new category
+        if (rawLines.length > 0) {
+          const joinedLines = this.joinSkillLines(rawLines)
+          const skills = this.parseSkillsByDelimiter(joinedLines)
+          currentSkills.push(...skills)
+          rawLines.length = 0
+        }
+
+        // Save previous category group
         if (currentSkills.length > 0) {
           blocks.push({
             id: uuidv4(),
@@ -2210,16 +2339,33 @@ export class ResumeStructureParser {
 
         currentCategory = line.slice(0, -1)
         currentSkills = []
-      } else {
-        // Parse skills from line (comma or bullet separated)
-        const skills = this.isBullet(line)
-          ? [line.replace(/^[-•*]\s*/, '')]
-          : this.splitSkills(line)
+      } else if (this.isBullet(line)) {
+        // Process accumulated lines first
+        if (rawLines.length > 0) {
+          const joinedLines = this.joinSkillLines(rawLines)
+          const skills = this.parseSkillsByDelimiter(joinedLines)
+          currentSkills.push(...skills)
+          rawLines.length = 0
+        }
 
-        currentSkills.push(...skills)
+        // Bullet points are individual skills
+        const skillText = line.replace(/^[-•*]\s*/, '').trim()
+        if (skillText) {
+          currentSkills.push(skillText)
+        }
+      } else {
+        // Accumulate non-bullet, non-category lines
+        rawLines.push(line)
       }
 
       this.currentIndex++
+    }
+
+    // Process any remaining accumulated lines
+    if (rawLines.length > 0) {
+      const joinedLines = this.joinSkillLines(rawLines)
+      const skills = this.parseSkillsByDelimiter(joinedLines)
+      currentSkills.push(...skills)
     }
 
     // Save last group
@@ -2231,6 +2377,149 @@ export class ResumeStructureParser {
           category: currentCategory,
           skills: currentSkills,
         },
+      })
+    }
+
+    return blocks
+  }
+
+  /**
+   * Intelligently join skill lines
+   * Only join a line to previous if it's a continuation:
+   * - Previous line has unbalanced parentheses AND current line starts lowercase/punctuation
+   * - Current line clearly continues previous (lowercase start)
+   */
+  private joinSkillLines(lines: string[]): string {
+    if (lines.length === 0) return ''
+    if (lines.length === 1) return lines[0]
+
+    let result = lines[0]
+
+    for (let i = 1; i < lines.length; i++) {
+      const prevLine = lines[i - 1]
+      const currLine = lines[i]
+
+      // Count parentheses in CURRENT skill only (since last period)
+      // This prevents one malformed skill from polluting subsequent skills
+      const lastPeriodIndex = result.lastIndexOf('.')
+      const currentSkillPart = lastPeriodIndex >= 0 ? result.substring(lastPeriodIndex + 1) : result
+      const openParens = (currentSkillPart.match(/\(/g) || []).length
+      const closeParens = (currentSkillPart.match(/\)/g) || []).length
+      const hasUnbalancedParens = openParens > closeParens
+
+      // Check if current line looks like a continuation
+      const startsLowercase = /^[a-z0-9]/.test(currLine)
+      const startsWithPunctuation = /^[,;)]/.test(currLine)
+      const endsWithPeriod = currLine.endsWith('.')
+      const startsUppercase = /^[A-Z]/.test(currLine)
+
+      // Count parens in current line to see if it closes the open paren
+      const currOpenParens = (currLine.match(/\(/g) || []).length
+      const currCloseParens = (currLine.match(/\)/g) || []).length
+      const closesParenthesis = currCloseParens > currOpenParens
+
+      // Priority logic for joining:
+      // 1. If current closes paren → JOIN (completes parenthetical expression)
+      // 2. If current is complete skill (uppercase + period) → NEW SKILL (even if prev has unbalanced parens)
+      // 3. If starts lowercase/punctuation → JOIN (continuation)
+      // 4. If prev has unbalanced parens → JOIN (continuation)
+      // 5. Otherwise → NEW SKILL
+
+      if (closesParenthesis) {
+        // Priority 1: Closes parenthesis - must be continuation
+        result += ' ' + currLine
+      } else if (startsUppercase && endsWithPeriod && currLine.length > 5) {
+        // Priority 2: Complete new skill (uppercase + period)
+        // This is a NEW skill even if previous has unbalanced parens
+        if (!result.endsWith('.')) {
+          result += '. '
+        } else {
+          result += ' '
+        }
+        result += currLine
+      } else if (startsLowercase || startsWithPunctuation) {
+        // Priority 3: Starts lowercase/punctuation - continuation
+        result += ' ' + currLine
+      } else if (hasUnbalancedParens) {
+        // Priority 4: Previous has unbalanced parens - probably continuation
+        result += ' ' + currLine
+      } else {
+        // Priority 5: Otherwise, it's a new skill
+        if (!result.endsWith('.')) {
+          result += '. '
+        } else {
+          result += ' '
+        }
+        result += currLine
+      }
+    }
+
+    return result
+  }
+
+  /**
+   * Parse skills by delimiter
+   * Skills are period-delimited, but periods are optional
+   * Strategy: Split on periods first, then check each part for completeness
+   */
+  private parseSkillsByDelimiter(text: string): string[] {
+    const skills: string[] = []
+
+    // Split on period - each period indicates end of a skill
+    const periodParts = text.split(/\.(?=\s|$)/) // Split on period followed by space or end
+
+    for (const part of periodParts) {
+      const trimmed = part.trim()
+      if (!trimmed) continue
+
+      // Check if parentheses are balanced - if not, this is incomplete
+      const openParens = (trimmed.match(/\(/g) || []).length
+      const closeParens = (trimmed.match(/\)/g) || []).length
+
+      if (openParens === closeParens) {
+        // Balanced parentheses = complete skill
+        skills.push(trimmed)
+      } else {
+        // Unbalanced - this shouldn't happen after our line-joining logic
+        // But if it does, still add it (better than losing data)
+        console.warn('[Parser] Warning: Unbalanced parentheses in skill:', trimmed.substring(0, 50))
+        skills.push(trimmed)
+      }
+    }
+
+    return skills
+  }
+
+  /**
+   * Parse languages section
+   * Handles formats like "English, IELTS 8.0 / CLB 9" or bullet lists
+   */
+  private parseLanguagesContent(): ContentBlock[] {
+    const blocks: ContentBlock[] = []
+    const textLines: string[] = []
+
+    while (this.currentIndex < this.lines.length) {
+      const currentLine = this.lines[this.currentIndex]
+
+      // Stop at next section heading
+      if (this.isHeading(currentLine)) {
+        break
+      }
+
+      const line = currentLine.trim()
+      if (line) {
+        textLines.push(line)
+      }
+
+      this.currentIndex++
+    }
+
+    // If we have content, create a text block
+    if (textLines.length > 0) {
+      blocks.push({
+        id: uuidv4(),
+        type: 'text',
+        content: textLines.join(' '),
       })
     }
 
@@ -2277,29 +2566,47 @@ export class ResumeStructureParser {
         continue
       }
 
-      // Handle lines without periods (might be multi-line certification names)
-      // Accumulate until we hit a line with period, bullet, or next section
+      // Handle lines without periods
+      // CRITICAL: Only join lines if they're clearly continuations (lowercase start or short fragments)
       let certName = line
       this.currentIndex++
 
-      // Check if next lines continue this certification
+      // Check if next line is a continuation
       while (this.currentIndex < this.lines.length) {
         const nextLine = this.lines[this.currentIndex].trim()
 
+        // Stop conditions
         if (!nextLine || this.isHeading(this.lines[this.currentIndex]) || this.isBullet(nextLine)) {
           break
         }
 
-        // If line ends with period, it's the end of this certification
+        // Only join if next line is clearly a continuation:
+        // 1. Starts with lowercase (continuation word)
+        // 2. Starts with "(" (clarification)
+        // 3. Is a very short fragment (< 20 chars) that looks incomplete
+        // 4. Previous line ends with "Certified" or "pursuing" AND next line is a certification level
+        const prevEndsWithCertified = /\b(Certified|pursuing|Cloud|Certified AWS|Certified Azure)\s*$/i.test(certName)
+        const nextIsCertLevel = /^(Solutions Architect|Cloud Practitioner|Developer|SysOps|Administrator|Associate|Professional|Fundamentals|Foundation|Specialist)/i.test(nextLine)
+
+        const isContinuation =
+          /^[a-z(]/.test(nextLine) ||  // Starts lowercase or with paren
+          (nextLine.length < 20 && !/^(AWS|Azure|CCNA|CCNP|CCDA|MCSA|MCSE|ITIL|Red Hat|Siemon|User|Network)/.test(nextLine)) ||
+          (prevEndsWithCertified && nextIsCertLevel)  // Certification level continuation
+
+        // If it doesn't look like a continuation, treat current as complete and don't join
+        if (!isContinuation) {
+          break
+        }
+
+        // Join the continuation
         if (nextLine.endsWith('.')) {
           certName += ' ' + nextLine.replace(/\.$/, '').trim()
           this.currentIndex++
           break
+        } else {
+          certName += ' ' + nextLine
+          this.currentIndex++
         }
-
-        // Continue accumulating
-        certName += ' ' + nextLine
-        this.currentIndex++
       }
 
       if (certName.trim()) {
@@ -2337,6 +2644,19 @@ export class ResumeStructureParser {
       if (this.isHeading(this.lines[this.currentIndex])) break
 
       const line = this.lines[this.currentIndex].trim()
+
+      // CRITICAL: Stop at bullets (don't capture them)
+      // This prevents orphaned achievement bullets from being captured
+      if (line && this.isBullet(line)) {
+        break
+      }
+
+      // CRITICAL: Stop at "Achievements" heading even if not recognized as section
+      // This prevents orphaned "Achievements" sections from being captured
+      if (line.toLowerCase() === 'achievements' || line.toLowerCase().startsWith('achievement')) {
+        break
+      }
+
       if (line) {
         textLines.push(line)
       }

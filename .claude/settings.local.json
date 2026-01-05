@@ -46,7 +46,11 @@
       "Bash(git revert:*)",
       "Bash(Jan 2020 - Present\" → IS a date line\n❌ \"May Corporation\" → NOT a date line\n❌ \"2020 Technologies\" → NOT a date line\n❌ \"August Solutions\" → NOT a date line\n\nCHANGES:\nLines 1843-1861: Replaced permissive regex with strict date range regex\n- Now requires date range separator (-, –, —)\n- Won''t match company names with months/years\n- Won''t match random text with \"Present\" in it\n\nThis fix enables dates on separate lines WITHOUT breaking parsing\nfor companies with month/year names!\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n)\")",
       "Bash(Dates\"\n- Date on separate line: Title/company on one line, dates on next\n- Date on separate line with blank: Blank line between title and dates\n- All caps dates: \"JANUARY 2005 — MAY 2008\"\n- Mixed case dates: \"Jan 2024 - Present\"\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n)\")",
-      "Bash(powershell -Command:*)"
+      "Bash(powershell -Command:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm outdated:*)",
+      "Bash(echo:*)",
+      "Bash(git rm:*)"
     ],
     "deny": [],
     "ask": []

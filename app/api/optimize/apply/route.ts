@@ -257,10 +257,10 @@ function convertStructuredToText(structured: StructuredResume): string {
           break
 
         case 'certification_item':
-          // CRITICAL FIX: Handle certification items
+          // CRITICAL FIX: Handle certification items with bullet formatting
           const cert = block.content as any
           if (cert.name) {
-            lines.push(cert.name)
+            lines.push(`• ${cert.name}`)
           }
           break
       }

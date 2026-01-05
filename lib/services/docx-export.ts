@@ -343,9 +343,10 @@ function convertStructuredToFormattedText(structured: StructuredResume): string 
 
         case 'certification_item':
           // CRITICAL FIX: Handle certification items in export
+          // Export with bullet formatting to match original format
           const cert = block.content as any
           if (cert.name) {
-            lines.push(cert.name)
+            lines.push(`• ${cert.name}`)
           }
           break
       }
