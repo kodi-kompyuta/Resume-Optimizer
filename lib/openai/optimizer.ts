@@ -164,6 +164,9 @@ function structuredResumeToPlainText(resume: StructuredResume): string {
         const skills = block.content as any
         if (skills.category) lines.push(`${skills.category}:`)
         lines.push(skills.skills.join(', '))
+      } else if (block.type === 'certification_item') {
+        const cert = block.content as any
+        if (cert.name) lines.push(`• ${cert.name}`)
       }
     }
     lines.push('')
@@ -515,25 +518,34 @@ function jsonToStructuredResume(json: any, originalResume: StructuredResume): St
   }
 
   // Certifications section
-  // CRITICAL FIX: Use certification_item type (not bullet_list) to match parser output
+  // CRITICAL FIX: Preserve certifications from original resume if AI doesn't return them
+  const originalCertSection = originalResume.sections.find(s => s.type === 'certifications')
+
   if (json.certifications && json.certifications.length > 0) {
     sections.push({
       id: uuidv4(),
       type: 'certifications',
-      heading: 'Certifications',
+      heading: originalCertSection?.heading || 'Certifications',
       order: order++,
-      content: json.certifications.map((cert: string) => ({
+      content: json.certifications.map((cert: string | any) => ({
         id: uuidv4(),
         type: 'certification_item',
         content: {
           id: uuidv4(),
-          name: cert,
-          issuer: undefined,
-          date: undefined,
-          expiryDate: undefined,
-          credentialId: undefined,
+          name: typeof cert === 'string' ? cert : cert.name || cert,
+          issuer: typeof cert === 'object' ? cert.issuer : undefined,
+          date: typeof cert === 'object' ? cert.date : undefined,
+          expiryDate: typeof cert === 'object' ? cert.expiryDate : undefined,
+          credentialId: typeof cert === 'object' ? cert.credentialId : undefined,
         }
       }))
+    })
+  } else if (originalCertSection && originalCertSection.content.length > 0) {
+    // Preserve original certifications if AI didn't return them
+    console.log('[Optimizer] Preserving original certifications (AI did not return them)')
+    sections.push({
+      ...originalCertSection,
+      order: order++
     })
   }
 
