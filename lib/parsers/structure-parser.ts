@@ -466,7 +466,8 @@ export class ResumeStructureParser {
         if (!line) continue
 
         // Stop if we hit another major section heading
-        if (this.isHeading(line) && i > contactSectionIndex + 5) break
+        // CRITICAL FIX: Don't skip early section headings - stop as soon as we hit any heading
+        if (this.isHeading(line)) break
 
         // Extract contact details
         this.extractContactFromLine(line, contactInfo)
@@ -540,7 +541,8 @@ export class ResumeStructureParser {
     })
 
     // Move index past contact section
-    this.currentIndex = Math.max(lastContactLine + 1, contactSectionIndex >= 0 ? contactSectionIndex + 10 : 0)
+    // CRITICAL FIX: Don't blindly skip 10 lines - use actual last contact line to avoid skipping sections like PROFESSIONAL SUMMARY
+    this.currentIndex = lastContactLine + 1
 
     return {
       id: uuidv4(),
@@ -643,6 +645,10 @@ export class ResumeStructureParser {
     // CRITICAL: Any line with bullet formatting is NEVER a heading
     // This includes bullets at the start OR number-based bullets
     if (this.isBullet(trimmed) || /^[-•*\d]/.test(trimmed)) return false
+
+    // CRITICAL FIX: Exclude parenthesized abbreviations like "(DLI)", "(AWS)", etc.
+    // These are not section headings, they're just notes/abbreviations for previous items
+    if (/^\([A-Z]+\)$/i.test(trimmed)) return false
 
     // CRITICAL FIX: Only treat as heading if it's a KNOWN section name
     // This prevents all-caps job titles like "SENIOR PROJECT MANAGER" from being treated as headings
