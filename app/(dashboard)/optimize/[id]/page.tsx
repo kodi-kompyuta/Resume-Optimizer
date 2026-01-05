@@ -32,7 +32,6 @@ export default function OptimizePage() {
     fixGrammar: true,
     enhanceSections: true,
     preserveLength: false,
-    aggressiveness: 'moderate',
   })
 
   // Track which changes are accepted
@@ -231,27 +230,6 @@ export default function OptimizePage() {
                 />
                 <span className="text-gray-700">Preserve similar length</span>
               </label>
-
-              <div className="pt-4">
-                <label className="block text-gray-700 mb-2">Aggressiveness</label>
-                <select
-                  value={options.aggressiveness}
-                  onChange={e =>
-                    setOptions({
-                      ...options,
-                      aggressiveness: e.target.value as
-                        | 'conservative'
-                        | 'moderate'
-                        | 'aggressive',
-                    })
-                  }
-                  className="w-full p-2 border rounded"
-                >
-                  <option value="conservative">Conservative (minimal changes)</option>
-                  <option value="moderate">Moderate (balanced approach)</option>
-                  <option value="aggressive">Aggressive (significant rewrite)</option>
-                </select>
-              </div>
             </div>
 
             {error && (

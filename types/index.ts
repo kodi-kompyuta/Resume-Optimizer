@@ -385,7 +385,6 @@ export interface OptimizationOptions {
   targetRole?: string
   targetIndustry?: string
   preserveLength?: boolean // Try to keep similar length
-  aggressiveness?: 'conservative' | 'moderate' | 'aggressive' // How much to change
   optimizationContext?: OptimizationContext // NEW: Strategic context from matcher
   enable_comprehensive_rewrite?: boolean // NEW: Allow major rewrites vs minor tweaks
 }

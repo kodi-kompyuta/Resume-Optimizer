@@ -449,64 +449,85 @@ export class ResumeStructureParser {
     const contentBlocks: ContentBlock[] = []
     let foundContact = false
     let name: string | undefined
-
-    // Look at first 10 lines for contact info
-    const maxLines = Math.min(10, this.lines.length)
     let lastContactLine = -1
+
+    // Strategy 1: Look for explicit "CONTACT" section (handles sidebar layouts)
+    const contactSectionIndex = this.lines.findIndex(line =>
+      /^(CONTACT|CONTACT\s+INFO(RMATION)?|PERSONAL\s+INFO(RMATION)?)$/i.test(line.trim())
+    )
+
+    if (contactSectionIndex >= 0) {
+      // Extract contact info from the section after the CONTACT heading
+      // Search up to 30 lines after the heading or until we hit another section
+      const searchEnd = Math.min(contactSectionIndex + 30, this.lines.length)
+
+      for (let i = contactSectionIndex + 1; i < searchEnd; i++) {
+        const line = this.lines[i].trim()
+        if (!line) continue
+
+        // Stop if we hit another major section heading
+        if (this.isHeading(line) && i > contactSectionIndex + 5) break
+
+        // Extract contact details
+        this.extractContactFromLine(line, contactInfo)
+
+        if (Object.keys(contactInfo).length > 0) {
+          foundContact = true
+          lastContactLine = Math.max(lastContactLine, i)
+        }
+      }
+    }
+
+    // Strategy 2: Check first 20 lines for contact info (traditional format)
+    const maxLines = Math.min(20, this.lines.length)
 
     for (let i = 0; i < maxLines; i++) {
       const line = this.lines[i].trim()
       if (!line) continue
 
-      // Name is usually the first non-empty line, often in all caps or title case
+      // Name is usually the first non-empty line
       // Skip section headings like "CONTACT INFORMATION"
       if (!name && line.length < 50 && !this.isEmail(line) && !this.isPhone(line) && !this.isHeading(line)) {
         name = line
-        contactInfo.name = line
-        foundContact = true
-        lastContactLine = i
+        if (!contactInfo.name) {
+          contactInfo.name = line
+          foundContact = true
+          lastContactLine = Math.max(lastContactLine, i)
+        }
         continue
       }
 
-      // Email
-      const emailMatch = line.match(/\b[\w.+-]+@[\w.-]+\.\w{2,}\b/i)
-      if (emailMatch) {
-        contactInfo.email = emailMatch[0]
-        foundContact = true
-        lastContactLine = i
-      }
+      // Extract other contact details
+      const hadContact = Object.keys(contactInfo).length
+      this.extractContactFromLine(line, contactInfo)
 
-      // Phone - flexible pattern for worldwide phone numbers (any format)
-      // Matches: +254723727791, +44 20 7946 0958, (555) 123-4567, etc.
-      const phoneMatch = line.match(/(\+\d{1,4}[\s.-]?)?(\(?\d{1,4}\)?[\s.-]?){2,5}\d{1,4}/)
-      if (phoneMatch && phoneMatch[0].replace(/\D/g, '').length >= 7) {
-        // Ensure it has at least 7 digits (minimum valid phone number)
-        contactInfo.phone = phoneMatch[0]
+      if (Object.keys(contactInfo).length > hadContact) {
         foundContact = true
-        lastContactLine = i
+        lastContactLine = Math.max(lastContactLine, i)
       }
+    }
 
-      // LinkedIn
-      if (line.toLowerCase().includes('linkedin.com/')) {
-        const match = line.match(/linkedin\.com\/in\/[\w-]+/)
-        contactInfo.linkedin = match ? match[0] : line
-        foundContact = true
-        lastContactLine = i
-      }
+    // Strategy 3: If still missing key info (phone/email), search first 100 lines
+    // This handles sidebar layouts where contact info appears later in the document
+    if (!contactInfo.phone || !contactInfo.email) {
+      const extendedSearchLines = Math.min(100, this.lines.length)
 
-      // GitHub
-      if (line.toLowerCase().includes('github.com/')) {
-        const match = line.match(/github\.com\/[\w-]+/)
-        contactInfo.github = match ? match[0] : line
-        foundContact = true
-        lastContactLine = i
-      }
+      for (let i = 0; i < extendedSearchLines; i++) {
+        const line = this.lines[i].trim()
+        if (!line) continue
 
-      // Location (city, state/country format)
-      if (line.match(/^[\w\s]+,\s*[\w\s]{2,}$/)) {
-        contactInfo.location = line
-        foundContact = true
-        lastContactLine = i
+        // Skip if this line is part of a major section (avoid picking up phone numbers from content)
+        const prevLine = i > 0 ? this.lines[i - 1].trim() : ''
+        if (prevLine.match(/^(SKILLS|EDUCATION|EXPERIENCE|WORK\s+EXPERIENCE|CERTIFICATIONS|PROJECTS)/i)) {
+          continue
+        }
+
+        this.extractContactFromLine(line, contactInfo)
+
+        if (contactInfo.phone && contactInfo.email) {
+          // Found both, can stop searching
+          break
+        }
       }
     }
 
@@ -519,7 +540,7 @@ export class ResumeStructureParser {
     })
 
     // Move index past contact section
-    this.currentIndex = lastContactLine + 1
+    this.currentIndex = Math.max(lastContactLine + 1, contactSectionIndex >= 0 ? contactSectionIndex + 10 : 0)
 
     return {
       id: uuidv4(),
@@ -527,6 +548,44 @@ export class ResumeStructureParser {
       heading: 'Contact Information',
       order: 0,
       content: contentBlocks,
+    }
+  }
+
+  /**
+   * Helper to extract contact details from a single line
+   */
+  private extractContactFromLine(line: string, contactInfo: ContactInfo): void {
+    // Email
+    if (!contactInfo.email) {
+      const emailMatch = line.match(/\b[\w.+-]+@[\w.-]+\.\w{2,}\b/i)
+      if (emailMatch) {
+        contactInfo.email = emailMatch[0]
+      }
+    }
+
+    // Phone - flexible pattern for worldwide phone numbers
+    if (!contactInfo.phone) {
+      const phoneMatch = line.match(/(\+\d{1,4}[\s.-]?)?(\(?\d{1,4}\)?[\s.-]?){2,5}\d{1,4}/)
+      if (phoneMatch && phoneMatch[0].replace(/\D/g, '').length >= 7) {
+        contactInfo.phone = phoneMatch[0]
+      }
+    }
+
+    // LinkedIn
+    if (!contactInfo.linkedin && line.toLowerCase().includes('linkedin.com/')) {
+      const match = line.match(/linkedin\.com\/in\/[\w-]+/)
+      contactInfo.linkedin = match ? match[0] : line
+    }
+
+    // GitHub
+    if (!contactInfo.github && line.toLowerCase().includes('github.com/')) {
+      const match = line.match(/github\.com\/[\w-]+/)
+      contactInfo.github = match ? match[0] : line
+    }
+
+    // Location (city, state/country format)
+    if (!contactInfo.location && line.match(/^[\w\s]+,\s*[\w\s]{2,}$/)) {
+      contactInfo.location = line
     }
   }
 

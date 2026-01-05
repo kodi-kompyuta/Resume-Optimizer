@@ -201,7 +201,7 @@ async function optimizeResumeStrategically(
 
   console.log(`[Optimizer] High-value keywords (first 5): ${highValueKeywords.slice(0, 5).join(', ')}`)
 
-  // Determine optimization aggressiveness based on current score
+  // Determine optimization strategy based on current score
   const currentScore = optimizationContext.current_score
   const targetScore = optimizationContext.target_score || (currentScore + 10)
   const scoreGap = targetScore - currentScore
@@ -667,12 +667,6 @@ export async function optimizeResume(
     console.log(`[Optimizer] Target Score: 90%+`)
     console.log(`[Optimizer] Keywords: ${options.optimizationContext!.high_value_keywords?.length || 0}`)
     console.log(`[Optimizer] Gaps: ${options.optimizationContext!.prioritized_gaps?.length || 0}`)
-
-    // Force aggressive mode for single-pass comprehensive optimization
-    options = {
-      ...options,
-      aggressiveness: 'aggressive'
-    }
   } else {
     console.log('[Optimizer] Using section-by-section optimization (no match context)')
   }
@@ -1374,8 +1368,8 @@ Respond with JSON only:
 }`
 
   try {
-    // Use maximum creativity when we have match context for comprehensive single-pass optimization
-    const temperature = hasMatchContext ? 1.0 : (options.aggressiveness === 'conservative' ? 0.8 : 1.0)
+    // Use maximum creativity for comprehensive optimization
+    const temperature = 1.0
     const maxTokens = hasMatchContext ? 4096 : 3000 // More tokens for comprehensive rewrites
 
     if (hasMatchContext) {
@@ -1483,8 +1477,6 @@ Guidelines:
 - Incorporate job-relevant keywords ONLY if natural
 - Don't add unnecessary words just for style
 ${options.preserveLength ? '- Keep similar or shorter length' : ''}
-${options.aggressiveness === 'conservative' ? '- Make MINIMAL changes, focus on grammar and keyword preservation' : ''}
-${options.aggressiveness === 'aggressive' ? '- Can rewrite but MUST preserve keywords and maintain clarity' : ''}
 
 Respond with JSON only:
 {
@@ -1508,7 +1500,7 @@ Respond with JSON only:
           content: prompt,
         },
       ],
-      temperature: options.aggressiveness === 'conservative' ? 0.8 : 1.0,
+      temperature: 1.0,
       max_tokens: 1000,
       response_format: { type: 'json_object' },
     })
